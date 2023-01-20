@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Pixel";
+    src: url("./Pixel1.ttf");
+  }
+
+  @font-face {
+    font-family: "Impact";
+    src: url("./Impact.ttf");
+  }
+
+  img {
+    @apply inline-block;
+  }
+}
+
+@layer base {
+  
+  .font-outline-1 {
+    -webkit-text-stroke: 2px black;
+  }
+  .font-outline-2 {
+    -webkit-text-stroke: 3px black;
+  }
+  .font-outline-4 {
+    -webkit-text-stroke: 4px black;
+  }
+}
