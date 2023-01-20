@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^0.1.40",
+    "@civic/solana-gateway-react": "^0.10.0",
     "@getpip/react-pip-button": "^1.0.12",
     "@heroicons/react": "^1.0.5",
     "@metaplex-foundation/js": "^0.17.1",
