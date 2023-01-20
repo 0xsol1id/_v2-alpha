@@ -11,13 +11,14 @@ import confetti from "canvas-confetti";
 import * as anchor from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { GatewayProvider } from '@civic/solana-gateway-react';
 import Countdown from "react-countdown";
 import { Snackbar, Paper, LinearProgress, Chip } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import { toDate, AlertState, getAtaForMint } from './utils';
 import { MintButton } from './MintButton';
 import { MultiMintButton } from './MultiMintButton';
-import {
+import { 
   CandyMachine,
   awaitTransactionSignatureConfirmation,
   getCandyMachineState,
@@ -253,7 +254,7 @@ export const MintView: FC<HomeProps> = (props) => {
         Hours</Card><Card elevation={1}><h1>{minutes}</h1>Mins</Card><Card elevation={1}>
           <h1>{seconds}</h1>Secs</Card></div>
     );
-  };
+  };  
 
   function displaySuccess(mintPublicKey: any, qty: number = 1): void {
     let remaining = itemsRemaining - qty;
@@ -285,7 +286,7 @@ export const MintView: FC<HomeProps> = (props) => {
   }
 
   async function mintMany(quantityString: number) {
-
+    
     console.log("STATUS2:")
     if (wallet && candyMachine?.program && wallet.publicKey) {
       const quantity = Number(quantityString);
@@ -379,7 +380,7 @@ export const MintView: FC<HomeProps> = (props) => {
   }
 
   async function mintOne() {
-
+    
     console.log("STATUS1:")
     if (wallet && candyMachine?.program && wallet.publicKey) {
       const mint = anchor.web3.Keypair.generate();
@@ -428,7 +429,7 @@ export const MintView: FC<HomeProps> = (props) => {
         await mintMany(quantityString);
       }
     } catch (error: any) {
-
+      
       console.log("STATUS:" + error)
       let message = error.msg || 'Minting failed! Please try again!';
       if (!error.msg) {
@@ -478,7 +479,7 @@ export const MintView: FC<HomeProps> = (props) => {
   return (
     <div className="mx-auto">
       <div className="">
-        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
+      <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
           <div>
             <MainMenu />
             <p className="card p-2 text-sm font-bold rounded-lg bg-base-300"><img src="./fudility.png" /> <p>V1.0_beta</p></p>
@@ -497,7 +498,48 @@ export const MintView: FC<HomeProps> = (props) => {
               <MintContainer>
                 <DesContainer>
                   <div><Image src="mint_banner1.png" alt="NFT To Mint" /></div>
-                  
+                  {!isActive && !isEnded && candyMachine?.state.goLiveDate && (!isWLOnly || whitelistTokenBalance > 0) ? (
+                    <Countdown
+                      date={toDate(candyMachine?.state.goLiveDate)}
+                      onMount={({ completed }) => completed && setIsActive(!isEnded)}
+                      onComplete={() => {
+                        setIsActive(!isEnded);
+                      }}
+                      renderer={renderGoLiveDateCounter}
+                    />) : (
+                    !wallet ? (
+                      <WalletMultiButton />
+                    ) : (!isWLOnly || whitelistTokenBalance > 0) ?
+                      candyMachine?.state.gatekeeper &&
+                        wallet.publicKey &&
+                        wallet.signTransaction ? (
+                        <GatewayProvider
+                          wallet={{
+                            publicKey:
+                              wallet.publicKey ||
+                              new PublicKey(CANDY_MACHINE_PROGRAM),
+                            //@ts-ignore
+                            signTransaction: wallet.signTransaction,
+                          }}
+                          // // Replace with following when added
+                          // gatekeeperNetwork={candyMachine.state.gatekeeper_network}
+                          gatekeeperNetwork={
+                            candyMachine?.state?.gatekeeper?.gatekeeperNetwork
+                          } // This is the ignite (captcha) network
+                          /// Don't need this for mainnet
+                          clusterUrl={rpcUrl}
+                          options={{ autoShowModal: false }}
+                        >
+                          <MintButton
+                            candyMachine={candyMachine}
+                            isMinting={isMinting}
+                            isActive={isActive}
+                            isEnded={isEnded}
+                            isSoldOut={isSoldOut}
+                            onMint={startMint}
+                          />
+                        </GatewayProvider>
+                      ) : (
                         <div className="p-5 rounded-box bg-secondary">
 
                           {wallet && isActive &&
@@ -517,6 +559,9 @@ export const MintView: FC<HomeProps> = (props) => {
                             price={whitelistEnabled && (whitelistTokenBalance > 0) ? whitelistPrice : price}
                           />
                         </div>
+                      ) :
+                      <h1>Mint is private.</h1>
+                  )}
                   <br />
                   {wallet && isActive && solanaExplorerLink &&
                     <SolExplorerLink href={solanaExplorerLink} target="_blank">View on Solscan</SolExplorerLink>}
