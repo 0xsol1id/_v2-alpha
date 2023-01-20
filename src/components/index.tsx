@@ -6,4 +6,3 @@ export { MagicEdenLogo } from "./MagicEdenLogo";
 export { GithubLogo } from "./GithubLogo";
 export { SelectAndConnectWalletButton } from "./SelectAndConnectWalletButton";
 export { ConnectWallet }from "./ConnectWallet";
-export { PIPButtonCustom }from "./PIPButtonCustom";

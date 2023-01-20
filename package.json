@@ -1,17 +1,15 @@
 {
   "name": "fudility",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4269",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4269",
     "lint": "next lint"
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^0.1.40",
     "@civic/solana-gateway-react": "^0.10.0",
-    "@getpip/react-pip-button": "^1.0.12",
     "@heroicons/react": "^1.0.5",
     "@metaplex-foundation/js": "^0.17.1",
     "@metaplex-foundation/js-next": "^0.10.0",

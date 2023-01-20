@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { FC } from "react";
-import { DiscordLogo, TwitterLogo, GithubLogo, PIPButtonCustom } from "components"
+import { DiscordLogo, TwitterLogo, GithubLogo } from "components"
 
 
 export const MainMenu: FC = ({ }) => {
@@ -18,7 +18,7 @@ export const MainMenu: FC = ({ }) => {
                     </li>
                     <li>
                         <a>
-                            <Link href="/meme"><img src="./button/mememaker.png" /></Link>
+                            <Link href="/memepro"><img src="./button/mememaker.png" /></Link>
                         </a>
                     </li>
                     <li>
@@ -60,7 +60,6 @@ export const MainMenu: FC = ({ }) => {
                 </ul>
             </div>
 
-            <PIPButtonCustom />
             <button className="btn bg-green-500 mx-1">
                 <Link href="/mint">
                     <img src="./button/mint_gen2.png" />
