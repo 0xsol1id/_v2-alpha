@@ -627,8 +627,15 @@ export const MemeProView: FC = ({ }) => {
     return img;
   };
 
-  const saveImg = async () => {
-    const canvas = await html2canvas(document.getElementById('canvas')!);
+  const saveImgMobile = async () => {
+    const canvas = await html2canvas(document.getElementById('canvasMobile')!);
+    const img = canvas.toDataURL('image/png');
+
+    downloadjs(img, 'download.png', 'image/png');
+  };
+
+  const saveImgDesktop = async () => {
+    const canvas = await html2canvas(document.getElementById('canvasDesktop')!);
     const img = canvas.toDataURL('image/png');
 
     downloadjs(img, 'download.png', 'image/png');
@@ -720,7 +727,7 @@ export const MemeProView: FC = ({ }) => {
         <div className="">
           {/* MEME CANVAS - START */}
           <div className="flex justify-center mt-4">
-            <div className="lg:w-[500px] lg:h-[500px] w-[400px] h-[400px] container" id="canvas">
+            <div className="lg:w-[500px] lg:h-[500px] w-[400px] h-[400px] container" id="canvasMobile">
               <div className="relative">
                 {theme == 1 &&
                   <div>
@@ -921,7 +928,7 @@ export const MemeProView: FC = ({ }) => {
         </div>
         <div className="mt-4 flex justify-center p-2">
           <button className="font-pixel btn mr-2 btn-primary"
-            onClick={saveImg}>Download Image
+            onClick={saveImgMobile}>Download Image
           </button>
 
           {sending == false &&
@@ -1208,14 +1215,14 @@ export const MemeProView: FC = ({ }) => {
                   </div>}
 
                 <button className="font-pixel btn btn-primary btn-sm mt-8"
-                  onClick={saveImg}>Download Image
+                  onClick={saveImgDesktop}>Download Image
                 </button>
               </div>
             </div>
           </div>
           {/* MEME CANVAS - START */}
           <div className="flex flex-col justify-center items-center col-span-3">
-            <div className={`w-[800px] h-[800px] container text-center`} id="canvas">
+            <div className={`w-[800px] h-[800px] container text-center`} id="canvasDesktop">
               <div className="relative">
                 {theme == 1 &&
                   <div>
