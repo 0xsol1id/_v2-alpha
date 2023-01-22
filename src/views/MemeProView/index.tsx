@@ -948,7 +948,7 @@ export const MemeProView: FC = ({ }) => {
         </div>
       </div>
       {/*DESKTOP VIEW---------------------------------------------- */}
-      <div className="">
+      <div className="hidden lg:flex">
         <div className='grid grid-cols-4'>
           {/*TOOLBAR MEMEMAKER*/}
           <div className="grid grid-rows-8 gap-4 bg-gray-900">
@@ -1215,7 +1215,7 @@ export const MemeProView: FC = ({ }) => {
           </div>
           {/* MEME CANVAS - START */}
           <div className="flex flex-col justify-center items-center col-span-3">
-            <div className={`w-[900px] h-[900px] container text-center`} id="canvas">
+            <div className={`w-[800px] h-[800px] container text-center`} id="canvas">
               <div className="relative">
                 {theme == 1 &&
                   <div>
