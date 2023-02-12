@@ -14,7 +14,7 @@ export const TokenName = (props: { mint: string }) => {
     async function isNFT() {
       try {
         const mintPublickey = new PublicKey(props.mint);
-        const connection = new Connection("https://solana-mainnet.g.alchemy.com/v2/p5DCRRBHKVxuF7b6CfaS0YDyXaialE_Z");
+        const connection = new Connection("https://compatible-smart-general.solana-mainnet.discover.quiknode.pro/9b4affb03539b7a422f5c636723e162c7a1b3afe/");
         // create an entry point to Metaplex SDK
         const metaplex = new Metaplex(connection);
         // get the nft object with the mint publickey address

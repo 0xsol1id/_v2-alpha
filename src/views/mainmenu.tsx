@@ -10,10 +10,9 @@ export const MainMenu: FC = ({ }) => {
             <div className="dropdown">
                 <div tabIndex={0} className="btn mr-1 btn-primary text-xl"><img className="w-6" src="./heads/8.png" alt="cs" /></div>
                 <ul tabIndex={0} className="mt-1 text-md shadow menu dropdown-content bg-base-300 rounded border border-gray-500 w-[19rem]">
-                    <p className="card p-2 text-sm rounded-lg bg-base-300 flex justify-between"><img className="w-16 text-center" src="./fudility.png" /> <p className="font-pixel">V0.2.2_alpha</p></p>
                     <li>
                         <a>
-                            <Link href="/gallery"><img src="./button/walletstalker.png" /></Link>
+                            <Link href="/gallery?wallet="><img src="./button/walletstalker.png" /></Link>
                         </a>
                     </li>
                     <li>

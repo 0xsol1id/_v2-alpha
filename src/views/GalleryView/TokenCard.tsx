@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { SelectBurnButton } from '../../utils/SelectBurnButton';
@@ -25,7 +25,7 @@ export const TokenCard: FC<Props> = ({
   return (
     <div className="grid grid-cols-3 rounded-lg bg-gray-900 justify-between mb-1 p-1 text-center align-middle">
         <h2 className="card-title text-sm text-center">
-          {uri}
+        {mint}
         </h2>
         <h2 className="card-title text-sm text-left">{name}</h2>
       <div className="sm:flex justify-center">

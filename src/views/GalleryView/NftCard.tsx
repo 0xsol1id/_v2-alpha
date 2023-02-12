@@ -92,25 +92,7 @@ export const NftCard: FC<Props> = ({
       revalidateOnReconnect: false,
     }
   );
-
-  async function GrabData(uri: string) {
-    try {
-      const { data } = await axios.get(uri)
-      return data
-    } catch (error) {
-      console.log("error fetching metadata: ", error)
-    }
-  }
-  {/*const [image, setImage] =
-    useState<string>("");
-  GrabData(uri).then(data => {
-    try {
-      setImage(data.image)
-    } catch (error) {
-      console.log("error fetching metadata: ", error)
-    }
-  })
-*/}
+  
   useEffect(() => {
     if (!error && !!data) {
       onTokenDetailsFetched(data);
@@ -558,15 +540,15 @@ export const NftCard: FC<Props> = ({
   }
 
   return (
-    <div className="rounded bg-gray-900 border-2 border-gray-700">
-      <figure className="animation-pulse-color">
+    <div className="rounded bg-gray-900 p-1 border-2 border-gray-700 text-center">
+      <figure className="animation-pulse-color mb-1">
         {!fallbackImage && !error ? (
           <div>
-            <button onClick={toggleModal} className="btn btn-ghost hover:bg-primary h-auto p-1">
+            <button onClick={toggleModal} className="btn btn-ghost h-44 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
               <img
                 src={image}
                 onError={onImageError}
-                className="bg-gray-800 object-cover rounded"
+                className="bg-gray-800 object-cover rounded h-40"
               />
             </button>
           </div>
@@ -574,32 +556,30 @@ export const NftCard: FC<Props> = ({
           // Fallback when preview isn't available. This could be broken image, video, or audio
           <div>
             <div className="w-auto flex items-center justify-center">
-              <button onClick={toggleModal} className="btn btn-ghost hover:bg-primary h-44 p-0">
+              <button onClick={toggleModal} className="btn btn-ghost h-44 w-40 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
                 <img
                   src={image}
                   onError={onImageError}
-                  className="object-cover rounded"
+                  className="object-cover rounded text-center"
                 />
-                <EyeOffIcon className="h-28 w-28 text-white" />
+                <EyeOffIcon className="h-38 w-38 text-white" />
               </button>
             </div>
           </div>
         )}
       </figure>
-      <h2 className="font-pixel text-sm text-center">{name}</h2>
-      <div className="">
+      <h2 className="font-pixel text-xs text-center h-10">{name}</h2>
+      <div className="mb-2">
         <div className="flex justify-center">
           <LegitOrScam firstCreator={firstCreator} />
-          <a target="_blank" className="btn btn-ghost btn-xs" href={"https://solscan.io/token/" + tokenMintAddress}><img className="w-5 h-5" src="./solscan_logo.png" /></a>
-        </div>
-        <div className="flex justify-center">
+          <a target="_blank" className="btn btn-ghost btn-xs tooltip tooltip-top font-pixel" data-tip="Show on SolScan" href={"https://solscan.io/token/" + tokenMintAddress}><img className="w-5 h-5" src="./solscan_logo.png" /></a>
+
           <SelectBurnButton isConnectedWallet={isConnectedWallet} tokenMintAddress={tokenMintAddress} connection={connection} publicKey={publicKey} toBurn={toBurn} />
           {/*<SelectSendButton tokenMintAddress={tokenMintAddress} connection={connection} publicKey={publicKey} toSend={toSend} />*/}
           {publicKey &&
-            <button onClick={toggleUpdateMetadataModal} className="btn btn-ghost btn-xs tooltip tooltip-up" data-tip="Update NFT">📝</button>
+            <button onClick={toggleUpdateMetadataModal} className="btn btn-ghost btn-xs tooltip tooltip-top font-pixel" data-tip="Update NFT">📝</button>
           }
         </div>
-
       </div>
       <Modal
         isOpen={isOpen}
@@ -750,16 +730,15 @@ export const NftCard: FC<Props> = ({
           </h1>
           <button className="font-pixel text-white btn btn-xs btn-primary" onClick={toggleUpdateMetadataModal}>X</button>
         </div>
-
         <div className="w-full text-center">
+          {/* 
           {NFTName != '' &&
             <div className="flex">
               <button className="text-white font-pixel text-xl w-[6rem] h-[2rem] mt-2 mb-2 btn btn-primary"
                 onClick={reset} >Back</button>
             </div>
           }
-
-
+          */}
           {NFTName == '' &&
             <div>
               <button className="text-white font-pixel text-xl btn btn-primary h-[35px] uppercase" onClick={fetchMetadata}>Check for Authority</button>
@@ -768,11 +747,9 @@ export const NftCard: FC<Props> = ({
           <div className='flex'>
             {NFTName != '' &&
               <div className="mx-auto">
-
                 {isUpdateAuthority ? <div className="text-white font-pixel text-3xl mb-5" >You want to update</div> :
                   <div className="text-white font-pixel text-3xl mb-5" >You are not the update authority for this NFT</div>
                 }
-
                 <div className="flex justify-center" >
                   <figure>
                     <img className="w-[250px] h-[250px]" src={NFTImage}></img>
@@ -785,9 +762,7 @@ export const NftCard: FC<Props> = ({
                 </div>
               </div>
             }
-
             {isUpdateAuthority == true &&
-
               <div className="mx-auto">
                 <div className="mx-auto font-pixel text-3xl">Fill in the inputs you want to update</div>
                 <div className="flex flex-col m-auto">
@@ -839,7 +814,6 @@ export const NftCard: FC<Props> = ({
                       </select>
                     </div>
                   </div>
-
                   <div className="md:w-[550px] flex items-center">
                     <div className="mr-2 flex justify-between">
                       <label className="underline flex font-pixel">Animation URI</label>
@@ -858,21 +832,16 @@ export const NftCard: FC<Props> = ({
                         <option className="font-pixel text-lg" value="gltf">gltf</option>
                       </select>
                     </div>
-
                   </div>
                   <div className='flex justify-between'>
-
                     <label className="underline flex font-pixel">External URL</label>
                     <input className="font-pixel my-[1%] md:w-[480px] text-left text-black pl-1 border-2 border-black"
                       type="text"
                       placeholder="URL pointing to an external URL defining the asset"
                       onChange={(e) => setNewExternalURL(e.target.value)}
                     /></div>
-
-
                   <div className="">
                     <div className="mt-5 underline flex font-pixel text-2xl">Attributes</div>
-
                     <div className=' overflow-auto h-40 border'>
                       {attributesList.map((x, i) => {
                         return (
@@ -900,10 +869,9 @@ export const NftCard: FC<Props> = ({
                             <button className="btn btn-secondary btn-sm font-pixel bg-[#414e63] hover:bg-[#2C3B52]" onClick={() => handleRemoveClick(i)}>x</button>
                           </div>
                         );
-                      })}</div>
-
+                      })}
+                    </div>
                   </div>
-
                   <button className="mt-3 text-white font-pixel text-xl bg-[#414e63] hover:bg-[#2C3B52] w-[200px] h-[40px] rounded-full shadow-xl border uppercase" onClick={handleAddClick}>Add attributes</button>
                   {!isUpdating ?
                     <button className="mt-[30px] mx-auto text-white font-pixel text-xl w-[160px] h-[35px] btn btn-primary uppercase" onClick={update} >update</button>
@@ -917,13 +885,8 @@ export const NftCard: FC<Props> = ({
             }
           </div>
           {success && <div className="font-pixel mt-[1%]">✅ Metadata successfuly updated!</div>}
-
-
           {errorUpdate != '' && <div className="font-pixel mt-[1%]">❌ Ohoh.. An error occurs: {errorUpdate}</div>}
-
         </div>
-
-
       </Modal>
     </div>
   );

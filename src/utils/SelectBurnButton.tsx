@@ -61,16 +61,16 @@ export const SelectBurnButton: FC<Props> = ({
     return (
         <div>
             {publicKey && isConnectedWallet &&
-                <div>
+                <div className=''>
                     {!isSelected && accountExist == true &&
-                        <button className="btn btn-sm bg-[#55268e] hover:bg-[#3d1b66] uppercase mb-2 sm:mb-4 sm:mr-1" onClick={() => { setIsSelected(true); toBurn.push(tokenMintAddress) }}>🔥</button>
+                        <button className="btn btn-xs btn-ghost tooltip tooltip-top font-pixel" data-tip="Select to burn" onClick={() => { setIsSelected(true); toBurn.push(tokenMintAddress) }}>🔥</button>
                     }
                     {isSelected && accountExist == true &&
-                        <button className="btn btn-sm bg-[#3d1b66] hover:bg-[#55268e] uppercase mb-2 sm:mb-4 sm:mr-1" onClick={() => { setIsSelected(false); toBurn.splice(toBurn.indexOf(tokenMintAddress), 1) }}>❌</button>
+                        <button className="btn btn-xs btn-ghost tooltip tooltip-top font-pixel" data-tip="Deselect from burn" onClick={() => { setIsSelected(false); toBurn.splice(toBurn.indexOf(tokenMintAddress), 1) }}>♨️</button>
                     }
 
                     {accountExist == false &&
-                        <button className="btn btn-primary uppercase mb-2 sm:mb-4 sm:mr-1" disabled>success!</button>
+                        <p className="">🚫</p>
                     }
 
 
