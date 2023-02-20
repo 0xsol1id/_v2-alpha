@@ -1,11 +1,7 @@
 import { FC } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-
-import { TokenIcon } from "utils/TokenIcon";
 import { TokenName } from "utils/TokenName";
 import { SelectRevokeButton } from "utils/SelectRevokeButton";
-import { DelegatedAddress } from "utils/delegatedAddress"
-
 
 type Props = {
   mint: string;

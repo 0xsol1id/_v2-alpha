@@ -19,7 +19,7 @@ export const TokenIconEA = (props: { account: string, connection: Connection, me
 
       // get the token account info of the token account
       const accountInfo = await connection.getParsedAccountInfo(accountPubKey);
-
+      
       let data: any
 
       // get the data of the token account
@@ -34,7 +34,7 @@ export const TokenIconEA = (props: { account: string, connection: Connection, me
 
         // get the nft object with the mint publickey address
         const nft = await metaplex.nfts().findByMint({ mintAddress: mintPublickey });
-
+        
         // get the logo of the nft object
         const logo = nft.json?.image
 

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { FC, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useAlert } from 'react-alert'
 
 import { MainMenu } from "../mainmenu"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -29,20 +28,6 @@ import {
 
 const decimals = process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS ? +process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS!.toString() : 9;
 const splTokenName = process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME ? process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME.toString() : "TOKEN";
-
-const WalletAmount = styled.div`
-  color: white;
-  width: auto;
-  min-width: 48px;
-  background-color: var(--main-text-color);
-  font-weight: 500;
-  line-height: 1.75;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  vertical-align: middle;
-  justify-content: flex-start;
-`;
 
 const Card = styled(Paper)`
   display: inline-block;

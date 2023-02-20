@@ -43,11 +43,11 @@ export const RevokeButton: FC<Props> = ({
             }
 
             {message != '' &&
-                <div className='font-semibold mb-2'>{message}</div>
+                <div className='font-pixel text-sm'>{message}</div>
             }
 
             {isRevoking && currentTx != undefined && totalTx != undefined &&
-                <div className='font-semibold mb-2'>Please confirm Tx: {currentTx}/{totalTx}</div>
+                <div className='font-pixel text-sm'>Please confirm Tx: {currentTx}/{totalTx}</div>
 
             }
 

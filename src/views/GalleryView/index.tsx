@@ -1,17 +1,17 @@
-import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { resolveToWalletAddrress } from "@nfteyez/sol-rayz";
+import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
+import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
 
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { PublicKey, LAMPORTS_PER_SOL, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, performReverseLookup, NAME_PROGRAM_ID } from "@bonfida/spl-name-service";
 
-import { Loader, SelectAndConnectWalletButton, MagicEdenLogo } from "components";
 import { NftCard } from "./NftCard";
+import { CollageNftCard } from "./CollageNftCard";
 import { BurnButton } from "utils/BurnButton";
 import { useWalletTokens } from "../../utils/useWalletTokens"
 import { EmptyTokenCard } from "./EmptyTokenCard";
@@ -20,176 +20,23 @@ import { TokenCard } from "./TokenCard";
 import { RevokeCard } from "./RevokeCard";
 import { RevokeButton } from "utils/RevokeButton";
 import { useWalletDelegated } from "utils/useWalletDelegated";
-import { TokenName } from "utils/TokenName";
 
 import { CreateTokenButton } from '../../utils/CreateTokenButton';
-import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
 import html2canvas from 'html2canvas';
+import downloadjs from 'downloadjs';
 import Modal from 'react-modal';
 import Papa from "papaparse";
 import useSWR from "swr";
 
-import { MainMenu } from 'views/mainmenu';
+import { Loader, SelectAndConnectWalletButton, MagicEdenLogo } from "components";
 import { Footer } from 'views/footer';
 import { fetcher } from 'utils/fetcher';
 import { EyeOffIcon } from '@heroicons/react/outline';
+import { MainMenu } from "../mainmenu"
+import { randomWallets } from "../wallets"
+import { TokenName } from "utils/TokenName";
 
 Modal.setAppElement("#__next");
-
-const randomWallets = [
-  { "Wallet": "DVmQbyfoTztR4iAdibRx2h6cb4J84EYArTZfj1ZcM8u4" },
-  { "Wallet": "94qM9awvQiW35vmS5m86sHeJp1JZAQWkW7w3vYwHZeor" },
-  { "Wallet": "6gjFy9Gp3mMN8uTLtfAyMmxdDfUe74YTo8cUTDXJtBUH" },
-  { "Wallet": "DxKc73eJX5J1kY5ND69hnLs7ox64Q2exN3BVUWxBtBjo" },
-  { "Wallet": "HLSgM1a7wSufVwe1NrPPR22ynY2aPsH8a1XQfqFsQiqY" },
-  { "Wallet": "73tF8uN3BwVzUzwETv59WNAafuEBct2zTgYbYXLggQiU" },
-  { "Wallet": "2tn4ToRyMT8Mnh29AHcrixZr8GmDBUjBcSqpYdEuWoAU" },
-  { "Wallet": "EAHJNfFDtivTMzKMNXzwAF9RTAeTd4aEYVwLjCiQWY1E" },
-  { "Wallet": "5URSakmV37mRXJ2rETDRZEyzEVBE2ebySVeLGWhUUk5h" },
-  { "Wallet": "8v5DE3Yf6oaBFckTcG2iAvrmauiKXjHWqQ7HuRzj4htp" },
-  { "Wallet": "FaqEroxry6uiu3C1WrxYnJybww3mkHkXuavbCpBvKLr5" },
-  { "Wallet": "cXQEAwX36w4f2nuBybcNA2ntexKyJ7F3iUNLb3eX8PJ" },
-  { "Wallet": "gqwBMP2shvC3n21n4PwtqQujQG9yHCx9yHAziYom4uZ" },
-  { "Wallet": "2srVaGFB8htkvB5qYEam2bHArRQCwzrLAoq9zYFZDw5a" },
-  { "Wallet": "BdwoSZEFqYwvWLHgwzmTg2j3cXYpiY1jpvvFYRJnsgyU" },
-  { "Wallet": "9f3iyEszuvHgyDQbw2DLPvCfjma9fn2UtWGGw6BWqhpA" },
-  { "Wallet": "MGRGhyEYZyVzwWTPnWR1gvP61NK9oDb2sLrs1FnVgmX" },
-  { "Wallet": "9fALd2Qm4VW9B6VKqY18bx7YByzcZqwV5yVex9iHQWjP" },
-  { "Wallet": "5rqeAsk5R3fmwLRR77KGQYxbdif2PFCuiM3uK2uyxvaV" },
-  { "Wallet": "JDjFuj29hBWoSp9gjY8XcmwqdsisPyh2w8S5vgUaq2w9" },
-  { "Wallet": "D6wh3WS66LqAa5ya4fTCvYRKaZDScC5d54H3ijbSAg3Z" },
-  { "Wallet": "7ikJca2CpYn2yp7FGRS5uAWbuSATeSTjvTM37v8noTdo" },
-  { "Wallet": "DmhK9gKYwgmzk6bP52kat1qgwvFo4gJ8HhEH32zVdCab" },
-  { "Wallet": "5ni1d8WXwspbruncxs9iwDibWU2veXCaLdJ8ZT8WnKvt" },
-  { "Wallet": "DxX6esF4DEDdJJzB54atkQaDCLjUK7Q2uTvhbKMQCvBQ" },
-  { "Wallet": "CFmKZePyVHakWmkL8tDwWeSSZWoErBJtLD99o3R9zs2m" },
-  { "Wallet": "6zusztonKZB4g7zNz3fX4o8Vxm6xayWTkoPp6RZKoqoe" },
-  { "Wallet": "2b88gGMDV43Q1kweF489bqj4RZ4zU6yrke5PcCaZiizh" },
-  { "Wallet": "Bxjx6HhSrc5DGuzccfsbLLch64oKKHLS3qy9Te5tVPcf" },
-  { "Wallet": "BVqz7gyf2rMcNgqUkx8iJJDS4yHASmBwu93HAitV7ey3" },
-  { "Wallet": "AYZCLBEGMjLR7yzgf4PSy5ZU5q7frPSMqgS6QU6sGyhh" },
-  { "Wallet": "4M5vgNq26ova2nVbgKgHT5R1hpo3Gf9Yq19xER1yC7qQ" },
-  { "Wallet": "7cDS2kK1cFkvGT5dz6CxMjhNZk8pZ7yHxrsuHjG5GoFv" },
-  { "Wallet": "2uFuEpAch4fDvw9xurNXtLjJFP8rZnnE4Yimpyz88VJK" },
-  { "Wallet": "9REeqvAq6aEosq3cAvwTMBgw2EJePBZ7k13PLYLbuLeW" },
-  { "Wallet": "AvukdqQtiW2hm7kn64nviCySvr18soPmse5yoHiduScX" },
-  { "Wallet": "7iYBkQXZZnw7Jxz5yLnhofx1oEYuZERWfnwKdrB5WydF" },
-  { "Wallet": "AfRpqBSiT8BgUcEEMbPLCy9TpZSQcpkWvA4BkunHcef" },
-  { "Wallet": "6rnPRTCHV5kBSG4pYrCZHviABZcBdj7Mc6uUihkPPpc2" },
-  { "Wallet": "AH4zFowqsAeCrbBsw9UHWLCmUDqqEJCoYFtKjH6Y9N8k" },
-  { "Wallet": "4ZAAEnQFqhsiCXzxGmHyfSc95rKSstqXLwccHT5pspvL" },
-  { "Wallet": "5RRz4vYmHopaT8bKgAxchufoNUAgZu7ZjUjURk9Ecs7x" },
-  { "Wallet": "DWYx3rgY7uTaE6KGyffHqh5QNa98Pt2uLbAQ9MGvewzJ" },
-  { "Wallet": "ZLgNEZsXCunR6TrZCk5eeK71MmyLLi8Zy18vKgNLJUL" },
-  { "Wallet": "AUNeqDuuFzPSeRx6jSn1WnvsyLwim3R2mqngsZeP8qH" },
-  { "Wallet": "DzDk6VsamFnGLYJrY3vERr5pb2e1coeZXMo2UpGdo8mj" },
-  { "Wallet": "8MFGGzfsWyiJwQVg9r7bZgY6e6fRkr54pPQj2Mr3voxx" },
-  { "Wallet": "4cvJYgHz56Sj6GY6dQiZfsxMiaXZ1ZuXrd1jo52X41fa" },
-  { "Wallet": "EomYnkxVCLotRPFMZ78xUQTfxfKncdeZUXjaLMTASwqG" },
-  { "Wallet": "Fbpmm2rAn2XedZxQz8sqnSiKqZQtbdrUXcwFatSvZBju" },
-  { "Wallet": "HeMDS1NhqsuVgag8QmWdY5WPZAsxb2vEvZEApAqS45Sw" },
-  { "Wallet": "BY4tJVNpsWjM5AjGX3t4bKT7BSfcSmo4j2octY1dht99" },
-  { "Wallet": "7woqoyhrysYZCRsHKSWmYEVtHxP3qWBjvpmUfNS71Ste" },
-  { "Wallet": "3Pnr2DZxT3CLGYX6NfhFQyKeZhcJEWKAHmH4oH7cDKRw" },
-  { "Wallet": "5aqZKcZfKzxPZY1w5tNajyb8WT6BjtCVfYdFyT4qjcip" },
-  { "Wallet": "31mKbYwGwJJa2eNCgxqzmkDDFfDkGyUNXvPe6NnXyVN8" },
-  { "Wallet": "2xE7HLyEXgt39cALfb1XiygEMB3HbNd1JfT7YhHhSRHY" },
-  { "Wallet": "6berDa4fhoPWEoNP36samHZhRYnuvsNphKQ4ABS7ZTh8" },
-  { "Wallet": "9er5VnavWah1c87gR3dPBzV23BtNWcoUjSHcTurD44EQ" },
-  { "Wallet": "3NLc8oSSr5LiyMU24eFE3RnqzTuz6QwDvph7Ex5H1Xyd" },
-  { "Wallet": "GUc4mZnLE9bHtGfkgwLN1EiiD8HZSRSnHJAiLCshZyp4" },
-  { "Wallet": "6zJp799qQvc4CoKqvhqHbiULzGrmRq4JaZBs9P2wvbuJ" },
-  { "Wallet": "2cCYDx5KKUw4Dtw6gButVH9NoRBoDkkvYt98Lf1vx91d" },
-  { "Wallet": "DC9r4aJ6HZZ9pwCChxcFxgWExKgMuRM926D344ikVZwT" },
-  { "Wallet": "Hqxph19idU17vg4YgmA7BjTpxASLA6PvRkL5ECKbV9Vb" },
-  { "Wallet": "78fUNLmXqEkxnhYj7HxE4HoqQtwtFuB3hPyR5tCACNXk" },
-  { "Wallet": "3NUvdKUikHKjjcjLFNjz2jpi43xKzN6GN13beUUiDV9D" },
-  { "Wallet": "7m1L23Qv7ErStz3gUzDudNFcEfBpmFXwniRnw99VbGKc" },
-  { "Wallet": "45nnw9MT4jGB4nSF2vtJZ2ygihy6t4LF6FZAcADp4p7o" },
-  { "Wallet": "2Jd1duAzk5inm4pEbUrrnxcWTeLer8G47NVyntU8aaUP" },
-  { "Wallet": "kDqcV7SN46wBz5RoXBwzgCUN2nza1zx25jTXvvzma2U" },
-  { "Wallet": "2TRy4WuaWcYEpK1R6663V9REKBSPhtTihKzvBPRVm2Lq" },
-  { "Wallet": "9MaDTH2fzPEZPepppnGRRQa7WaKjkgqFhiPCVABSQmoN" },
-  { "Wallet": "99zhJij4b3whQbdBxArELReYfrRbTtPCBT3C2A69uE3Z" },
-  { "Wallet": "BdxFF53v7ghx9ZSTJjZfd6wTJL5QrEsb5JX7E9oa8NFQ" },
-  { "Wallet": "8cry6tkZ3RuKziNfEWfavREvbSCssGGdmws6iudAVR9t" },
-  { "Wallet": "BFMSK8fsdG5ACHKmfpexHaM8fo4s3yYj9aGZtPdeE34u" },
-  { "Wallet": "2qtNznGCREEejenVtowLFRfetEQBetWxpYatD7dGHFiK" },
-  { "Wallet": "9r6Cf9tGmoM6aTkFxSTWf89iqEszMHh9uGWiuych7aie" },
-  { "Wallet": "6TkSWhELzpnLoUSEbMLxgGhCZ2ca98Hyvytfnx6EDQ89" },
-  { "Wallet": "8WQyTzC4T9KptRRecivtL2CD2ZBPaKVRemUwAYdjqjve" },
-  { "Wallet": "WM3Bnemp4E394AueZPfBt5hRXR7ZnEpysSdbftLCuqb" },
-  { "Wallet": "2ysNfvVvdtut4LpiMCELsEADiJmMiWXK51F7Ld3PYfKA" },
-  { "Wallet": "7M9b69YCmnSxriX9tiLFNG3rzVRPNKTRKoEzjbnYunBW" },
-  { "Wallet": "GkWdHnYio9d2uh4oK78M6eixhTJCBpMFjtixr5YnoS1q" },
-  { "Wallet": "2Ki1xkN4PgjTBz42VvfnuthMG5LHV4ecMwCEiXZGmXAK" },
-  { "Wallet": "dHvSL1iDsihVJf7Aq7EjpbQN5mqfwGNGRoNDb6g12W2" },
-  { "Wallet": "AmX8xmiEuwAdph3ntcncw7BEj6qb6apnWVbCCzh1BQVJ" },
-  { "Wallet": "AE2Z1TWYvmoorJTL63MdD8UUhJdaDVx9yF8CgHfCZk99" },
-  { "Wallet": "WUaFjLHh76f1168o2esLHxTt2imqTGuUj7RZ6L5uUZ7" },
-  { "Wallet": "5t7fN5YsHFAYuYUobfPqeLMxjjmwPawwDzcdLxA7ZieU" },
-  { "Wallet": "2iiF1uxpDFdda3nvgoFTvf9ig94EdKE7C6ijARzgZRJ8" },
-  { "Wallet": "FFRH5NUJ5RL97ndCMPnoRwCu3mL1LmMfePphZqeF1n39" },
-  { "Wallet": "DCmQYoGqF52FimrBtnj7CsydBpeskrTLSHWQTPSh7VoY" },
-  { "Wallet": "9i9LhzPtR6GKLN3YMAS9J1srtQ3fvwdfc5Hnf7CxcTVi" },
-  { "Wallet": "4h7kkCMTjoBFAoC58Tn9xLTCETBWvdy8UBtLmQKiUFLy" },
-  { "Wallet": "E3GNM8bG4CqVXCT3kzKeYubBLpKqj1hnCkVMbqfPWdMq" },
-  { "Wallet": "FNjwbBHgTb76Afc41q2WqKeDn6fUNa9vgCUinkxuzNST" },
-  { "Wallet": "CPwcLM5zRfG2CE81vDJ7kq5TkW8DyB3CiPuPunnndsMc" },
-  { "Wallet": "JA7MgydDLk6mLVwiKtrF6EKWZPBVdMX6N2e5yCUTv55G" },
-  { "Wallet": "D6bCeYL8q3piBCZG528imQ1RcwhgPFgebR8BQ5ZVvCSX" },
-  { "Wallet": "7tJSHom1qcys97jTKwcytXo3rSv32UwUXDyAH8ZzSvDb" },
-  { "Wallet": "FmPr12TxnrjxzFFChvaGiiPjBcu1bbE1UT6AiZfAPRNb" },
-  { "Wallet": "7aQdeym9sBzGwyd2kZuP64TPmxjsKAovD2QCdkkM3kyx" },
-  { "Wallet": "BEasUYLR4ZQvgMP5tBdaLZZ3GguwJDmnC7q78TbEwDY4" },
-  { "Wallet": "FJTecczet73dWgn4LysYBtSDcqfvp2ExHDwMHJ6AQUkj" },
-  { "Wallet": "H3YTFiYvr9heD4UF73jAeXzCxgTVaqgLmng9bhLaYTmr" },
-  { "Wallet": "9JVVWFB9aJ6ekXaAyjQ3W6PXifhsrk4Bjte5YBHaRE5Y" },
-  { "Wallet": "JCP4gy7rzq2xr1SWEUjz9VUtYUKtrAyFgM6NYbDzuP9p" },
-  { "Wallet": "GeeCvJntNNS6wR8TR7X3qqRYLPtQSsFZDGFFqAe7X4dA" },
-  { "Wallet": "4ewhoX7mZSgVEN13Tmja1Dy6zw2qy5A52HUKmNbCocL5" },
-  { "Wallet": "Fmg5Jdh6GCFaHZsgGXqrEgieBX3BMYzpAWgczKi6jzCd" },
-  { "Wallet": "9b1vmMHYTpAQCzdDJbrJAHDN1JMfUm8vpEHhsT4a3pMQ" },
-  { "Wallet": "F1xvQU6HfjBQYuUjgCB8TmAbQCQrM8J8H7Rte1sAwiWS" },
-  { "Wallet": "J66nm4GPswvq9T9eJDSdMTgdck7T8BP3zTTK49621uB" },
-  { "Wallet": "EGa4JBrNTDafetNXgb5EaQGomaAgTcZJNf1F19vgDqd7" },
-  { "Wallet": "BMWHPCit73cKF4biqsTpakf1ubW9g58gciZwPcRe33Ff" },
-  { "Wallet": "69uq5XWdDqTqoa5VNfkSTKgnvqKBCoUAVXe9GAijnvNF" },
-  { "Wallet": "4qzjkQueYSf3XJJGrWvzxJedTtVhWjZPCgeuvGfV2rG2" },
-  { "Wallet": "8pPYZ9sX8cLFqxdfNHrqP3xXBBPmnYDpnoPrAA5KDV1Q" },
-  { "Wallet": "CyTRnZN1KeVNy1xqKHG1ZR68eWxHhNB4AMDzmjfgtJyL" },
-  { "Wallet": "CaL8jGNdUEV8TSabSFMRA3YiJ5w6JQAnBuso73UYvphg" },
-  { "Wallet": "CYN3DaHmk9Xydo5W7Nheti2QL99LhfGrWQ8a8GrLQ8RJ" },
-  { "Wallet": "6Ro58eK7S693wgaNdKUzptEG28DJZ2aEvpPDts7Sg4uf" },
-  { "Wallet": "9944ZtJab8pjxm9dR8fsnj2nXcfrp4oH5f8PwQRriBmo" },
-  { "Wallet": "AP9PomHNRfd5s59XYnWFrFd6SX9EUTL4SD5gsSmqNkJ2" },
-  { "Wallet": "6YRHAC752eAzJb4sAM7QQPQbMKEqviMYugwZKeAA3mJs" },
-  { "Wallet": "8hZdvwaPivGic4DYtkZxiDbTKNRetf5HoUEf1UEAn4tY" },
-  { "Wallet": "5DxrzqVoTKPJXiABxRJwvsUBrWdk9XacqQdMjLw9LWv8" },
-  { "Wallet": "8VKqBznMqXytooi2YXLAeNxdspAKQyxMnVcpvbTNgR71" },
-  { "Wallet": "F8FjbEXtPW7S4dZk1si768fFCtRZBjPC3Wr27BLhBTQR" },
-  { "Wallet": "c5XFRmb4bJkxvKcUkY2r9yLeFnrDJqyGMbFtuSV8bUe" },
-  { "Wallet": "DzBhESoZpRTQF3UkzdcV85KKwNCBaWmuqx5J39hndwHk" },
-  { "Wallet": "9FYd2WxoT4baMXbZjJzqquUqqhndEP37Bzc5QmLA4ywk" },
-  { "Wallet": "ByFBCYEZa7xFFKyJYfaLuAksSY1i5z79Kj4Q2uTtfCKs" },
-  { "Wallet": "7jUgTohSbDNgqH58m2bNksEtKqsxyhcMf5fRG58XLLmE" },
-  { "Wallet": "HHmmWgMDYkXutU39hzoG7NzEhS8LKygAUewy763QE7rr" },
-  { "Wallet": "6v1fL88peHJCRyfKuze8XyqP4Tqcqy4wb9Wmtg6z8im1" },
-  { "Wallet": "5RMmnGh5KBSVNxgUpbpPhYAuKj2AEGe5X3SbiLy8f4w3" },
-  { "Wallet": "D3oREopGkE3fa3H2FT6AW9gh3BgoqDGDnZonZdztmg4U" },
-  { "Wallet": "2KcVHkLHyGjLFUcTw2kYnEc2WNqEubigAmjCV7JJi7Au" },
-  { "Wallet": "Bdn9HrKu7kubPAfuNZm4QBxTxwXF1r1y8NfGQ9TxEC9u" },
-  { "Wallet": "J3gAmJiP48z3uczX8ku6uu7gzUQxzV2FdwpQj7JxdC4G" },
-  { "Wallet": "H7G6jdWDXhGfyQanrc9gCRZwHk6j1WegEP6UY9pfNjqw" },
-  { "Wallet": "6wfnCWorHKjWuSNFCM3oxxmXYCb9kEs7uBo97hcBjKt8" },
-  { "Wallet": "ErNoHvtTyPaWcMc8PdXbYcCTN8oFqFWj3BXVXJNLCjLo" },
-  { "Wallet": "36MdZuBeUMLHpyNuoGgGzyrEcvSUHv4fVcWx7j8TRixL" },
-  { "Wallet": "A4jTwCn4zmUYmSo88MgiiCQRaCtuSbAMdR84ZPvay7Bw" },
-  { "Wallet": "4ZVYJvxt9b6fpRTpMTHQnE3jHWEmLx8wjLYYMBKAgNc9" },
-  { "Wallet": "88btH24DiLUyUvBzZJcapKBAEYLsPXzuQM6ni523RF8S" },
-  { "Wallet": "3HXUAb7FJ5xk3YEV86SdXAuNs3utwpuKzpj3coEJC9te" },
-  { "Wallet": "2nYaLvLTRbiGtdQjaFJZdumA36kqJRPES151qz8xTZJg" }
-]
 
 var isConnectedWallet = false
 var walletPublicKey = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
@@ -197,7 +44,7 @@ var walletPublicKey = randomWallets[randomInt(0, randomWallets.length)].Wallet /
 const NFTstoBurn: string[] = []
 const NFTstoSend: string[] = []
 const TokenstoRevoke: string[] = []
-const AccountstoClose: string[] = []
+let AccountstoClose: string[] = []
 
 function convertTimestamp(timestamp: any) {
   var d = new Date(timestamp * 1000),
@@ -229,8 +76,6 @@ function randomInt(low: number, high: number) {
   return Math.floor(Math.random() * (high - low) + low)
 }
 
-
-
 export const GalleryView: FC = ({ }) => {
   const queryParameters = new URLSearchParams(window.location.search)
   const walletParam: any = queryParameters.get("wallet")
@@ -242,6 +87,8 @@ export const GalleryView: FC = ({ }) => {
     mint: string
     onTokenDetailsFetched?: (props: any) => unknown;
   };
+
+  const { connection } = useConnection();
 
   type CollectionsListProps = {
     collections: string[];
@@ -267,11 +114,10 @@ export const GalleryView: FC = ({ }) => {
     return (
       <div>
         <div className="rounded">
-          <div className='flex justify-center bg-gray-900 p-2'>
-            <h1 className='font-pixel ml-5 underline'>Collection Overview</h1>
+          <div className='flex justify-center bg-gray-900 p-2 h-12'>
+            <h1 className='font-pixel ml-5 underline text-2xl'>Collection Overview</h1>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 items-start gap-1 p-2">
-
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 items-start gap-1 p-2">
             {collectionsUri2?.map((tmp, index) => (
               <CollectionCard ua={collections[index]} uri={tmp} mint={collectionsMint[index]} />
             ))}
@@ -326,7 +172,7 @@ export const GalleryView: FC = ({ }) => {
       }
     }
 
-    const test = () => {
+    const showCollection = () => {
       setSearch2(ua)
     }
 
@@ -339,11 +185,11 @@ export const GalleryView: FC = ({ }) => {
         <figure className="animation-pulse-color mb-1">
           {!fallbackImage && !error ? (
             <div>
-              <button onClick={test} className="btn btn-ghost h-44 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
+              <button onClick={showCollection} className="btn btn-ghost w-52 h-52 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
                 <img
                   src={image}
                   onError={onImageError}
-                  className="bg-gray-800 object-cover rounded h-40"
+                  className="bg-gray-800 object-cover rounded h-48"
                 />
               </button>
             </div>
@@ -351,7 +197,7 @@ export const GalleryView: FC = ({ }) => {
             // Fallback when preview isn't available. This could be broken image, video, or audio
             <div>
               <div className="w-auto flex items-center justify-center">
-                <button onClick={test} className="btn btn-ghost h-44 w-40 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
+                <button onClick={showCollection} className="btn btn-ghost h-52 w-52 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
                   <img
                     src={image}
                     onError={onImageError}
@@ -451,13 +297,13 @@ export const GalleryView: FC = ({ }) => {
 
     return (
       <div className="rounded">
-        <div className='flex justify-between bg-gray-900 p-2'>
-          <h1 className='font-pixel ml-5'>Collection: {updateAuthority}</h1>
-          <button onClick={back} className="btn btn-primary btn-sm font-pixel mr-2">back to overview</button>
+        <div className='flex justify-between bg-gray-900 p-2 h-12'>
+          <button onClick={back} className="btn btn-primary btn-sm font-pixel ml-2">◀ back to overview</button>
+          <h1 className='font-pixel mr-5 text-2xl'>Collection: {updateAuthority}</h1>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 items-start gap-1 p-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 items-start gap-1 p-2">
           {nfts?.map((nft: any, index) => (
-            nft.updateAuthority == updateAuthority ? (
+            nft.updateAuthority == updateAuthority || updateAuthority == "" ? (
               <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
             ) : (null)
           ))}
@@ -466,8 +312,37 @@ export const GalleryView: FC = ({ }) => {
     );
   };
 
+  type CollageListProps = {
+    nfts: NftTokenAccount[];
+    error?: Error;
+    setRefresh: Dispatch<SetStateAction<boolean>>
+  };
+
+  const CollageList = ({ nfts, error, setRefresh }: CollageListProps) => {
+    if (error) {
+      return null;
+    }
+
+    if (!nfts?.length) {
+      return (
+        <div className="font-pixel text-center text-2xl pt-16">
+          No NFTs found in this wallet
+        </div>
+      );
+    }
+
+    return (
+      <div className="rounded" id="collage">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 items-start gap-1 p-2">
+          {nfts?.map((nft: any, index) => (
+            <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const [openTab, setOpenTab] = useState(1);
-  const { connection } = useConnection();
   const [walletToParsePublicKey, setWalletToParsePublicKey] =
     useState<string>(walletParam == "" ? walletPublicKey : walletParam);
 
@@ -484,8 +359,14 @@ export const GalleryView: FC = ({ }) => {
   const { tokens } = useWalletTokens({
     publicAddress: walletToParsePublicKey,
     connection,
-    type: 'spl'
+    type: 'empty'
   });
+
+  /*const { tokens } = useWalletTokens({
+    publicAddress: walletToParsePublicKey,
+    connection,
+    type: 'spl'
+  });*/
 
   const { delegatedTokens } = useWalletDelegated({
     publicAddress: walletToParsePublicKey,
@@ -518,37 +399,10 @@ export const GalleryView: FC = ({ }) => {
   var rektiezCount: number = 0
   var points = 0
 
-  /*const [collections, setCollections] = useState<string[]>([])  //PICS / NAME ???
-  const handleChangeCollections = (val: string) => {
-    const tmp = collections
-    tmp.push(val)
-    setCollections(tmp)
-  }
-  
-
-  const [collectionsUri, setCollectionsUri] = useState<string[]>([])  //PICS / NAME ???
-  const handleChangeCollectionsUri = (val: string) => {
-    const tmp = collectionsUri
-    tmp.push(val)
-    setCollectionsUri(tmp)
-  }
-
-  const [collectionsMint, setCollectionsMint] = useState<string[]>([])  //PICS / NAME ???
-  const handleChangeCollectionsMint = (val: string) => {
-    const tmp = collectionsMint
-    tmp.push(val)
-    setCollectionsMint(tmp)
-  }
-
-  const resetCollections = (val: any) => {
-    setCollectionsUri(val)
-    setCollectionsMint(val)
-    setCollections(val)
-  }*/
-
   let collections: any[] = []
   let collectionsUri: any[] = []
   let collectionsMint: any[] = []
+
 
   nfts.forEach((element: any) => {
     if (element.updateAuthority == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
@@ -578,21 +432,40 @@ export const GalleryView: FC = ({ }) => {
     return null;
   }
 
+  const [rarityData, setRarityData] = useState<any>()
+  //RARITY RANKING  
+  async function CheckRarity(url: string) {
+    try {
+      const response = await fetch(url)
+      setRarityData(await response.json())
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const [value, setValue] = useState(walletToParsePublicKey);
 
   const onChange = async () => {
+    AccountstoClose = []
     setOpenTab(1)
     const val = value
     const address = await resolveToWalletAddrress({ text: val.trim() })
-    isConnectedWallet = false
+    if (value == publicKey?.toBase58())
+      isConnectedWallet = true
+    else
+      isConnectedWallet = false
     setWalletToParsePublicKey(address)
     walletPublicKey = address
     //GetHistory(`https://fudility.xyz:3420/history/${address}`)
   };
 
   const onChangeME = async (address: any) => {
+    AccountstoClose = []
     setOpenTab(1)
-    isConnectedWallet = false
+    if (value == publicKey?.toBase58())
+      isConnectedWallet = true
+    else
+      isConnectedWallet = false
     setWalletToParsePublicKey(address)
     walletPublicKey = address
     setValue(address)
@@ -600,9 +473,13 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const randomWallet = () => {
+    AccountstoClose = []
     setOpenTab(1)
     var wallet = randomWallets[randomInt(0, randomWallets.length)]
-    isConnectedWallet = false
+    if (value == publicKey?.toBase58())
+      isConnectedWallet = true
+    else
+      isConnectedWallet = false
     setWalletToParsePublicKey(wallet.Wallet)
     walletPublicKey = wallet.Wallet
     setValue(wallet.Wallet)
@@ -610,6 +487,7 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const onUseWalletClick = () => {
+    AccountstoClose = []
     if (publicKey) {
       setOpenTab(1)
       isConnectedWallet = true
@@ -618,21 +496,6 @@ export const GalleryView: FC = ({ }) => {
       setValue(publicKey?.toBase58())
       //GetHistory(`https://fudility.xyz:3420/history/${publicKey?.toBase58()}`)
     }
-  };
-
-  const refreshWallet = () => {
-    var wallet = value
-    var wallet2 = randomWallets[randomInt(0, randomWallets.length)]
-
-    setValue(wallet2.Wallet)
-    walletPublicKey = wallet2.Wallet
-
-    setTimeout(function () {
-      setWalletToParsePublicKey(wallet)
-      walletPublicKey = wallet
-      setValue(wallet)
-      //GetHistory(`https://fudility.xyz:3420/history/${wallet}`)
-    }, 200);
   };
 
   {/*const getTransactions = async (address: PublicKeyInitData, numTx: any) => {
@@ -808,16 +671,27 @@ export const GalleryView: FC = ({ }) => {
     }
   }
 
-  const copy = async () => {
+  const copyWalletAddress = async () => {
     await navigator.clipboard.writeText(value);
   }
 
   useEffect(() => {
+    if (value == publicKey?.toBase58())
+      isConnectedWallet = true
+    else
+      isConnectedWallet = false
     GetHistory(`https://fudility.xyz:3420/history/${walletToParsePublicKey}`)
     //getTransactions(walletPublicKey, 5)
     setSearch(walletToParsePublicKey)
     setSearch2("")
   }, [walletToParsePublicKey])
+
+  const saveCollage = async () => {
+    const canvas = await html2canvas(document.getElementById('collage')!);
+    const img = canvas.toDataURL('image/png');
+
+    downloadjs(img, 'download.png', 'image/png');
+  };
 
   return (
     <div className="">
@@ -845,7 +719,7 @@ export const GalleryView: FC = ({ }) => {
               </button>
             </div>
             <div className="tooltip tooltip-left" data-tip="Copy wallet">
-              <button onClick={copy} className="btn btn-primary text-xl ml-2 mr-2">
+              <button onClick={copyWalletAddress} className="btn btn-primary text-xl ml-2 mr-2">
                 💾
               </button>
             </div>
@@ -888,7 +762,7 @@ export const GalleryView: FC = ({ }) => {
                     <div className="">
                       {/*<DomainName />*/}
                       <Balance />
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>
+                      {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
                       <br />
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
@@ -907,24 +781,24 @@ export const GalleryView: FC = ({ }) => {
                   <li>
                   </li>
                   <li>
-                    <a href="#ownedNFTs"
+                    <a href="#allNFTs"
                       onClick={() => setOpenTab(1)}
                       className={` ${openTab === 1 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >SHOW NFTs</a>
+                    >Show collage</a>
+                  </li>                  
+                  <li>
+                    <button
+                      onClick={() => saveCollage()}
+                      className="font-pixel btn btn-sm w-full rounded"
+                    >Save collage</button>
                   </li>
                   <li>
-                    <a href="#MEhistory"
+                    <a href="#collectionOverview"
                       onClick={() => setOpenTab(2)}
                       className={` ${openTab === 2 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >Show SPL-Tokens</a>
+                    >Detail view</a>
                   </li>
-                  <li>
-                    <a href="#MEhistory"
-                      onClick={() => setOpenTab(4)}
-                      className={` ${openTab === 4 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >Show <MagicEdenLogo /> History</a>
-                  </li>
-                  <li>
+                  {/*<li>
                     <a href="#closeAcc"
                       onClick={() => setOpenTab(5)}
                       className={` ${openTab === 5 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
@@ -935,18 +809,24 @@ export const GalleryView: FC = ({ }) => {
                       onClick={() => setOpenTab(6)}
                       className={` ${openTab === 6 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
                     >Show Delegated Auth</a>
+                  </li>*/}
+                  <li>
+                    <a href="#MEhistory"
+                      onClick={() => setOpenTab(4)}
+                      className={` ${openTab === 4 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
+                    >Show <MagicEdenLogo /> History</a>
                   </li>
                   <div className="w-full">
                     {isConnectedWallet ? (
                       <div>
-                        {openTab === 1 || openTab === 2 ? (
-                          <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />) : (
-                          <div />
-                        )}
-                        {openTab === 5 ? (
-                          <CloseButton toClose={AccountstoClose} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />) : (
-                          <div />
-                        )}
+                        {openTab === 1 || openTab === 2 &&
+                          <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                        }
+                        {tokens.length > 0 &&
+                          <div className="mt-2 mb-2">
+                            <CloseButton toClose={tokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                          </div>
+                        }
                         {openTab === 6 ? (
                           <RevokeButton toRevoke={TokenstoRevoke} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />) : (
                           <div />
@@ -1001,32 +881,16 @@ export const GalleryView: FC = ({ }) => {
                 <div className=" col-span-8">
                   <div className={openTab === 1 ? "block" : "hidden"}>
                     <div className="overflow-auto h-[55.7rem] scrollbar">
+                      <CollageList nfts={nfts} error={error} setRefresh={setRefresh}/>
+                    </div>
+                  </div>
+                  <div className={openTab === 2 ? "block" : "hidden"}>
+                    <div className="overflow-auto h-[55.7rem] scrollbar">
                       {search2 != '' &&
                         <NftList nfts={nfts} error={error} setRefresh={setRefresh} updateAuthority={search2} />
                       }
                       {search2 == '' &&
                         <CollectionsList collections={collections} collectionsUri2={collectionsUri} collectionsMint={collectionsMint} error={error} setRefresh={setRefresh} />
-                      }
-                    </div>
-                  </div>
-                  <div className={openTab === 2 ? "block" : "hidden"}>
-                    <div className="">
-                      {error && errorMessage != "Invalid address: " ? (
-                        <div>
-                          <h1 className='font-pixel'>Error Occures</h1>
-                          {(error as any)?.message}
-                        </div>
-                      ) : null}
-
-                      {!error && isLoading &&
-                        <div>
-                          <Loader />
-                        </div>
-                      }
-                      {!error && !isLoading && !refresh &&
-                        <div className="p-1 h-[55.7rem] mr-1 overflow-auto min-w-full">
-                          <TokenList tokens={tokens} error={error} setRefresh={setRefresh} />
-                        </div>
                       }
                     </div>
                   </div>
@@ -1036,7 +900,7 @@ export const GalleryView: FC = ({ }) => {
                   </div>
                   <div className={openTab === 4 ? "block" : "hidden"}>
                     <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
-                      {history?.map((num: any, index) => (
+                      {history?.map((num: any, index: any) => (
                         <div key={index}>
                           {num.type != "bid" ? (
                             <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
@@ -1044,8 +908,7 @@ export const GalleryView: FC = ({ }) => {
                                 {/*<TokenIconME mint={num.tokenMint} />*/}
                                 <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
                                   <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
-                                    {/*<TokenName mint={num.tokenMint} />*/}
-                                    {num.tokenMint}
+                                    <TokenName mint={num.tokenMint} />
                                   </a>
                                 </button>
                                 {/*<p className='flex font-pixel text-xs'>{num.collection}</p>*/}
@@ -1103,9 +966,7 @@ export const GalleryView: FC = ({ }) => {
                   </div>
                   <div className={openTab === 5 ? "block" : "hidden"}>
                     <div className="overflow-auto h-[55.7rem] scrollbar">
-                      {isConnectedWallet &&
-                        <EmptyAccounts />
-                      }
+                      <EmptyAccounts />
                     </div>
                   </div>
                   <div className={openTab === 6 ? "block" : "hidden"}>
@@ -1130,9 +991,7 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   </div>
                   <div className={openTab === 7 ? "block" : "hidden"}>
-                    {isConnectedWallet &&
-                      <SPLTokenView />
-                    }
+                    <SPLTokenView />
                   </div>
                   <div className={openTab === 8 ? "block" : "hidden"}>
 
@@ -1411,7 +1270,7 @@ const TokenList = ({ tokens, error, setRefresh }: TokenListProps) => {
 
   if (!tokens?.length) {
     return (
-      <div className="text-center text-2xl">
+      <div className="text-center font-pixel text-2xl">
         No token found in this wallet
       </div>
     );
@@ -1420,7 +1279,7 @@ const TokenList = ({ tokens, error, setRefresh }: TokenListProps) => {
   return (
     <div>
       {tokens?.map((token, index) => (
-        <TokenCard isConnectedWallet={isConnectedWallet} key={index} details={token} mint={token} toBurn={NFTstoBurn} />
+        <TokenCard isConnectedWallet={isConnectedWallet} key={index} mint={token} toBurn={NFTstoBurn} />
       ))}
     </div>
   );
@@ -1661,7 +1520,7 @@ const AccountList = ({ accounts, error, setRefresh }: AccountListProps) => {
 
   if (!accounts?.length) {
     return (
-      <div className="text-center text-2xl pt-16">
+      <div className="text-center font-pixel text-2xl pt-16">
         No empty account found in this wallet
       </div>
     );

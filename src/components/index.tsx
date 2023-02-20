@@ -1,4 +1,5 @@
 export { Loader } from "./Loader";
+export { GameLogo } from "./GameLogo";
 export { SolanaLogo } from "./SolanaLogo";
 export { DiscordLogo } from "./DiscordLogo";
 export { TwitterLogo } from "./TwitterLogo";

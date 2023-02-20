@@ -42,11 +42,11 @@ export const BurnButton: FC<Props> = ({
             }
 
             {message != '' &&
-                <div className='font-semibold'>{message}</div>
+                <div className='font-pixel text-sm'>{message}</div>
             }
 
             {isburning && currentTx != undefined && totalTx != undefined &&
-                <div className='font-semibold'>Please confirm Tx: {currentTx}/{totalTx}</div>
+                <div className='font-pixel text-sm'>Please confirm Tx: {currentTx}/{totalTx}</div>
 
             }
         </div>

@@ -11,8 +11,14 @@ import { LegitOrScam } from '../../utils/LegitOrScam';
 import { SelectBurnButton } from '../../utils/SelectBurnButton';
 import { SelectSendButton } from '../../utils/SelectSendButton';
 
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+
+import loadable from '@loadable/component';
+const ReactJson = loadable(() => import('react-json-view'));
+const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
+
 import { MagicEdenLogo } from "components";
-import axios from "axios"
 
 import Modal from 'react-modal';
 import {
@@ -24,6 +30,8 @@ import {
   Tooltip,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import React from "react";
+import dynamic from "next/dynamic";
 
 ChartJS.register(
   CategoryScale,
@@ -92,18 +100,30 @@ export const NftCard: FC<Props> = ({
       revalidateOnReconnect: false,
     }
   );
-  
+
   useEffect(() => {
+    //CheckRarity(`https://fudility.xyz:3420/rarity/${details.updateAuthority}/${tokenMintAddress}`)
     if (!error && !!data) {
       onTokenDetailsFetched(data);
     }
   }, [data, error]);
 
   const onImageError = () => setFallbackImage(true);
-
   const { image, description } = data ?? {};
 
   const tokenMintAddress = details.mint;
+  const [rarityData, setRarityData] = useState<any>()
+
+  //RARITY RANKING  
+  async function CheckRarity(url: string) {
+    try {
+      const response = await fetch(url)
+      setRarityData(await response.json())
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const wallet = useWallet();
@@ -199,12 +219,14 @@ export const NftCard: FC<Props> = ({
         if (element.type == "buyNow") {
           prices.push(element.price)
           label.push(convertTimestamp(element.blockTime))
+          console.log("yesser!!!!!")
         }
       });
       handleChangepriceHistory(prices.reverse())
       handleChangeLabelHistory(label.reverse())
     } catch (e) {
-      console.log(e)
+      console.log("PNSQRT: " + e)
+      console.log("PNSQRT")
     }
   }
 
@@ -218,6 +240,7 @@ export const NftCard: FC<Props> = ({
   function toggleUpdateMetadataModal() {
     setIsUpdateOpen(!isUpdateOpen);
   }
+
 
   //const [chartData, setChartData] = useState({});
   var labels = [11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -539,24 +562,39 @@ export const NftCard: FC<Props> = ({
     }
   }
 
+  const copyAddress = async (val: any) => {
+    await navigator.clipboard.writeText(val);
+  }
+
   return (
     <div className="rounded bg-gray-900 p-1 border-2 border-gray-700 text-center">
       <figure className="animation-pulse-color mb-1">
         {!fallbackImage && !error ? (
           <div>
-            <button onClick={toggleModal} className="btn btn-ghost h-44 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
+            <button onClick={toggleModal} className="btn btn-ghost w-52 h-52 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
               <img
                 src={image}
                 onError={onImageError}
-                className="bg-gray-800 object-cover rounded h-40"
+                className="bg-gray-800 object-cover rounded h-48"
               />
+              {rarityData &&
+                <div>
+
+                  <span className="absolute top-[1rem] left-[1rem] bg-gray-900 bg-opacity-50 p-1 rounded">
+                    <p className="font-pixel text-md text-center">#{rarityData?.Rank}</p>
+                  </span>
+                  <span className="absolute bottom-[1rem] right-[1rem] bg-gray-900 bg-opacity-50 bg-o p-1 rounded">
+                    <p className="font-pixel text-md text-center">{rarityData?.Score}</p>
+                  </span>
+                </div>
+              }
             </button>
           </div>
         ) : (
           // Fallback when preview isn't available. This could be broken image, video, or audio
           <div>
             <div className="w-auto flex items-center justify-center">
-              <button onClick={toggleModal} className="btn btn-ghost h-44 w-40 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
+              <button onClick={toggleModal} className="btn btn-ghost h-48 w-48 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
                 <img
                   src={image}
                   onError={onImageError}
@@ -606,12 +644,11 @@ export const NftCard: FC<Props> = ({
         <div className="flex justify-between mb-2">
           <div />
           <a href={`https://explorer.solana.com/address/${tokenMintAddress}`} target="_blank">
-            <p className="font-pixel card-title text-lg text-center">{name}</p>
+            <p className="font-pixel text-bold text-lg text-center hover:text-red-300">{name}</p>
           </a>
           <button className="font-pixel text-white btn btn-xs btn-primary" onClick={toggleModal}>X</button>
         </div>
-        <p className="font-pixel text-sm text-center mb-3 w-[40rem]">{description}</p>
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 mb-3">
           {!fallbackImage && !errorUpdate ? (
             <img
               src={image}
@@ -623,83 +660,121 @@ export const NftCard: FC<Props> = ({
               <EyeOffIcon className="h-24 w-24 text-white" />
             </div>
           )}
-          <div className="m-4">
-            <div className="text-center text-white">
-              <div className="mb-4">
-                {collectionName != "-" ? (
-                  <div>{collectionName != undefined ? (
-                    <button className="btn btn-primary w-full">
-                      <a href={`https://magiceden.io/marketplace/${collectionName}`} target="_blank">
-                        <div className="flex">
-                          <p className="font-pixel text-lg">{collectionName} on</p>
-                          <MagicEdenLogo />
-                        </div>
-                      </a>
-                    </button>) : (
-                    <p className="font-pixel bg-red-600 p-2 rounded-md">not on MagicEden</p>
-                  )}</div>
-                ) : (
-                  <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-                  </svg>
-                )}
+          <div className="w-full grid content-center">
+            <div className="bg-gray-700 font-pixel rounded-lg p-2">
+              <div className="flex justify-between">
+                <p>Mint:</p>
+                <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.mint)}>
+                  {(details.mint).slice(0, 5) + "..." + (details.mint).slice(-5)}
+                </button>
               </div>
-
-              <div className="flex justify-between mb-2">
-                <h1 className="font-pixel card-title">Floor:</h1>
-                {floor != "-" ? (
-                  <h1 className="font-pixel">{floor}◎</h1>
-                ) : (
-                  <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-                  </svg>
-                )}
+              <div className="flex justify-between">
+                <p>Update Authority:</p>
+                <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.updateAuthority)}>
+                  {(details.updateAuthority).slice(0, 5) + "..." + (details.updateAuthority).slice(-5)}
+                </button>
               </div>
-              <div className="flex justify-between mb-2">
-                <h1 className="font-pixel card-title">Fair Profit: </h1>
-                {floor != "-" ? (
-                  <h1 className="font-pixel">{profit}◎</h1>
-                ) : (
-                  <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-                  </svg>
-                )}
+              <div className="flex justify-between">
+                <p>Verified Creator:</p>
+                {details.data.creators != undefined &&
+                  <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.data.creators[0].address)}>
+                    {(details.data.creators[0].address).slice(0, 5) + "..." + (details.data.creators[0].address).slice(-5)}
+                  </button>
+                }
               </div>
-
-            </div>
-            <div className="text-center text-white">
-              <div className="flex justify-between mb-2">
-                <h1 className="font-pixel card-title">Listed:</h1>
-                {listed != "-" ? (
-                  <h1 className="font-pixel">{listed}</h1>
-                ) : (
-                  <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-                  </svg>
-                )}
+              <div className="flex justify-between">
+                <p>Creators:</p>
+                {details.data.creators != undefined &&
+                  <div>{details.data.creators.length}</div>
+                }
               </div>
-              <div className="flex justify-between mb-2">
-                <h1 className="font-pixel card-title">Volume:</h1>
-                {volume != "-" ? (
-                  <h1 className="font-pixel">{volume}◎</h1>
-                ) : (
-                  <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-                  </svg>
-                )}
+              <div className="flex justify-between">
+                <p>Royalties:</p>
+                <p>{(data.seller_fee_basis_points) / 100}%</p>
+              </div>
+              <br />
+              <div className="">
+                <a href={`${data.external_url}`} target="_blank">
+                  <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data.external_url}</p>
+                </a>
               </div>
             </div>
           </div>
         </div>
-        <div className="bg-gray-800 rounded mt-2">
-          <h1 className="font-pixel card-title text-center">Most Recent Sales</h1>
-          <Line options={options} data={chartData} height="60px" />
-        </div>
+
+        <Tabs>
+          <TabList>
+            <Tab><h1 className="font-pixel">Attributes</h1></Tab>
+            <Tab><h1 className="font-pixel">Token Data</h1></Tab>
+            <Tab><h1 className="font-pixel">Metadata</h1></Tab>
+            <Tab><h1 className="font-pixel">Recent Sales</h1></Tab>
+            <Tab><h1 className="font-pixel">MagicEden Data</h1></Tab>
+          </TabList>
+
+          <TabPanel>
+            <div className="grid grid-cols-3 gap-1 w-[50rem] h-44">
+              {data.attributes?.map((num: any, index: any) => (
+                <div key={index}>
+                  <div className="bg-gray-700 font-pixel text-sm rounded p-1 flex justify-between h-full">
+                    <div className="text-bold underline">{num.trait_type}:</div>
+                    <div>{num.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabPanel>
+
+          <TabPanel>
+            <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs rounded-lg">
+              <DynamicReactJson src={details} theme="monokai" />
+            </div>
+          </TabPanel>
+
+          <TabPanel>
+            <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs mt-2 rounded-lg">
+              <DynamicReactJson src={data} theme="monokai" />
+            </div>
+          </TabPanel>
+
+          <TabPanel>
+            <div className="bg-gray-800 rounded h-44 w-[50rem] ">
+              <Line options={options} data={chartData} height="60px" />
+            </div>
+          </TabPanel>
+
+          <TabPanel>
+            <div className="h-44 w-[50rem] p-2 bg-gray-700 rounded-lg">
+              <div className="text-center text-white">
+                <div className="flex justify-between mb-2">
+                  <h1 className="font-pixel">Floor:</h1>
+                  {floor != "-" ? (<h1 className="font-pixel">{floor}◎</h1>) : (<LoadingSVG />)}
+                </div>
+              </div>
+              <div className="text-center text-white">
+                <div className="flex justify-between mb-2">
+                  <h1 className="font-pixel">Listed:</h1>
+                  {listed != "-" ? (<h1 className="font-pixel">{listed}</h1>) : (<LoadingSVG />)}
+                </div>
+                <div className="flex justify-between mb-2">
+                  <h1 className="font-pixel">Total Volume:</h1>
+                  {volume != "-" ? (<h1 className="font-pixel">{volume}◎</h1>) : (<LoadingSVG />)}
+                </div>
+              </div>
+              {collectionName != "-" ? (
+                <div className="text-center">{collectionName != undefined ? (
+                  <button className="btn btn-primary">
+                    <a href={`https://magiceden.io/marketplace/${collectionName}`} target="_blank">
+                      <div className="flex">
+                        <p className="font-pixel text-lg">View Collection on Magic Eden</p>
+                      </div>
+                    </a>
+                  </button>) : (
+                  <p className="font-pixel bg-red-600 p-2 rounded-md">not on MagicEden</p>
+                )}</div>
+              ) : (<LoadingSVG />)}
+            </div>
+          </TabPanel>
+        </Tabs>
       </Modal>
 
       <Modal
@@ -731,14 +806,6 @@ export const NftCard: FC<Props> = ({
           <button className="font-pixel text-white btn btn-xs btn-primary" onClick={toggleUpdateMetadataModal}>X</button>
         </div>
         <div className="w-full text-center">
-          {/* 
-          {NFTName != '' &&
-            <div className="flex">
-              <button className="text-white font-pixel text-xl w-[6rem] h-[2rem] mt-2 mb-2 btn btn-primary"
-                onClick={reset} >Back</button>
-            </div>
-          }
-          */}
           {NFTName == '' &&
             <div>
               <button className="text-white font-pixel text-xl btn btn-primary h-[35px] uppercase" onClick={fetchMetadata}>Check for Authority</button>
@@ -891,3 +958,14 @@ export const NftCard: FC<Props> = ({
     </div>
   );
 };
+
+const LoadingSVG = ({ }) => {
+  return (
+    <div>
+      <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
+        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
+      </svg>
+    </div>
+  )
+}
