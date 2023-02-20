@@ -16,7 +16,6 @@ import 'react-tabs/style/react-tabs.css';
 
 import loadable from '@loadable/component';
 const ReactJson = loadable(() => import('react-json-view'));
-const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 import { MagicEdenLogo } from "components";
 
@@ -31,7 +30,6 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import React from "react";
-import dynamic from "next/dynamic";
 
 ChartJS.register(
   CategoryScale,
@@ -725,15 +723,19 @@ export const NftCard: FC<Props> = ({
           </TabPanel>
 
           <TabPanel>
-            <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs rounded-lg">
-              <DynamicReactJson src={details} theme="monokai" />
-            </div>
+            <React.Fragment>
+              <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs rounded-lg">
+                {typeof document !== 'undefined' && ReactJson && <ReactJson src={details} theme="monokai" />}
+              </div>
+            </React.Fragment>
           </TabPanel>
 
           <TabPanel>
-            <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs mt-2 rounded-lg">
-              <DynamicReactJson src={data} theme="monokai" />
-            </div>
+            <React.Fragment>
+              <div className="overflow-auto h-44 w-[50rem] scrollbar text-xs mt-2 rounded-lg">
+                {typeof document !== 'undefined' && ReactJson && <ReactJson src={data} theme="monokai" />}
+              </div>
+            </React.Fragment>
           </TabPanel>
 
           <TabPanel>

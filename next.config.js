@@ -64,6 +64,7 @@ const nextConfig = {
       config.optimization.minimize = false;
     }
     return config;
+    
   },
 };
 
