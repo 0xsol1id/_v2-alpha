@@ -402,12 +402,12 @@ export const CollageNftCard: FC<Props> = ({
                 </div>
                 <div className="flex justify-between">
                   <p>Royalties:</p>
-                  <p>{(data.seller_fee_basis_points) / 100}%</p>
+                  <p>{(data?.seller_fee_basis_points) / 100}%</p>
                 </div>
                 <br />
                 <div className="">
-                  <a href={`${data.external_url}`} target="_blank">
-                    <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data.external_url}</p>
+                  <a href={`${data?.external_url}`} target="_blank">
+                    <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data?.external_url}</p>
                   </a>
                 </div>
               </div>

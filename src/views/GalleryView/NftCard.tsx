@@ -688,12 +688,12 @@ export const NftCard: FC<Props> = ({
               </div>
               <div className="flex justify-between">
                 <p>Royalties:</p>
-                <p>{(data.seller_fee_basis_points) / 100}%</p>
+                <p>{(data?.seller_fee_basis_points) / 100}%</p>
               </div>
               <br />
               <div className="">
-                <a href={`${data.external_url}`} target="_blank">
-                  <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data.external_url}</p>
+                <a href={`${data?.external_url}`} target="_blank">
+                  <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data?.external_url}</p>
                 </a>
               </div>
             </div>
@@ -711,7 +711,7 @@ export const NftCard: FC<Props> = ({
 
           <TabPanel>
             <div className="grid grid-cols-3 gap-1 w-[50rem] h-44">
-              {data.attributes?.map((num: any, index: any) => (
+              {data?.attributes?.map((num: any, index: any) => (
                 <div key={index}>
                   <div className="bg-gray-700 font-pixel text-sm rounded p-1 flex justify-between h-full">
                     <div className="text-bold underline">{num.trait_type}:</div>
