@@ -9,6 +9,7 @@ import Link from "next/link";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 
 export const HomeView: FC = ({ }) => {
+  const { publicKey } = useWallet();
 
   const [message, setMessage] = useState(false)
   var valid = false
@@ -27,13 +28,10 @@ export const HomeView: FC = ({ }) => {
 
   return (
     <div className="min-h-full">
-      <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
-        <MainMenu />
-        <WalletMultiButton />
-      </div>
-      <div className="hero h-3/4">
-        <div className="text-center hero-content items-center">
-          <div className="border-2 rounded-lg border-gray-700 bg-gray-700">
+      <div className="">
+        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
+          <MainMenu />
+          <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
             <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
               <Link href={`/gallery?wallet=${randomWallet}`}>🤷‍♂️ </Link>
             </button>
@@ -57,9 +55,44 @@ export const HomeView: FC = ({ }) => {
             )
             }
           </div>
+          <div>
+            <div>
+              {publicKey ?
+                <button className="btn btn-primary mr-2">
+                  <Link href={`/gallery?wallet=${publicKey?.toBase58()}`}><img src="./profil.png" className="w-8 h-8" /></Link>
+                </button>
+                : null}
+            </div>
+            <WalletMultiButton />
+          </div>
         </div>
+        <div className="hero my-auto">
+          <div className="text-center hero-content items-center">
+
+            <div className="border-2 rounded-lg border-gray-700 bg-gray-700 lg:hidden block">
+              <button className="btn btn-primary mb-3 font-pixel w-full">
+                <Link href={`/gallery?wallet=${randomWallet}`}>Load random wallet</Link>
+              </button>
+              <input
+                type="text"
+                placeholder="Enter Wallet Address"
+                className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
+                value={value}
+                onChange={onChange}
+              />
+              {message == true ? (
+                <button className="btn btn-primary mb-3 font-pixel w-full">
+                  <Link href={`/gallery?wallet=${value}`}>Load Wallet</Link>
+                </button>
+              ) : (
+                <button className="bg-gray-700 mt-3 font-pixel">not a valid wallet</button>
+              )
+              }
+            </div>
+          </div>
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };

@@ -16,8 +16,7 @@ import 'react-tabs/style/react-tabs.css';
 
 import loadable from '@loadable/component';
 const ReactJson = loadable(() => import('react-json-view'));
-
-import { MagicEdenLogo } from "components";
+import Zoom from 'react-img-zoom'
 
 import Modal from 'react-modal';
 import {
@@ -239,7 +238,6 @@ export const NftCard: FC<Props> = ({
     setIsUpdateOpen(!isUpdateOpen);
   }
 
-
   //const [chartData, setChartData] = useState({});
   var labels = [11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   const options = {
@@ -314,7 +312,6 @@ export const NftCard: FC<Props> = ({
   const metaplex = Metaplex.make(connection)
     .use(walletAdapterIdentity(wallet))
     .use(bundlrStorage());
-
 
   // allow to fetch the current metadata of the NFT
   const fetchMetadata = async () => {
@@ -648,11 +645,14 @@ export const NftCard: FC<Props> = ({
         </div>
         <div className="grid grid-cols-2 mb-3">
           {!fallbackImage && !errorUpdate ? (
-            <img
-              src={image}
-              onError={onImageError}
-              className="object-cover h-[20rem] rounded"
-            />
+            <Zoom
+            img={image}
+            zoomScale={3}
+            width={350}
+            height={350}
+            className="rounded"
+            onError={onImageError}
+          />
           ) : (
             <div className="w-auto h-48 flex items-center justify-center">
               <EyeOffIcon className="h-24 w-24 text-white" />

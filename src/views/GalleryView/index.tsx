@@ -4,6 +4,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
+import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
 
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
@@ -348,6 +349,9 @@ export const GalleryView: FC = ({ }) => {
 
   const { publicKey } = useWallet();
   const wallet = useWallet();
+
+  const [message, setMessage] = useState(false)
+  var valid = false
 
   const [refresh, setRefresh] = useState(false)
 
@@ -694,40 +698,39 @@ export const GalleryView: FC = ({ }) => {
   };
 
   return (
-    <div className="">
+    <div className="flex flex-wrap flex-col md:flex-row items-center h-screen">
       <div className="">
         <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
           <div>
             <MainMenu />
           </div>
-          <div>
-            <div className="tooltip tooltip-left font-pixel" data-tip="Show a random wallet">
-              <button onClick={randomWallet} className="btn btn-primary text-2xl">
+
+          <div className="hidden lg:block border-2 rounded-lg border-gray-700 bg-gray-700">
+            <div className="flex">
+              <button onClick={randomWallet} className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
                 🤷‍♂️
               </button>
-            </div>
-            <input
-              type="text"
-              placeholder="Enter Wallet Address"
-              className="font-pixel w-96 input input-bordered mr-2 ml-2 bg-base-200"
-              value={value}
-              onChange={(e) => { setValue(e.target.value) }}
-            />
-            <div className="tooltip tooltip-left" data-tip="Load wallet">
-              <button onClick={onChange} className="btn btn-primary text-xl">
-                👁️
-              </button>
-            </div>
-            <div className="tooltip tooltip-left" data-tip="Copy wallet">
-              <button onClick={copyWalletAddress} className="btn btn-primary text-xl ml-2 mr-2">
-                💾
-              </button>
-            </div>
-            {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
+              <input
+                type="text"
+                placeholder="Enter Wallet Address"
+                className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
+                value={value}
+                onChange={(e) => { setValue(e.target.value) }}
+              />
+              <div className="tooltip tooltip-right" data-tip="Load wallet">
+                <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
+                  👁️
+                </button>
+              </div>
+              {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
               <button onClick={refreshWallet} className="btn btn-primary text-lg">
                 🗘
               </button>
             </div>*/}
+              <button onClick={copyWalletAddress} className="ml-2 bg-primary hover:bg-gray-800 rounded h-10 w-12 tooltip tooltip-left" data-tip="Copy wallet">
+                💾
+              </button>
+            </div>
           </div>
           {publicKey ? (
             <div>
@@ -755,9 +758,57 @@ export const GalleryView: FC = ({ }) => {
                 <Loader />
               </div>
             }
+
             {!error && !isLoading && !refresh &&
-              <div className="grid grid-cols-9">
-                <ul className="space-y-2 bg-gray-900 h-[55.7rem] block p-2">
+              <div className="lg:grid lg:grid-cols-9">
+                <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-16 z-50">
+                  <div>
+                    <div className="tooltip tooltip-left font-pixel" data-tip="Show a random wallet">
+                      <button onClick={randomWallet} className="btn btn-primary">
+                        🤷‍♂️
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Enter Wallet Address"
+                      className="font-pixel w-60 input input-bordered mr-2 ml-2 bg-base-200"
+                      value={value}
+                      onChange={(e) => { setValue(e.target.value) }}
+                    />
+                    <div className="tooltip tooltip-left" data-tip="Load wallet">
+                      <button onClick={onChange} className="btn btn-primary lg:text-xl">
+                        👁️
+                      </button>
+                    </div>
+                    <div className="tooltip tooltip-left" data-tip="Copy wallet">
+                      <button onClick={copyWalletAddress} className="btn btn-primary lg:text-xl ml-2 mr-2">
+                        💾
+                      </button>
+                    </div>
+                    {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
+              <button onClick={refreshWallet} className="btn btn-primary text-lg">
+                🗘
+              </button>
+            </div>*/}
+                  </div>
+                  <li className="">
+                    <div className="">
+                      {/*<DomainName />*/}
+                      <div className="flex justify-between">
+                        <Balance />
+                        {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
+                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
+                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
+                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{points}</p></div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <ul className="space-y-2 bg-gray-900 h-[55.7rem] p-2 hidden lg:block">
                   <li className="">
                     <div className="">
                       {/*<DomainName />*/}
@@ -785,7 +836,7 @@ export const GalleryView: FC = ({ }) => {
                       onClick={() => setOpenTab(1)}
                       className={` ${openTab === 1 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
                     >Show collage</a>
-                  </li>                  
+                  </li>
                   <li>
                     <button
                       onClick={() => saveCollage()}
@@ -878,14 +929,14 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   )}
                 </ul>
-                <div className=" col-span-8">
+                <div className="col-span-2 lg:col-span-8 w-full">
                   <div className={openTab === 1 ? "block" : "hidden"}>
-                    <div className="overflow-auto h-[55.7rem] scrollbar">
-                      <CollageList nfts={nfts} error={error} setRefresh={setRefresh}/>
+                    <div className="overflow-auto lg:h-[55.7rem] scrollbar">
+                      <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
                     </div>
                   </div>
                   <div className={openTab === 2 ? "block" : "hidden"}>
-                    <div className="overflow-auto h-[55.7rem] scrollbar">
+                    <div className="overflow-auto lg:h-[55.7rem] scrollbar">
                       {search2 != '' &&
                         <NftList nfts={nfts} error={error} setRefresh={setRefresh} updateAuthority={search2} />
                       }
@@ -895,7 +946,7 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   </div>
                   <div className={openTab === 3 ? "block" : "hidden"}>
-                    <div className="p-1 rounded h-[55.7rem] mr-1 overflow-auto min-w-full scrollbar">
+                    <div className="p-1 rounded lg:h-[55.7rem] mr-1 overflow-auto min-w-full scrollbar">
                     </div>
                   </div>
                   <div className={openTab === 4 ? "block" : "hidden"}>
