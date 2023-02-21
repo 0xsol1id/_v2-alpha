@@ -216,7 +216,6 @@ export const NftCard: FC<Props> = ({
         if (element.type == "buyNow") {
           prices.push(element.price)
           label.push(convertTimestamp(element.blockTime))
-          console.log("yesser!!!!!")
         }
       });
       handleChangepriceHistory(prices.reverse())

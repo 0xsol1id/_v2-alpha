@@ -217,7 +217,6 @@ export const CollageNftCard: FC<Props> = ({
         if (element.type == "buyNow") {
           prices.push(element.price)
           label.push(convertTimestamp(element.blockTime))
-          console.log("yesser!!!!!")
         }
       });
       handleChangepriceHistory(prices.reverse())
@@ -335,7 +334,7 @@ export const CollageNftCard: FC<Props> = ({
             backgroundColor: 'rgba(0, 0, 0, 0.75)'
           },
           content: {
-            top: '58%',
+            top: '60%',
             left: '50%',
             right: 'auto',
             bottom: 'auto',
@@ -358,14 +357,21 @@ export const CollageNftCard: FC<Props> = ({
         </div>
         <div className="lg:grid lg:grid-cols-2 mb-3">
           {!fallbackImage && !error ? (
-            <Zoom
-              img={image}
-              zoomScale={3}
-              width={350}
-              height={350}
-              className="rounded"
-              onError={onImageError}
-            />
+            <div>
+              <div className="hidden lg:block">
+                <Zoom
+                  img={image}
+                  zoomScale={3}
+                  width={350}
+                  height={350}
+                  className="rounded"
+                  onError={onImageError}
+                />
+              </div>
+              <div className="lg:hidden block justify-center">
+                <img src={image} className="rounded-lg h-72" />
+              </div>
+            </div>
           ) : (
             <div className="w-auto h-48 flex items-center justify-center">
               <EyeOffIcon className="h-24 w-24 text-white" />
@@ -373,7 +379,7 @@ export const CollageNftCard: FC<Props> = ({
           )}
           <div className="w-full grid content-center">
             <div className="lg:bg-gray-700 font-pixel rounded-lg p-2">
-              <div className="bg-gray-700 font-pixel rounded-lg p-2 hidden lg:block">
+              <div className="bg-gray-700 font-pixel rounded-lg p-2 hidden lg:block">{/* DESKTOP VIEW */}
                 <div className="flex justify-between">
                   <p>Mint:</p>
                   <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.mint)}>
@@ -411,7 +417,7 @@ export const CollageNftCard: FC<Props> = ({
                   </a>
                 </div>
               </div>
-              <div className="block lg:hidden">
+              <div className="block lg:hidden">{/* MOBILE VIEW */}
                 {collectionName != "-" ? (
                   <div className="text-center">{collectionName != undefined ? (
                     <button className="btn btn-primary">

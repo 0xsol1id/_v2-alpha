@@ -36,6 +36,7 @@ import { EyeOffIcon } from '@heroicons/react/outline';
 import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
 import { TokenName } from "utils/TokenName";
+import Link from "next/link";
 
 Modal.setAppElement("#__next");
 
@@ -700,13 +701,13 @@ export const GalleryView: FC = ({ }) => {
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen">
       <div className="">
-        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
-          <div>
-            <MainMenu />
-          </div>
+        <div className="hidden lg:block navbar sticky top-0 z-50 justify-between text-neutral-content bg-gray-900">
 
-          <div className="hidden lg:block border-2 rounded-lg border-gray-700 bg-gray-700">
-            <div className="flex">
+
+          <div className="flex justify-between"><div>
+            <MainMenu />
+          </div> {/*desktop view*/}
+            <div className="flex border-2 rounded-lg border-gray-700 bg-gray-700">
               <button onClick={randomWallet} className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
                 🤷‍♂️
               </button>
@@ -730,21 +731,20 @@ export const GalleryView: FC = ({ }) => {
               <button onClick={copyWalletAddress} className="ml-2 bg-primary hover:bg-gray-800 rounded h-10 w-12 tooltip tooltip-left" data-tip="Copy wallet">
                 💾
               </button>
-            </div>
-
-          </div>
-          {publicKey ? (
-            <div>
-              <div className="font-pixel tooltip tooltip-left" data-tip="Show Your wallet">
-                <SelectAndConnectWalletButton
-                  onUseWalletClick={onUseWalletClick}
-                />
+            </div>{publicKey ? (
+              <div>
+                <div className="font-pixel tooltip tooltip-left" data-tip="Show Your wallet">
+                  <SelectAndConnectWalletButton
+                    onUseWalletClick={onUseWalletClick}
+                  />
+                </div>
+                <WalletMultiButton />
               </div>
+            ) : (
               <WalletMultiButton />
-            </div>
-          ) : (
-            <WalletMultiButton />
-          )}
+            )}
+          </div>
+
         </div>
         <div className="">
           <div className="tab-content" id="tabs-tabContent">
@@ -755,22 +755,28 @@ export const GalleryView: FC = ({ }) => {
               </div>
             ) : null}
             {!error && isLoading &&
-              <div className="grid grid-flow-row auto-rows-max content-center h-[55.7rem]">
+              <div className="grid grid-flow-row auto-rows-max content-center h-[55.7rem] w-screen">
                 <Loader />
               </div>
             }
 
+            {/*MOBILE VIEW */}
             {!error && !isLoading && !refresh &&
               <div className="lg:grid lg:grid-cols-9">
-                <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-16 z-50">
+                <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-0 z-50 w-screen">
                   <div className="flex justify-between">
+                    <button className="btn bg-green-500 mx-1">
+                      <Link href="/mint">
+                        M
+                      </Link>
+                    </button>
                     <div className="tooltip tooltip-left font-pixel" data-tip="Show a random wallet">
-                      <button onClick={randomWallet} className="btn btn-primary ml-2 mr-2">
+                      <button onClick={randomWallet} className="btn btn-primary ml-2">
                         🤷‍♂️
                       </button>
                     </div>
                     <div className="tooltip tooltip-left" data-tip="Load wallet">
-                      <button onClick={onChange} className="btn btn-primary ml-2 mr-2">
+                      <button onClick={onChange} className="btn btn-primary ml-2">
                         👁️
                       </button>
                     </div>
@@ -779,9 +785,20 @@ export const GalleryView: FC = ({ }) => {
                         💾
                       </button>
                     </div>
-                      <button onClick={toggleModal} className="btn btn-primary ml-2 mr-2">
-                        ✉️
-                      </button>
+
+                    {publicKey ? (
+                      <div className="flex">
+                        <button onClick={toggleModal} className="btn btn-primary mr-2">
+                          ✉️
+                        </button>
+                        <SelectAndConnectWalletButton
+                          onUseWalletClick={onUseWalletClick}
+                        />
+                      </div>
+                    ) : (
+                      <WalletMultiButton />
+                    )
+                    }
                     {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
                         <button onClick={refreshWallet} className="btn btn-primary text-lg">
                           🗘
@@ -791,7 +808,7 @@ export const GalleryView: FC = ({ }) => {
                   <input
                     type="text"
                     placeholder="Enter Wallet Address"
-                    className="font-pixel input input-bordered h-8 w-full mr-2 ml-2 bg-base-200"
+                    className="font-pixel input input-bordered h-8 w-full bg-base-200"
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
                   />
@@ -958,7 +975,7 @@ export const GalleryView: FC = ({ }) => {
                                 {/*<TokenIconME mint={num.tokenMint} />*/}
                                 <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
                                   <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
-                                    <TokenName mint={num.tokenMint} />
+                                    {/*<TokenName mint={num.tokenMint} />*/}
                                   </a>
                                 </button>
                                 {/*<p className='flex font-pixel text-xs'>{num.collection}</p>*/}
@@ -1016,7 +1033,7 @@ export const GalleryView: FC = ({ }) => {
                   </div>
                   <div className={openTab === 5 ? "block" : "hidden"}>
                     <div className="overflow-auto h-[55.7rem] scrollbar">
-                      <EmptyAccounts />
+                      
                     </div>
                   </div>
                   <div className={openTab === 6 ? "block" : "hidden"}>
@@ -1071,7 +1088,7 @@ export const GalleryView: FC = ({ }) => {
               backgroundColor: 'rgba(0, 0, 0, 0.75)'
             },
             content: {
-              top: '50%',
+              top: '55%',
               left: '50%',
               right: 'auto',
               bottom: 'auto',
@@ -1087,11 +1104,10 @@ export const GalleryView: FC = ({ }) => {
         >
           <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleModal}>X</button>
           <div className="text-center">
-            <h1 className="font-pixel text-2xl">Send a NFT Message to:</h1>
-            <h1 className="font-pixel text-2xl">{walletToParsePublicKey}</h1>
+            <h1 className="font-pixel lg:text-2xl">Send a NFT Message</h1>
             <div>
               <form className="mt-[5%] mb-[3%]">
-                <input className="font-pixel mb-[1%] text-black pl-1 border-1 border-black sm:w-[520px] w-[100%] text-center h-12"
+                <input className="font-pixel mb-[1%] text-black pl-1 border-1 border-black sm:w-[520px] w-[320px] w-[100%] text-center h-12"
                   type="text"
                   required
                   placeholder="Message"
@@ -1499,60 +1515,6 @@ const SPLTokenView = ({ }) => {
         }
       </div>
       <CreateTokenButton connection={connection} publicKey={publicKey} wallet={wallet} quantity={quantity} decimals={decimals} isChecked={isChecked} tokenName={tokenName} symbol={symbol} metadataURL={metadataURL} description={tokenDescription} file={file} metadataMethod={metadataMethod} />
-    </div>
-  );
-};
-
-//-------------------Close empty accounts-------------------------------------------------
-const EmptyAccounts = ({ }) => {
-  const { connection } = useConnection();
-
-  const [walletToParsePublicKey, setWalletToParsePublicKey] =
-    useState<string>(walletPublicKey);
-
-  const { publicKey } = useWallet();
-
-  const [refresh, setRefresh] = useState(false)
-
-  const onUseWalletClick = () => {
-    if (publicKey) {
-      setWalletToParsePublicKey(publicKey?.toBase58());
-    }
-  };
-
-  const { tokens, isLoading, error } = useWalletTokens({
-    publicAddress: walletToParsePublicKey,
-    connection,
-    type: 'empty'
-  });
-
-
-  let errorMessage
-  if (error) {
-    errorMessage = error.message
-  }
-
-  return (
-    <div className="w-11/12">
-      <div className="">
-        {error && errorMessage != "Invalid address: " ? (
-          <div>
-            <h1>Error Occures</h1>
-            {(error as any)?.message}
-          </div>
-        ) : null}
-
-        {!error && isLoading &&
-          <div>
-            <Loader />
-          </div>
-        }
-        {!error && !isLoading && !refresh &&
-          <AccountList accounts={tokens} error={error} setRefresh={setRefresh} />
-        }
-
-      </div>
-
     </div>
   );
 };
