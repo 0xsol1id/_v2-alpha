@@ -334,7 +334,7 @@ export const GalleryView: FC = ({ }) => {
 
     return (
       <div className="rounded" id="collage">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 items-start gap-1 p-2">
+        <div className="grid grid-cols-2 lg:grid-cols-7 items-start gap-1 p-2">
           {nfts?.map((nft: any, index) => (
             <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
           ))}
@@ -718,7 +718,7 @@ export const GalleryView: FC = ({ }) => {
                 onChange={(e) => { setValue(e.target.value) }}
               />
               <div className="tooltip tooltip-right" data-tip="Load wallet">
-                <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
+                <button onClick={onChange} className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
                   👁️
                 </button>
               </div>
@@ -731,6 +731,7 @@ export const GalleryView: FC = ({ }) => {
                 💾
               </button>
             </div>
+
           </div>
           {publicKey ? (
             <div>
@@ -762,48 +763,46 @@ export const GalleryView: FC = ({ }) => {
             {!error && !isLoading && !refresh &&
               <div className="lg:grid lg:grid-cols-9">
                 <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-16 z-50">
-                  <div>
+                  <div className="flex justify-between">
                     <div className="tooltip tooltip-left font-pixel" data-tip="Show a random wallet">
-                      <button onClick={randomWallet} className="btn btn-primary">
+                      <button onClick={randomWallet} className="btn btn-primary ml-2 mr-2">
                         🤷‍♂️
                       </button>
                     </div>
-                    <input
-                      type="text"
-                      placeholder="Enter Wallet Address"
-                      className="font-pixel w-60 input input-bordered mr-2 ml-2 bg-base-200"
-                      value={value}
-                      onChange={(e) => { setValue(e.target.value) }}
-                    />
                     <div className="tooltip tooltip-left" data-tip="Load wallet">
-                      <button onClick={onChange} className="btn btn-primary lg:text-xl">
+                      <button onClick={onChange} className="btn btn-primary ml-2 mr-2">
                         👁️
                       </button>
                     </div>
                     <div className="tooltip tooltip-left" data-tip="Copy wallet">
-                      <button onClick={copyWalletAddress} className="btn btn-primary lg:text-xl ml-2 mr-2">
+                      <button onClick={copyWalletAddress} className="btn btn-primary ml-2 mr-2">
                         💾
                       </button>
                     </div>
+                      <button onClick={toggleModal} className="btn btn-primary ml-2 mr-2">
+                        ✉️
+                      </button>
                     {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
-              <button onClick={refreshWallet} className="btn btn-primary text-lg">
-                🗘
-              </button>
-            </div>*/}
+                        <button onClick={refreshWallet} className="btn btn-primary text-lg">
+                          🗘
+                       </button>
+                     </div>*/}
                   </div>
+                  <input
+                    type="text"
+                    placeholder="Enter Wallet Address"
+                    className="font-pixel input input-bordered h-8 w-full mr-2 ml-2 bg-base-200"
+                    value={value}
+                    onChange={(e) => { setValue(e.target.value) }}
+                  />
                   <li className="">
                     <div className="">
                       {/*<DomainName />*/}
                       <div className="flex justify-between">
                         <Balance />
                         {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
-                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
-                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
-                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{points}</p></div>
+                        <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
+                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Score:&nbsp;</p><p className="font-pixel">{points}</p></div>
                       </div>
                     </div>
                   </li>

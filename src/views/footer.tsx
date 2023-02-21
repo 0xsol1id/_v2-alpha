@@ -3,7 +3,9 @@ import React from "react";
 export const Footer: React.FC = ({ }) => {
     return (
         <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-1 h-6 flex justify-between">
-            <div></div>
+            <div>
+                <h1 className="font-pixel text-xs">SOLJUNKS.io</h1>
+            </div>
             <div className="flex">
                 <div className="card p-2 text-sm font-bold flex justify-center">
                     <img src="./fudility.png" />

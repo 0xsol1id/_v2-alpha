@@ -289,15 +289,15 @@ export const CollageNftCard: FC<Props> = ({
   }
 
   return (
-    <div className="rounded bg-gray-900 text-center">
+    <div className="text-center">
       <figure className="animation-pulse-color">
         {!fallbackImage && !error ? (
           <div>
-            <button onClick={toggleModal} className="btn btn-ghost h-44 p-1">
+            <a onClick={toggleModal} className="hover:cursor-pointer">
               <img
                 src={image}
                 onError={onImageError}
-                className="bg-gray-800 object-cover rounded h-40"
+                className="object-cover rounded hover:border-2 border-primary"
               />
               {rarityData &&
                 <div>
@@ -309,20 +309,20 @@ export const CollageNftCard: FC<Props> = ({
                   </span>
                 </div>
               }
-            </button>
+            </a>
           </div>
         ) : (
           // Fallback when preview isn't available. This could be broken image, video, or audio
           <div>
             <div className="w-auto flex items-center justify-center">
-              <button onClick={toggleModal} className="btn btn-ghost h-44 w-40 p-0">
+              <a onClick={toggleModal} className="hover:cursor-pointer">
                 <img
                   src={image}
                   onError={onImageError}
                   className="object-cover rounded text-center"
                 />
                 <EyeOffIcon className="h-38 w-38 text-white" />
-              </button>
+              </a>
             </div>
           </div>
         )}
@@ -373,41 +373,43 @@ export const CollageNftCard: FC<Props> = ({
           )}
           <div className="w-full grid content-center">
             <div className="lg:bg-gray-700 font-pixel rounded-lg p-2">
-              <div className="flex justify-between">
-                <p>Mint:</p>
-                <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.mint)}>
-                  {(details.mint).slice(0, 5) + "..." + (details.mint).slice(-5)}
-                </button>
-              </div>
-              <div className="flex justify-between">
-                <p>Update Authority:</p>
-                <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.updateAuthority)}>
-                  {(details.updateAuthority).slice(0, 5) + "..." + (details.updateAuthority).slice(-5)}
-                </button>
-              </div>
-              <div className="flex justify-between">
-                <p>Verified Creator:</p>
-                {details.data?.creators != undefined &&
-                  <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.data?.creators[0].address)}>
-                    {(details.data?.creators[0].address).slice(0, 5) + "..." + (details.data?.creators[0].address).slice(-5)}
+              <div className="bg-gray-700 font-pixel rounded-lg p-2 hidden lg:block">
+                <div className="flex justify-between">
+                  <p>Mint:</p>
+                  <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.mint)}>
+                    {(details.mint).slice(0, 5) + "..." + (details.mint).slice(-5)}
                   </button>
-                }
-              </div>
-              <div className="flex justify-between">
-                <p>Creators:</p>
-                {details.data?.creators != undefined &&
-                  <div>{details.data?.creators.length}</div>
-                }
-              </div>
-              <div className="flex justify-between">
-                <p>Royalties:</p>
-                <p>{(data?.seller_fee_basis_points) / 100}%</p>
-              </div>
-              <br />
-              <div className="">
-                <a href={`${data?.external_url}`} target="_blank">
-                  <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data?.external_url}</p>
-                </a>
+                </div>
+                <div className="flex justify-between">
+                  <p>Update Authority:</p>
+                  <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.updateAuthority)}>
+                    {(details.updateAuthority).slice(0, 5) + "..." + (details.updateAuthority).slice(-5)}
+                  </button>
+                </div>
+                <div className="flex justify-between">
+                  <p>Verified Creator:</p>
+                  {details.data.creators != undefined &&
+                    <button className="hover:text-red-300" onClick={(e: any) => copyAddress(details.data.creators[0].address)}>
+                      {(details.data.creators[0].address).slice(0, 5) + "..." + (details.data.creators[0].address).slice(-5)}
+                    </button>
+                  }
+                </div>
+                <div className="flex justify-between">
+                  <p>Creators:</p>
+                  {details.data.creators != undefined &&
+                    <div>{details.data.creators.length}</div>
+                  }
+                </div>
+                <div className="flex justify-between">
+                  <p>Royalties:</p>
+                  <p>{(data.seller_fee_basis_points) / 100}%</p>
+                </div>
+                <br />
+                <div className="">
+                  <a href={`${data.external_url}`} target="_blank">
+                    <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{data.external_url}</p>
+                  </a>
+                </div>
               </div>
               <div className="block lg:hidden">
                 {collectionName != "-" ? (
