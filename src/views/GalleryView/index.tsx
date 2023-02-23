@@ -345,7 +345,9 @@ export const GalleryView: FC = ({ }) => {
                         columnsSize == 4 ? "lg:grid-cols-4" :
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {nfts?.map((nft: any, index) => (
-            <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
+            selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
+              <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
+            ) : (null)
           ))}
         </div>
       </div>
@@ -415,9 +417,9 @@ export const GalleryView: FC = ({ }) => {
   let collections: any[] = []
   let collectionsUri: any[] = []
   let collectionsMint: any[] = []
+  let collectionsNames: any[] = []
 
-
-  nfts.forEach((element: any) => {
+  nfts.forEach(async (element: any) => {
     if (element.updateAuthority == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
       junksCount++
     }
@@ -437,6 +439,7 @@ export const GalleryView: FC = ({ }) => {
       collections.push(element.updateAuthority)
       collectionsUri.push(element.data.uri)
       collectionsMint.push(element.mint)
+      collectionsNames.push(element.data.symbol)
     }
   });
 
@@ -706,6 +709,18 @@ export const GalleryView: FC = ({ }) => {
     downloadjs(img, 'download.png', 'image/png');
   };
 
+  const getInitialState = () => {
+    const value = "Show all collections";
+    return value;
+  };
+
+  const [selectedCollection, setSelectedCollection] = useState<string>(getInitialState);
+
+  const handleCollectionChange = (e: any) => {
+    console.log(e.target.value)
+    setSelectedCollection(e.target.value);
+  };
+
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen">
       <div className="">
@@ -753,6 +768,15 @@ export const GalleryView: FC = ({ }) => {
               />
               <p className="font-pixel text-xs">{columnsSize}</p>
             </div>
+
+            <select onChange={handleCollectionChange} className="select select-bordered w-full max-w-xs font-pixel">
+              <option selected>Show all collections</option>
+              {collections?.map((num: any, index: any) => (
+                <option>{num}</option>
+              ))
+              }
+            </select>
+
             {publicKey ? (
               <div className="flex items-center">
                 <div className="font-pixel tooltip tooltip-left" data-tip="Show Your wallet">
@@ -865,9 +889,9 @@ export const GalleryView: FC = ({ }) => {
                     <a href="#allNFTs"
                       onClick={() => setOpenTab(1)}
                       className={` ${openTab === 1 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >Show collage</a>
+                    >Show NFTs</a>
                   </li>
-                  <li>
+                  {/*<li>
                     <button
                       onClick={() => saveCollage()}
                       className="font-pixel btn btn-sm w-full rounded"
@@ -879,7 +903,7 @@ export const GalleryView: FC = ({ }) => {
                       className={` ${openTab === 2 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
                     >Detail view</a>
                   </li>
-                  {/*<li>
+                  <li>
                     <a href="#closeAcc"
                       onClick={() => setOpenTab(5)}
                       className={` ${openTab === 5 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
@@ -1288,7 +1312,7 @@ const Balance = ({ }) => {
           )
         }).then(res => res.json())
           .then(json => {
-            handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(2))
+            handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(3))
           });
       } catch (e) {
         console.log("BALANCE ERROR:" + e)
