@@ -29,7 +29,7 @@ export const RevokeButton: FC<Props> = ({
     return (
         <div>
             {!isRevoking &&
-                <button className="btn btn-primary uppercase w-full" onClick={() => { if (publicKey) revokeAuthority(toRevoke, publicKey, wallet, connection, setIsRevoking, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>revoke all selected</button>
+                <button className="btn btn-primary uppercase w-full font-pixel" onClick={() => { if (publicKey) revokeAuthority(toRevoke, publicKey, wallet, connection, setIsRevoking, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>revoke {toRevoke.length} delegated authoritys</button>
             }
 
 
@@ -47,11 +47,8 @@ export const RevokeButton: FC<Props> = ({
             }
 
             {isRevoking && currentTx != undefined && totalTx != undefined &&
-                <div className='font-pixel text-sm'>Please confirm Tx: {currentTx}/{totalTx}</div>
-
+                <div className='font-pixel text-xs'>Please confirm Tx: {currentTx}/{totalTx}</div>
             }
-
-
         </div>
     );
 };

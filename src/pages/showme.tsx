@@ -6,7 +6,7 @@ const Home: NextPage = (props) => {
   return (
     <div className=" flex flex-col h-screen justify-between">
       <Head>
-        <title>WalletStalker</title>
+        <title>DegenBags</title>
         <meta name="description" content="Stalk every wallet in the ecosystem and bash them!" />
       </Head>
       <GalleryView />

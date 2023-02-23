@@ -334,7 +334,7 @@ export const CollageNftCard: FC<Props> = ({
             backgroundColor: 'rgba(0, 0, 0, 0.75)'
           },
           content: {
-            top: '60%',
+            top: '50%',
             left: '50%',
             right: 'auto',
             bottom: 'auto',

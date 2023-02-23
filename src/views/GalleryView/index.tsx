@@ -1,7 +1,6 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
@@ -29,14 +28,12 @@ import Modal from 'react-modal';
 import Papa from "papaparse";
 import useSWR from "swr";
 
-import { Loader, SelectAndConnectWalletButton, MagicEdenLogo } from "components";
+import { Loader, SelectAndConnectWalletButton, MagicEdenLogo, ConnectWallet } from "components";
 import { Footer } from 'views/footer';
 import { fetcher } from 'utils/fetcher';
 import { EyeOffIcon } from '@heroicons/react/outline';
 import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
-import { TokenName } from "utils/TokenName";
-import Link from "next/link";
 
 Modal.setAppElement("#__next");
 
@@ -314,6 +311,8 @@ export const GalleryView: FC = ({ }) => {
     );
   };
 
+  const [columnsSize, setcolumnsSize] = useState(7);
+
   type CollageListProps = {
     nfts: NftTokenAccount[];
     error?: Error;
@@ -335,7 +334,16 @@ export const GalleryView: FC = ({ }) => {
 
     return (
       <div className="rounded" id="collage">
-        <div className="grid grid-cols-2 lg:grid-cols-7 items-start gap-1 p-2">
+        <div className={`${columnsSize == 12 ? "lg:grid-cols-12" :
+          columnsSize == 11 ? "lg:grid-cols-11" :
+            columnsSize == 10 ? "lg:grid-cols-10" :
+              columnsSize == 9 ? "lg:grid-cols-9" :
+                columnsSize == 8 ? "lg:grid-cols-8" :
+                  columnsSize == 7 ? "lg:grid-cols-7" :
+                    columnsSize == 6 ? "lg:grid-cols-6" :
+                      columnsSize == 5 ? "lg:grid-cols-5" :
+                        columnsSize == 4 ? "lg:grid-cols-4" :
+                          columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {nfts?.map((nft: any, index) => (
             <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
           ))}
@@ -731,17 +739,31 @@ export const GalleryView: FC = ({ }) => {
               <button onClick={copyWalletAddress} className="ml-2 bg-primary hover:bg-gray-800 rounded h-10 w-12 tooltip tooltip-left" data-tip="Copy wallet">
                 💾
               </button>
-            </div>{publicKey ? (
-              <div>
+            </div>
+
+            <div className="flex gap-2 items-center bg-gray-700 rounded-xl p-2">
+              <p className="font-pixel text-xs">GRID</p>
+              <input
+                type="range"
+                max="12"
+                min="2"
+                value={columnsSize}
+                className="range w-32 range-primary"
+                onChange={(e) => { setcolumnsSize(parseInt(e.target.value)) }}
+              />
+              <p className="font-pixel text-xs">{columnsSize}</p>
+            </div>
+            {publicKey ? (
+              <div className="flex items-center">
                 <div className="font-pixel tooltip tooltip-left" data-tip="Show Your wallet">
                   <SelectAndConnectWalletButton
                     onUseWalletClick={onUseWalletClick}
                   />
                 </div>
-                <WalletMultiButton />
+                <ConnectWallet />
               </div>
             ) : (
-              <WalletMultiButton />
+              <ConnectWallet />
             )}
           </div>
 
@@ -765,46 +787,38 @@ export const GalleryView: FC = ({ }) => {
               <div className="lg:grid lg:grid-cols-9">
                 <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-0 z-50 w-screen">
                   <div className="flex justify-between">
-                    <button className="btn bg-green-500 mx-1">
-                      <Link href="/mint">
-                        M
-                      </Link>
-                    </button>
-                    <div className="tooltip tooltip-left font-pixel" data-tip="Show a random wallet">
-                      <button onClick={randomWallet} className="btn btn-primary ml-2">
-                        🤷‍♂️
-                      </button>
-                    </div>
-                    <div className="tooltip tooltip-left" data-tip="Load wallet">
-                      <button onClick={onChange} className="btn btn-primary ml-2">
-                        👁️
-                      </button>
-                    </div>
-                    <div className="tooltip tooltip-left" data-tip="Copy wallet">
-                      <button onClick={copyWalletAddress} className="btn btn-primary ml-2 mr-2">
-                        💾
-                      </button>
-                    </div>
-
-                    {publicKey ? (
-                      <div className="flex">
-                        <button onClick={toggleModal} className="btn btn-primary mr-2">
-                          ✉️
+                    <div className="flex">
+                      <div className="font-pixel">
+                        <button onClick={randomWallet} className="btn btn-primary ml-2">
+                          🤷‍♂️
                         </button>
-                        <SelectAndConnectWalletButton
-                          onUseWalletClick={onUseWalletClick}
-                        />
                       </div>
-                    ) : (
-                      <WalletMultiButton />
-                    )
-                    }
-                    {/*<div className="tooltip tooltip-left" data-tip="Refresh Wallet">
-                        <button onClick={refreshWallet} className="btn btn-primary text-lg">
-                          🗘
-                       </button>
-                     </div>*/}
+                      <div className="">
+                        <button onClick={onChange} className="btn btn-primary ml-2">
+                          👁️
+                        </button>
+                      </div>
+                      <div className="">
+                        <button onClick={copyWalletAddress} className="btn btn-primary ml-2 mr-2">
+                          💾
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      {publicKey &&
+                        <div className="flex">
+                          <button onClick={toggleModal} className="btn btn-primary mr-2">
+                            ✉️
+                          </button>
+                          <SelectAndConnectWalletButton
+                            onUseWalletClick={onUseWalletClick}
+                          />
+                        </div>
+                      }
+                    </div>
+                    <ConnectWallet />
                   </div>
+
                   <input
                     type="text"
                     placeholder="Enter Wallet Address"
@@ -894,10 +908,11 @@ export const GalleryView: FC = ({ }) => {
                             <CloseButton toClose={tokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
                           </div>
                         }
-                        {openTab === 6 ? (
-                          <RevokeButton toRevoke={TokenstoRevoke} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />) : (
-                          <div />
-                        )}
+                        {delegatedTokens.length > 0 &&
+                          <div>
+                            <RevokeButton toRevoke={delegatedTokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                          </div>
+                        }
                       </div>
                     ) : (
                       <div />
@@ -1033,7 +1048,7 @@ export const GalleryView: FC = ({ }) => {
                   </div>
                   <div className={openTab === 5 ? "block" : "hidden"}>
                     <div className="overflow-auto h-[55.7rem] scrollbar">
-                      
+
                     </div>
                   </div>
                   <div className={openTab === 6 ? "block" : "hidden"}>
@@ -1273,7 +1288,7 @@ const Balance = ({ }) => {
           )
         }).then(res => res.json())
           .then(json => {
-            handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(4))
+            handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(2))
           });
       } catch (e) {
         console.log("BALANCE ERROR:" + e)

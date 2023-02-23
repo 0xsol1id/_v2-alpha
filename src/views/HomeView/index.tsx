@@ -2,11 +2,11 @@ import { FC, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 import { MainMenu } from "../mainmenu"
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { randomWallets } from "../wallets"
 import { Footer } from '../footer';
 import Link from "next/link";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
+import { ConnectWallet } from "components";
 
 export const HomeView: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -33,7 +33,7 @@ export const HomeView: FC = ({ }) => {
           <MainMenu />
           <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
             <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
-              <Link href={`/gallery?wallet=${randomWallet}`}>🤷‍♂️ </Link>
+              <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
             </button>
             <input
               type="text"
@@ -45,7 +45,7 @@ export const HomeView: FC = ({ }) => {
             {message == true ? (
               <div className="tooltip tooltip-right" data-tip="Load wallet">
                 <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
-                  <Link href={`/gallery?wallet=${value}`}>👁️</Link>
+                  <Link href={`/showme?wallet=${value}`}>👁️</Link>
                 </button>
               </div>
             ) : (
@@ -58,12 +58,15 @@ export const HomeView: FC = ({ }) => {
           <div>
             <div>
               {publicKey ?
-                <button className="btn btn-primary mr-2">
-                  <Link href={`/gallery?wallet=${publicKey?.toBase58()}`}><img src="./profil.png" className="w-8 h-8" /></Link>
+                <button className="btn btn-primary mr-2 block">
+                  <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
+                    <img src="./profil.png" className="w-6 h-6" />
+                    </Link>                    
+                    <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
                 </button>
                 : null}
             </div>
-            <WalletMultiButton />
+            <ConnectWallet />
           </div>
         </div>
         <div className="hero my-auto">
@@ -71,7 +74,7 @@ export const HomeView: FC = ({ }) => {
 
             <div className="border-2 rounded-lg border-gray-700 bg-gray-700 lg:hidden block">
               <button className="btn btn-primary mb-3 font-pixel w-full">
-                <Link href={`/gallery?wallet=${randomWallet}`}>Load random wallet</Link>
+                <Link href={`/showme?wallet=${randomWallet}`}>Load random wallet</Link>
               </button>
               <input
                 type="text"
@@ -82,7 +85,7 @@ export const HomeView: FC = ({ }) => {
               />
               {message == true ? (
                 <button className="btn btn-primary mb-3 font-pixel w-full">
-                  <Link href={`/gallery?wallet=${value}`}>Load Wallet</Link>
+                  <Link href={`/showme?wallet=${value}`}>Load Wallet</Link>
                 </button>
               ) : (
                 <button className="bg-gray-700 mt-3 font-pixel">not a valid wallet</button>
