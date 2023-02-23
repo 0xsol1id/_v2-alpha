@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from "react";
 import useSWR from "swr";
-import { EyeOffIcon } from "@heroicons/react/outline";
+import proxy from './proxy.png'
 
 import { fetcher } from "utils/fetcher";
 import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
@@ -313,14 +313,13 @@ export const CollageNftCard: FC<Props> = ({
         ) : (
           // Fallback when preview isn't available. This could be broken image, video, or audio
           <div>
-            <div className="w-auto flex items-center justify-center">
-              <a onClick={toggleModal} className="hover:cursor-pointer">
+            <div className="w-auto flex items-center justify-center bg-gray-700 rounded">
+              <a onClick={toggleModal} className="hover:cursor-pointer border-primary hover:border-2">
                 <img
-                  src={image}
+                  src={proxy.src}
                   onError={onImageError}
                   className="object-cover rounded text-center"
                 />
-                <EyeOffIcon className="h-38 w-38 text-white" />
               </a>
             </div>
           </div>
@@ -373,8 +372,14 @@ export const CollageNftCard: FC<Props> = ({
               </div>
             </div>
           ) : (
-            <div className="w-auto h-48 flex items-center justify-center">
-              <EyeOffIcon className="h-24 w-24 text-white" />
+            <div className="w-auto flex items-center justify-center">
+              <div className="w-auto flex items-center justify-center">
+                <img
+                  src={proxy.src}
+                  onError={onImageError}
+                  className="object-cover rounded text-center h-96"
+                />
+              </div>
             </div>
           )}
           <div className="w-full grid content-center">
