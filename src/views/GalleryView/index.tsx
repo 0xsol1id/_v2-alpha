@@ -1,16 +1,16 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
+import { resolveToWalletAddress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
 
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { PublicKey, LAMPORTS_PER_SOL, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
-import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, performReverseLookup, NAME_PROGRAM_ID } from "@bonfida/spl-name-service";
+import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, getAllDomains, performReverseLookup, getFavoriteDomain } from "@bonfida/spl-name-service";
 
-import { CollageNftCard } from "./CollageNftCard";
+import { NftCard } from "./NftCard";
 import { BurnButton } from "utils/BurnButton";
 import { useWalletTokens } from "../../utils/useWalletTokens"
 import { CloseButton } from "utils/CloseButton";
@@ -113,6 +113,40 @@ export const GalleryView: FC = ({ }) => {
     errorMessage = error.message
   }
 
+  const Balance = ({ }) => {
+    const [balance, setBalance] = useState("")
+    const handleChangeBalance = (val: string) => {
+      setBalance(val)
+    }
+    useEffect(() => {
+      (async () => {
+        try {
+          fetch("https://compatible-smart-general.solana-mainnet.discover.quiknode.pro/9b4affb03539b7a422f5c636723e162c7a1b3afe/", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(
+              { "jsonrpc": "2.0", "id": 1, "method": "getBalance", "params": [value] }
+            )
+          }).then(res => res.json())
+            .then(json => {
+              console.log(json.result?.value + "-" + walletPublicKey)
+              handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(3))
+            });
+        } catch (e) {
+          console.log("BALANCE ERROR:" + e)
+        }
+
+      })();
+    }, [])
+    return (
+      <div className="flex justify-between text-sm ml-2">
+        <p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p>
+      </div>
+    )
+  }
+
   const getQuery = () => {
     if (typeof window !== 'undefined') {
       return new URLSearchParams(window.location.search);
@@ -189,7 +223,7 @@ export const GalleryView: FC = ({ }) => {
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {nfts?.map((nft: any, index) => (
             selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
-              <CollageNftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
+              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
             ) : (null)
           ))}
         </div>
@@ -218,6 +252,7 @@ export const GalleryView: FC = ({ }) => {
   var rektiezCount: number = 0
   var harrddyJunksCount: number = 0
   var score = 0
+  var trukClaim = ""
 
   let collections: any[] = []
   let collectionsUri: any[] = []
@@ -247,16 +282,17 @@ export const GalleryView: FC = ({ }) => {
       collections.push(element.updateAuthority)
       collectionsUri.push(element.data.uri)
       collectionsMint.push(element.mint)
-      collectionsNames.push(element.data.symbol)
+      collectionsNames.push(element.data.name)
     }
   });
-  score = (gen1Count * 1) + 
-          (gen2Count * 1) + 
-          (smbCount * 5) + 
-          (facesCount * 10) + 
-          (rektiezCount * 50) + 
-          (harrddyJunksCount * 100)
-  
+  score = (gen1Count * 1) +
+    (gen2Count * 1) +
+    (smbCount * 5) +
+    (facesCount * 10) +
+    (rektiezCount * 50) +
+    (harrddyJunksCount * 100)
+  trukClaim = (score / 6.9).toFixed(2)
+
   const [rarityData, setRarityData] = useState<any>()
   //RARITY RANKING  
   async function CheckRarity(url: string) {
@@ -273,13 +309,31 @@ export const GalleryView: FC = ({ }) => {
   const onChange = async () => {
     setOpenTab(1)
     const val = value
-    const address = await resolveToWalletAddrress({ text: val.trim() })
-    if (value == publicKey?.toBase58())
-      isConnectedWallet = true
-    else
-      isConnectedWallet = false
-    setWalletToParsePublicKey(address)
-    walletPublicKey = address
+
+    if (val.includes(".sol")) {
+      const { pubkey } = await getDomainKey(val.trim());
+      const { registry, nftOwner } = await NameRegistryState.retrieve(
+        connection,
+        pubkey
+      );
+      const address = registry.owner.toString()
+      if (value == registry.owner.toString())
+        isConnectedWallet = true
+      else
+        isConnectedWallet = false
+
+      setWalletToParsePublicKey(address)
+      walletPublicKey = address
+    }
+    else {
+      const address = await resolveToWalletAddress({ text: val.trim() })
+      if (value == publicKey?.toBase58())
+        isConnectedWallet = true
+      else
+        isConnectedWallet = false
+      setWalletToParsePublicKey(address)
+      walletPublicKey = address
+    }
   };
 
   const onChangeME = async (address: any) => {
@@ -487,6 +541,31 @@ export const GalleryView: FC = ({ }) => {
     await navigator.clipboard.writeText(value);
   }
 
+  const DomainName = ({ }) => {
+    const [domain, setDomain] = useState("loading...")
+    const handleChangeDomain = (val: string) => {
+      setDomain(val)
+    }
+    useEffect(() => {
+      (async () => {
+        try {
+          const user = new PublicKey(walletToParsePublicKey)
+          console.log("USER: " + user)
+          const domains = await getAllDomains(connection, user);
+          console.log("DOMAIN: " + domain)
+          handleChangeDomain(await performReverseLookup(connection, domains[0]) + ".sol")
+        } catch (err) {
+          console.log("DOMAIN ERROR:" + err)
+          handleChangeDomain("no domain found")
+        }
+      })();
+    }, [])
+
+    return (
+      <div className="flex justify-between text-sm ml-2 text-center"><p className="font-pixel">{domain}</p></div>
+    )
+  }
+
   useEffect(() => {
     if (value == publicKey?.toBase58())
       isConnectedWallet = true
@@ -661,7 +740,7 @@ export const GalleryView: FC = ({ }) => {
                 <ul className="space-y-2 bg-gray-900 h-[55.7rem] p-2 hidden lg:block">
                   <li className="">
                     <div className="">
-                      {/*<DomainName />*/}
+                      <DomainName />
                       <Balance />
                       {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
                       <br />
@@ -677,6 +756,7 @@ export const GalleryView: FC = ({ }) => {
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}</p></div>
                       <br />
                       <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score}</p></div>
+                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim}</p></div>
                       <br />
                     </div>
                   </li>
@@ -1011,75 +1091,6 @@ export const GalleryView: FC = ({ }) => {
     </div>
   );
 };
-
-const Balance = ({ }) => {
-  const [balance, setBalance] = useState("")
-  const handleChangeBalance = (val: string) => {
-    setBalance(val)
-  }
-  useEffect(() => {
-    (async () => {
-      try {
-        fetch("https://compatible-smart-general.solana-mainnet.discover.quiknode.pro/9b4affb03539b7a422f5c636723e162c7a1b3afe/", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(
-            { "jsonrpc": "2.0", "id": 1, "method": "getBalance", "params": [walletPublicKey] }
-          )
-        }).then(res => res.json())
-          .then(json => {
-            console.log(json.result?.value + "-" + walletPublicKey)
-            handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(3))
-          });
-      } catch (e) {
-        console.log("BALANCE ERROR:" + e)
-      }
-
-    })();
-  }, [])
-  return (
-    <div className="flex justify-between text-sm ml-2">
-      <p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p>
-    </div>
-  )
-}
-
-{/*const DomainName = ({ }) => {
-  const [domain, setDomain] = useState("loading...")
-  const handleChangeDomain = (val: string) => {
-    setDomain(val)
-  }
-  const pupKey = new PublicKey(walletPublicKey);
-  useEffect(() => {
-    (async () => {
-      try {
-        const { connection } = useConnection();
-        const filters = [
-          {
-            memcmp: {
-              offset: 32,
-              bytes: pupKey.toBase58(),
-            },
-          },
-        ];
-        const accounts = await connection.getProgramAccounts(NAME_PROGRAM_ID, {
-          filters,
-        })
-        const domainKey = new PublicKey(accounts[0].pubkey.toString());
-        handleChangeDomain(await performReverseLookup(connection, domainKey) + ".sol")
-      } catch (err) {
-        console.log("DOMAIN ERROR:" + err)
-        handleChangeDomain("none")
-      }
-    })();
-  }, [])
-
-  return (
-    <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Domain:&nbsp;</p><p className="font-pixel">{domain}</p></div>
-  )
-}*/}
 
 const CreatePonziView = ({ }) => {
   const { connection } = useConnection();

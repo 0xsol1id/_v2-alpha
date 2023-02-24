@@ -76,7 +76,7 @@ type Props = {
   toSend: any;
 };
 
-export const CollageNftCard: FC<Props> = ({
+export const NftCard: FC<Props> = ({
   details,
   isConnectedWallet,
   onSelect,
@@ -121,10 +121,6 @@ export const CollageNftCard: FC<Props> = ({
       console.log(e)
     }
   }
-
-  const { connection } = useConnection();
-  const { publicKey } = useWallet();
-  const wallet = useWallet();
 
   const creators = details.data?.creators;
   let firstCreator;
@@ -291,13 +287,21 @@ export const CollageNftCard: FC<Props> = ({
     <div className="text-center">
       <figure className="animation-pulse-color">
         {!fallbackImage && !error ? (
-          <div>
-            <a onClick={toggleModal} className="hover:cursor-pointer">
-              <img
-                src={image}
-                onError={onImageError}
-                className="object-cover rounded hover:border-2 border-primary"
-              />
+          <div className="relative "><a href="#" className="relative">
+            <div className="flex flex-wrap content-center">
+              <img src={image} className="mx-auto rounded" alt="" />
+            </div>
+          </a>
+            <a onClick={toggleModal} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
+              <div>
+                <h1 className="tracking-wider font-pixel bg-black bg-opacity-40 rounded p-1 text-xs border-2 border-opacity-20" >
+                  {name ? (
+                    <p>{name}</p>
+                  ) : (
+                    <p>...no name...</p>
+                  )}
+                </h1>
+              </div>
               {rarityData &&
                 <div>
                   <span className="absolute top-[1rem] left-[1rem] bg-gray-900 bg-opacity-50 p-1 rounded">
@@ -313,13 +317,22 @@ export const CollageNftCard: FC<Props> = ({
         ) : (
           // Fallback when preview isn't available. This could be broken image, video, or audio
           <div>
-            <div className="w-auto flex items-center justify-center bg-gray-700 rounded">
-              <a onClick={toggleModal} className="hover:cursor-pointer border-primary hover:border-2">
-                <img
-                  src={proxy.src}
-                  onError={onImageError}
-                  className="object-cover rounded text-center"
-                />
+            <div className="relative ">
+              <a href="#" className="relative">
+            <div className="flex flex-wrap content-center">
+              <img src={proxy.src} className="mx-auto rounded bg-gray-900" alt="" />
+            </div>
+          </a>
+            <a onClick={toggleModal} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
+              <div>
+                <h1 className="tracking-wider font-pixel bg-black bg-opacity-40 rounded p-1 text-xs border-2 border-opacity-20" >
+                  {name ? (
+                    <p>{name}</p>
+                  ) : (
+                    <p>...no name...</p>
+                  )}
+                </h1>
+              </div>
               </a>
             </div>
           </div>
