@@ -10,14 +10,10 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/sp
 import { PublicKey, LAMPORTS_PER_SOL, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, performReverseLookup, NAME_PROGRAM_ID } from "@bonfida/spl-name-service";
 
-import { NftCard } from "./NftCard";
 import { CollageNftCard } from "./CollageNftCard";
 import { BurnButton } from "utils/BurnButton";
 import { useWalletTokens } from "../../utils/useWalletTokens"
-import { EmptyTokenCard } from "./EmptyTokenCard";
 import { CloseButton } from "utils/CloseButton";
-import { TokenCard } from "./TokenCard";
-import { RevokeCard } from "./RevokeCard";
 import { RevokeButton } from "utils/RevokeButton";
 import { useWalletDelegated } from "utils/useWalletDelegated";
 
@@ -26,14 +22,13 @@ import html2canvas from 'html2canvas';
 import downloadjs from 'downloadjs';
 import Modal from 'react-modal';
 import Papa from "papaparse";
-import useSWR from "swr";
 
 import { Loader, SelectAndConnectWalletButton, MagicEdenLogo, ConnectWallet } from "components";
 import { Footer } from 'views/footer';
 import { fetcher } from 'utils/fetcher';
-import { EyeOffIcon } from '@heroicons/react/outline';
 import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
+import { TokenName } from "utils/TokenName";
 
 Modal.setAppElement("#__next");
 
@@ -42,8 +37,6 @@ var walletPublicKey = randomWallets[randomInt(0, randomWallets.length)].Wallet /
 
 const NFTstoBurn: string[] = []
 const NFTstoSend: string[] = []
-const TokenstoRevoke: string[] = []
-let AccountstoClose: string[] = []
 
 function convertTimestamp(timestamp: any) {
   var d = new Date(timestamp * 1000),
@@ -76,157 +69,49 @@ function randomInt(low: number, high: number) {
 }
 
 export const GalleryView: FC = ({ }) => {
+  const { connection } = useConnection();
   const queryParameters = new URLSearchParams(window.location.search)
   const walletParam: any = queryParameters.get("wallet")
   const collectionParam: any = queryParameters.get("collection")
 
-  type CollectionProps = {
-    ua: string
-    uri: string
-    mint: string
-    onTokenDetailsFetched?: (props: any) => unknown;
-  };
+  const [openTab, setOpenTab] = useState(1);
+  const [walletToParsePublicKey, setWalletToParsePublicKey] =
+    useState<string>(walletParam == "" ? walletPublicKey : walletParam);
 
-  const { connection } = useConnection();
+  const { publicKey } = useWallet();
+  const wallet = useWallet();
 
-  type CollectionsListProps = {
-    collections: string[];
-    collectionsUri2: string[];
-    collectionsMint: string[];
-    error?: Error;
-    setRefresh: Dispatch<SetStateAction<boolean>>
-  };
+  const [message, setMessage] = useState(false)
+  var valid = false
 
-  const CollectionsList = ({ collections, collectionsUri2, collectionsMint, error, setRefresh }: CollectionsListProps) => {
-    if (error) {
-      return null;
-    }
+  const [refresh, setRefresh] = useState(false)
 
-    if (!collectionsUri2?.length) {
-      return (
-        <div className="font-pixel text-center text-2xl pt-16">
-          No NFTs found in this wallet
-        </div>
-      );
-    }
+  const { nfts, isLoading, error } = useWalletNfts({
+    publicAddress: walletToParsePublicKey,
+    connection,
+  });
 
-    return (
-      <div>
-        <div className="rounded">
-          <div className='flex justify-center bg-gray-900 p-2 h-12'>
-            <h1 className='font-pixel ml-5 underline text-2xl'>Collection Overview</h1>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 items-start gap-1 p-2">
-            {collectionsUri2?.map((tmp, index) => (
-              <CollectionCard ua={collections[index]} uri={tmp} mint={collectionsMint[index]} />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const { tokens } = useWalletTokens({
+    publicAddress: walletToParsePublicKey,
+    connection,
+    type: 'empty'
+  });
 
-  const CollectionCard: FC<CollectionProps> = ({
-    ua,
-    uri,
-    mint,
-    onTokenDetailsFetched = () => { },
-  }) => {
-    const [fallbackImage, setFallbackImage] = useState(false);
-    const { data, error } = useSWR(
-      // uri || url ? getMetaUrl(details) : null,
-      uri,
-      fetcher,
-      {
-        revalidateIfStale: false,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-      }
-    );
+  /*const { splTokens } = useWalletTokens({
+    publicAddress: walletToParsePublicKey,
+    connection,
+    type: 'spl'
+  });*/
 
-    useEffect(() => {
-      if (!error && !!data) {
-        onTokenDetailsFetched(data);
-      }
-    }, [data, error]);
+  const { delegatedTokens } = useWalletDelegated({
+    publicAddress: walletToParsePublicKey,
+    connection,
+  });
 
-    const onImageError = () => setFallbackImage(true);
-    const [shortUpdateAuthority, setShortUpdateAuthority] = useState("")
-    const { image, external_url } = data ?? {};
-
-    const [collectionName, setcollectionName] = useState("")
-    const handleChangecollectionName = (val: string) => {
-      setcollectionName(val)
-    }
-    async function GetCollectionName(url: string) {
-      try {
-        const response = await fetch(url)
-        const jsonData = await response.json()
-        if (jsonData.collection)
-          handleChangecollectionName(jsonData.collection)
-        else
-          setShortUpdateAuthority(ua.slice(0, 3) + "..." + ua.slice(-3))
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
-    const showCollection = () => {
-      setSearch2(ua)
-    }
-
-    useEffect(() => {
-      GetCollectionName(`https://fudility.xyz:3420/collectionname/${mint}`)
-    }, []);
-
-    return (
-      <div className="rounded bg-gray-900 p-1 border-2 border-gray-700 text-center">
-        <figure className="animation-pulse-color mb-1">
-          {!fallbackImage && !error ? (
-            <div>
-              <button onClick={showCollection} className="btn btn-ghost w-52 h-52 p-1 tooltip tooltip-top font-pixel" data-tip="Show details">
-                <img
-                  src={image}
-                  onError={onImageError}
-                  className="bg-gray-800 object-cover rounded h-48"
-                />
-              </button>
-            </div>
-          ) : (
-            // Fallback when preview isn't available. This could be broken image, video, or audio
-            <div>
-              <div className="w-auto flex items-center justify-center">
-                <button onClick={showCollection} className="btn btn-ghost h-52 w-52 p-0 tooltip tooltip-top font-pixel" data-tip="Show details">
-                  <img
-                    src={image}
-                    onError={onImageError}
-                    className="object-cover rounded text-center"
-                  />
-                  <EyeOffIcon className="h-38 w-38 text-white" />
-                </button>
-              </div>
-            </div>
-          )}
-        </figure>
-        <div className=' h-14'>
-          <h2 className="font-pixel text-sm mb-2">
-            {collectionName.replace(/_/g, " ").toUpperCase()}
-            {shortUpdateAuthority}
-
-          </h2>
-          <div className="flex justify-center font-pixel text-xs">
-            {/*shortenUA*/}
-            {external_url &&
-              <a target="_blank" className="btn btn-ghost btn-xs tooltip tooltip-top font-pixel" data-tip="Show Website" href={external_url}>🔗</a>
-            }
-            {collectionName &&
-              <a target="_blank" className="btn btn-ghost btn-xs tooltip tooltip-top font-pixel" data-tip="Show on ME" href={`https://magiceden.io/marketplace/${collectionName}`}><MagicEdenLogo /></a>
-            }
-          </div>
-        </div>
-      </div>
-    );
-  };
+  let errorMessage
+  if (error) {
+    errorMessage = error.message
+  }
 
   const getQuery = () => {
     if (typeof window !== 'undefined') {
@@ -266,50 +151,8 @@ export const GalleryView: FC = ({ }) => {
 
     return [query, updateUrl];
   };
-
   const [search, setSearch] = useQueryParam('wallet', '');
   const [search2, setSearch2] = useQueryParam('collection', '');
-
-  type NftListProps = {
-    nfts: NftTokenAccount[];
-    updateAuthority: string
-    error?: Error;
-    setRefresh: Dispatch<SetStateAction<boolean>>
-  };
-
-  const NftList = ({ nfts, updateAuthority, error, setRefresh }: NftListProps) => {
-    if (error) {
-      return null;
-    }
-
-    if (!nfts?.length) {
-      return (
-        <div className="font-pixel text-center text-2xl pt-16">
-          No NFTs found in this wallet
-        </div>
-      );
-    }
-
-    const back = () => {
-      setSearch2('');
-    }
-
-    return (
-      <div className="rounded">
-        <div className='flex justify-between bg-gray-900 p-2 h-12'>
-          <button onClick={back} className="btn btn-primary btn-sm font-pixel ml-2">◀ back to overview</button>
-          <h1 className='font-pixel mr-5 text-2xl'>Collection: {updateAuthority}</h1>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 items-start gap-1 p-2">
-          {nfts?.map((nft: any, index) => (
-            nft.updateAuthority == updateAuthority || updateAuthority == "" ? (
-              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
-            ) : (null)
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   const [columnsSize, setcolumnsSize] = useState(7);
 
@@ -354,45 +197,6 @@ export const GalleryView: FC = ({ }) => {
     );
   };
 
-  const [openTab, setOpenTab] = useState(1);
-  const [walletToParsePublicKey, setWalletToParsePublicKey] =
-    useState<string>(walletParam == "" ? walletPublicKey : walletParam);
-
-  const { publicKey } = useWallet();
-  const wallet = useWallet();
-
-  const [message, setMessage] = useState(false)
-  var valid = false
-
-  const [refresh, setRefresh] = useState(false)
-
-  const { nfts, isLoading, error } = useWalletNfts({
-    publicAddress: walletToParsePublicKey,
-    connection,
-  });
-
-  const { tokens } = useWalletTokens({
-    publicAddress: walletToParsePublicKey,
-    connection,
-    type: 'empty'
-  });
-
-  /*const { tokens } = useWalletTokens({
-    publicAddress: walletToParsePublicKey,
-    connection,
-    type: 'spl'
-  });*/
-
-  const { delegatedTokens } = useWalletDelegated({
-    publicAddress: walletToParsePublicKey,
-    connection,
-  });
-
-  let errorMessage
-  if (error) {
-    errorMessage = error.message
-  }
-
   const [history, setHistory] = useState([])
   const handleChangeHistory = (val: []) => {
     setHistory(val)
@@ -407,12 +211,13 @@ export const GalleryView: FC = ({ }) => {
     }
   }
 
-  var junksCount: number = 0
+  var gen1Count: number = 0
+  var gen2Count: number = 0
   var smbCount: number = 0
   var facesCount: number = 0
-  var gen2Count: number = 0
   var rektiezCount: number = 0
-  var points = 0
+  var harrddyJunksCount: number = 0
+  var score = 0
 
   let collections: any[] = []
   let collectionsUri: any[] = []
@@ -421,7 +226,7 @@ export const GalleryView: FC = ({ }) => {
 
   nfts.forEach(async (element: any) => {
     if (element.updateAuthority == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
-      junksCount++
+      gen1Count++
     }
     if (element.updateAuthority == "FEtQrCx12b9ebbTZq8Un11RNJUYxiDQF4zQCJctzRYH6") {
       smbCount++
@@ -435,6 +240,9 @@ export const GalleryView: FC = ({ }) => {
     if (element.updateAuthority == "PnsQRTnqXBPshHpPj2kHWZwyrWABa5GTrPA6MDkwV4p") {
       rektiezCount++
     }
+    if (element.updateAuthority == "G14Wu9xSqL2yLHCrQHqajvhK7zApwdEM6iWhbBxcFQXS") {
+      harrddyJunksCount++
+    }
     if (!collections.includes(element.updateAuthority)) {
       collections.push(element.updateAuthority)
       collectionsUri.push(element.data.uri)
@@ -442,12 +250,13 @@ export const GalleryView: FC = ({ }) => {
       collectionsNames.push(element.data.symbol)
     }
   });
-
-  points = (junksCount * 5) + (smbCount * 25) + (facesCount * 100) + (gen2Count * 10) + (rektiezCount * 50)
-  if (error) {
-    return null;
-  }
-
+  score = (gen1Count * 1) + 
+          (gen2Count * 1) + 
+          (smbCount * 5) + 
+          (facesCount * 10) + 
+          (rektiezCount * 50) + 
+          (harrddyJunksCount * 100)
+  
   const [rarityData, setRarityData] = useState<any>()
   //RARITY RANKING  
   async function CheckRarity(url: string) {
@@ -462,7 +271,6 @@ export const GalleryView: FC = ({ }) => {
   const [value, setValue] = useState(walletToParsePublicKey);
 
   const onChange = async () => {
-    AccountstoClose = []
     setOpenTab(1)
     const val = value
     const address = await resolveToWalletAddrress({ text: val.trim() })
@@ -472,11 +280,9 @@ export const GalleryView: FC = ({ }) => {
       isConnectedWallet = false
     setWalletToParsePublicKey(address)
     walletPublicKey = address
-    //GetHistory(`https://fudility.xyz:3420/history/${address}`)
   };
 
   const onChangeME = async (address: any) => {
-    AccountstoClose = []
     setOpenTab(1)
     if (value == publicKey?.toBase58())
       isConnectedWallet = true
@@ -485,11 +291,9 @@ export const GalleryView: FC = ({ }) => {
     setWalletToParsePublicKey(address)
     walletPublicKey = address
     setValue(address)
-    //GetHistory(`https://fudility.xyz:3420/history/${address}`)
   };
 
   const randomWallet = () => {
-    AccountstoClose = []
     setOpenTab(1)
     var wallet = randomWallets[randomInt(0, randomWallets.length)]
     if (value == publicKey?.toBase58())
@@ -499,18 +303,15 @@ export const GalleryView: FC = ({ }) => {
     setWalletToParsePublicKey(wallet.Wallet)
     walletPublicKey = wallet.Wallet
     setValue(wallet.Wallet)
-    //GetHistory(`https://fudility.xyz:3420/history/${wallet.Wallet}`)
   };
 
   const onUseWalletClick = () => {
-    AccountstoClose = []
     if (publicKey) {
       setOpenTab(1)
       isConnectedWallet = true
       setWalletToParsePublicKey(publicKey?.toBase58())
       walletPublicKey = publicKey?.toBase58()
       setValue(publicKey?.toBase58())
-      //GetHistory(`https://fudility.xyz:3420/history/${publicKey?.toBase58()}`)
     }
   };
 
@@ -544,11 +345,6 @@ export const GalleryView: FC = ({ }) => {
   const [isBattleOpen, setIsBattleOpen] = useState(false);
   function toggleBattleModal() {
     setIsBattleOpen(!isBattleOpen);
-  }
-
-  const [isPonziOpen, setIsPonziOpen] = useState(false);
-  function togglePonziModal() {
-    setIsPonziOpen(!isPonziOpen);
   }
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -857,7 +653,7 @@ export const GalleryView: FC = ({ }) => {
                         <Balance />
                         {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
                         <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
-                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Score:&nbsp;</p><p className="font-pixel">{points}</p></div>
+                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Score:&nbsp;</p><p className="font-pixel">{score}</p></div>
                       </div>
                     </div>
                   </li>
@@ -873,13 +669,14 @@ export const GalleryView: FC = ({ }) => {
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
                       <br />
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{junksCount}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{gen1Count}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">$olana Money Bu$ine$$:&nbsp;</p><p className="font-pixel">{smbCount}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Faces of $MB:&nbsp;</p><p className="font-pixel">{facesCount}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Lil Rektiez:&nbsp;</p><p className="font-pixel">{rektiezCount}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}</p></div>
                       <br />
-                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{points}</p></div>
+                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score}</p></div>
                       <br />
                     </div>
                   </li>
@@ -891,33 +688,9 @@ export const GalleryView: FC = ({ }) => {
                       className={` ${openTab === 1 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
                     >Show NFTs</a>
                   </li>
-                  {/*<li>
-                    <button
-                      onClick={() => saveCollage()}
-                      className="font-pixel btn btn-sm w-full rounded"
-                    >Save collage</button>
-                  </li>
-                  <li>
-                    <a href="#collectionOverview"
-                      onClick={() => setOpenTab(2)}
-                      className={` ${openTab === 2 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >Detail view</a>
-                  </li>
-                  <li>
-                    <a href="#closeAcc"
-                      onClick={() => setOpenTab(5)}
-                      className={` ${openTab === 5 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >SHow Empty Accounts</a>
-                  </li>
-                  <li>
-                    <a href="#revokeAuth"
-                      onClick={() => setOpenTab(6)}
-                      className={` ${openTab === 6 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
-                    >Show Delegated Auth</a>
-                  </li>*/}
                   <li>
                     <a href="#MEhistory"
-                      onClick={() => setOpenTab(4)}
+                      onClick={() => setOpenTab(2)}
                       className={` ${openTab === 4 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
                     >Show <MagicEdenLogo /> History</a>
                   </li>
@@ -961,7 +734,7 @@ export const GalleryView: FC = ({ }) => {
                       <div>
                         <li>
                           <a href="#createSPLtoken"
-                            onClick={() => setOpenTab(7)}
+                            onClick={() => setOpenTab(3)}
                             className={` ${openTab === 7 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn w-full rounded mb-2`}
                           >Create ponzi token</a>
                         </li>
@@ -972,7 +745,7 @@ export const GalleryView: FC = ({ }) => {
                         </li>
                         <li>
                           <a href="#updateNFT"
-                            onClick={() => setOpenTab(12)}
+                            onClick={() => setOpenTab(4)}
                             className={` ${openTab === 12 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn w-full rounded mb-2`}
                           >Multi Send Token</a>
                         </li>
@@ -991,33 +764,17 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   </div>
                   <div className={openTab === 2 ? "block" : "hidden"}>
-                    <div className="overflow-auto lg:h-[55.7rem] scrollbar">
-                      {search2 != '' &&
-                        <NftList nfts={nfts} error={error} setRefresh={setRefresh} updateAuthority={search2} />
-                      }
-                      {search2 == '' &&
-                        <CollectionsList collections={collections} collectionsUri2={collectionsUri} collectionsMint={collectionsMint} error={error} setRefresh={setRefresh} />
-                      }
-                    </div>
-                  </div>
-                  <div className={openTab === 3 ? "block" : "hidden"}>
-                    <div className="p-1 rounded lg:h-[55.7rem] mr-1 overflow-auto min-w-full scrollbar">
-                    </div>
-                  </div>
-                  <div className={openTab === 4 ? "block" : "hidden"}>
                     <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
                       {history?.map((num: any, index: any) => (
                         <div key={index}>
                           {num.type != "bid" ? (
                             <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
                               <div className='my-auto p-1'>
-                                {/*<TokenIconME mint={num.tokenMint} />*/}
                                 <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
                                   <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
                                     {/*<TokenName mint={num.tokenMint} />*/}
                                   </a>
                                 </button>
-                                {/*<p className='flex font-pixel text-xs'>{num.collection}</p>*/}
                               </div>
                               {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
                                 <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto">BUY for {num.price.toFixed(2)}◎</p>
@@ -1063,55 +820,16 @@ export const GalleryView: FC = ({ }) => {
                                   null
                                 )}
                               </div>
-
                             </div>
                           ) : (null)}
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className={openTab === 5 ? "block" : "hidden"}>
-                    <div className="overflow-auto h-[55.7rem] scrollbar">
-
-                    </div>
+                  <div className={openTab === 3 ? "block" : "hidden"}>
+                    <CreatePonziView />
                   </div>
-                  <div className={openTab === 6 ? "block" : "hidden"}>
-                    <div className="mb-auto my-10">
-                      {error && errorMessage != "Invalid address: " ? (
-                        <div>
-                          <h1>Error Occures</h1>
-                          {(error as any)?.message}
-                        </div>
-                      ) : null}
-
-                      {!error && isLoading &&
-                        <div>
-                          <Loader />
-                        </div>
-                      }
-                      {!error && !isLoading && !refresh &&
-                        <div className="p-1 h-[55.7rem] mr-1 overflow-auto min-w-full scrollbar">
-                          <RevokeList tokens={delegatedTokens} error={error} setRefresh={setRefresh} />
-                        </div>
-                      }
-                    </div>
-                  </div>
-                  <div className={openTab === 7 ? "block" : "hidden"}>
-                    <SPLTokenView />
-                  </div>
-                  <div className={openTab === 8 ? "block" : "hidden"}>
-
-                  </div>
-                  <div className={openTab === 9 ? "block" : "hidden"}>
-
-                  </div>
-                  <div className={openTab === 10 ? "block" : "hidden"}>
-
-                  </div>
-                  <div className={openTab === 11 ? "block" : "hidden"}>
-                    eeeeeeearn
-                  </div>
-                  <div className={openTab === 12 ? "block" : "hidden"}>
+                  <div className={openTab === 4 ? "block" : "hidden"}>
                     <MultiSenderView />
                   </div>
                 </div >
@@ -1302,7 +1020,7 @@ const Balance = ({ }) => {
   useEffect(() => {
     (async () => {
       try {
-        fetch("https://solana-mainnet.g.alchemy.com/v2/p5DCRRBHKVxuF7b6CfaS0YDyXaialE_Z", {
+        fetch("https://compatible-smart-general.solana-mainnet.discover.quiknode.pro/9b4affb03539b7a422f5c636723e162c7a1b3afe/", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1312,6 +1030,7 @@ const Balance = ({ }) => {
           )
         }).then(res => res.json())
           .then(json => {
+            console.log(json.result?.value + "-" + walletPublicKey)
             handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(3))
           });
       } catch (e) {
@@ -1362,63 +1081,7 @@ const Balance = ({ }) => {
   )
 }*/}
 
-type TokenListProps = {
-  tokens: string[] | undefined;
-  error?: Error;
-  setRefresh: Dispatch<SetStateAction<boolean>>;
-};
-
-const TokenList = ({ tokens, error, setRefresh }: TokenListProps) => {
-  if (error) {
-    return null;
-  }
-
-  if (!tokens?.length) {
-    return (
-      <div className="text-center font-pixel text-2xl">
-        No token found in this wallet
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {tokens?.map((token, index) => (
-        <TokenCard isConnectedWallet={isConnectedWallet} key={index} mint={token} toBurn={NFTstoBurn} />
-      ))}
-    </div>
-  );
-};
-
-type RevokeListProps = {
-  tokens: string[] | undefined;
-  error?: Error;
-  setRefresh: Dispatch<SetStateAction<boolean>>;
-};
-
-const RevokeList = ({ tokens, error, setRefresh }: RevokeListProps) => {
-  if (error) {
-    return null;
-  }
-
-  if (!tokens?.length) {
-    return (
-      <div className="font-pixel text-center text-2xl">
-        This wallet has no delegated authority
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {tokens?.map((token) => (
-        <RevokeCard key={token} mint={token} toRevoke={TokenstoRevoke} />
-      ))}
-    </div>
-  );
-};
-
-const SPLTokenView = ({ }) => {
+const CreatePonziView = ({ }) => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const { publicKey } = useWallet();
@@ -1557,38 +1220,6 @@ const SPLTokenView = ({ }) => {
     </div>
   );
 };
-
-type AccountListProps = {
-  accounts: string[] | undefined;
-  error?: Error;
-  setRefresh: Dispatch<SetStateAction<boolean>>;
-};
-
-const AccountList = ({ accounts, error, setRefresh }: AccountListProps) => {
-  if (error) {
-    return null;
-  }
-
-  if (!accounts?.length) {
-    return (
-      <div className="text-center font-pixel text-2xl pt-16">
-        No empty account found in this wallet
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {accounts?.map((token) => (
-        <EmptyTokenCard key={token} account={token} toClose={AccountstoClose} isConnectedWallet={isConnectedWallet} />
-      ))}
-    </div>
-  );
-};
-
-
-
-
 
 
 //----------------------------------------------------------SENDER VIEW----------------------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ import Alert from "@material-ui/lab/Alert";
 import { toDate, AlertState, getAtaForMint } from './utils';
 import { MintButton } from './MintButton';
 import { MultiMintButton } from './MultiMintButton';
-import { 
+import {
   CandyMachine,
   awaitTransactionSignatureConfirmation,
   getCandyMachineState,
@@ -25,6 +25,10 @@ import {
   mintMultipleToken,
   CANDY_MACHINE_PROGRAM,
 } from "./candy-machine";
+import { randomWallets } from "../wallets"
+import { Footer } from '../footer';
+import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
+import { ConnectWallet, SelectAndConnectWalletButton } from "components";
 
 const decimals = process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS ? +process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS!.toString() : 9;
 const splTokenName = process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME ? process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME.toString() : "TOKEN";
@@ -70,7 +74,6 @@ const DesContainer = styled.div`
   flex-direction: column;
   flex: 1 1 auto;
   gap: 20px;
-  min-width: 500px;
 `;
 
 const Image = styled.img`
@@ -93,6 +96,21 @@ export interface HomeProps {
 
 export const MintView: FC<HomeProps> = (props) => {
   const { publicKey } = useWallet();
+
+  const [message, setMessage] = useState(false)
+  var valid = false
+  function randomInt(low: number, high: number) {
+    return Math.floor(Math.random() * (high - low) + low)
+  }
+
+  const [value, setValue] = useState("")
+  var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
+
+  const onChange = async (e: any) => {
+    setValue(e.target.value)
+    valid = isValidPublicKeyAddress(e.target.value)
+    setMessage(valid)
+  };
 
   const [balance, setBalance] = useState<number>();
   const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
@@ -239,7 +257,7 @@ export const MintView: FC<HomeProps> = (props) => {
         Hours</Card><Card elevation={1}><h1>{minutes}</h1>Mins</Card><Card elevation={1}>
           <h1>{seconds}</h1>Secs</Card></div>
     );
-  };  
+  };
 
   function displaySuccess(mintPublicKey: any, qty: number = 1): void {
     let remaining = itemsRemaining - qty;
@@ -271,7 +289,7 @@ export const MintView: FC<HomeProps> = (props) => {
   }
 
   async function mintMany(quantityString: number) {
-    
+
     console.log("STATUS2:")
     if (wallet && candyMachine?.program && wallet.publicKey) {
       const quantity = Number(quantityString);
@@ -365,7 +383,7 @@ export const MintView: FC<HomeProps> = (props) => {
   }
 
   async function mintOne() {
-    
+
     console.log("STATUS1:")
     if (wallet && candyMachine?.program && wallet.publicKey) {
       const mint = anchor.web3.Keypair.generate();
@@ -414,7 +432,7 @@ export const MintView: FC<HomeProps> = (props) => {
         await mintMany(quantityString);
       }
     } catch (error: any) {
-      
+
       console.log("STATUS:" + error)
       let message = error.msg || 'Minting failed! Please try again!';
       if (!error.msg) {
@@ -462,27 +480,89 @@ export const MintView: FC<HomeProps> = (props) => {
   ]);
 
   return (
-    <div className="mx-auto">
+    <div className="">
       <div className="">
-      <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
-          <div>
-            <MainMenu />
-            <p className="card p-2 text-sm font-bold rounded-lg bg-base-300"><img src="./fudility.png" /> <p>V1.0_beta</p></p>
-          </div>
-          {publicKey ? (
-            <div>
-              <WalletMultiButton />
+        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
+          <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-0 z-50 w-screen">
+            <div className="flex justify-between">
+              <div className="flex">
+                <div className="font-pixel">
+                  <button className="btn btn-primary ml-2" data-tip="Show a random wallet">
+                    <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
+                  </button>
+                </div>
+                <div className="">
+                  <button onClick={onChange} className="btn btn-primary ml-2">
+                    👁️
+                  </button>
+                </div>
+              </div>
+              <div className='flex'>
+                {publicKey &&
+                  <button className="btn btn-primary mr-2 block">
+                    <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
+                      <img src="./profil.png" className="w-6 h-6" />
+                    </Link>
+                    <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
+                  </button>
+                }
+              <ConnectWallet />
+              </div>
             </div>
-          ) : (
-            <WalletMultiButton />
-          )}
+
+            <input
+              type="text"
+              placeholder="Enter Wallet Address"
+              className="font-pixel input input-bordered h-8 w-full bg-base-200"
+              value={value}
+              onChange={(e) => { setValue(e.target.value) }}
+            />
+          </ul>
+          <div></div>
+          <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
+            <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
+              <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
+            </button>
+            <input
+              type="text"
+              placeholder="Enter Wallet Address"
+              className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
+              value={value}
+              onChange={onChange}
+            />
+            {message == true ? (
+              <div className="tooltip tooltip-right" data-tip="Load wallet">
+                <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
+                  <Link href={`/showme?wallet=${value}`}>👁️</Link>
+                </button>
+              </div>
+            ) : (
+              <div className="tooltip tooltip-right" data-tip="no valid wallet">
+                <button className="bg-gray-700 hover:bg-gray-800 rounded-r-md h-10 w-12">👁️</button>
+              </div>
+            )
+            }
+          </div>
+          <div className='hidden lg:flex'>
+            <div>
+              {publicKey ?
+                <button className="btn btn-primary mr-2 block">
+                  <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
+                    <img src="./profil.png" className="w-6 h-6" />
+                  </Link>
+                  <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
+                </button>
+                : null}
+            </div>
+            <ConnectWallet />
+          </div>
         </div>
         <div className="hero min-h-16">
           <div className="text-center hero-content">
             <div className="">
               <MintContainer>
                 <DesContainer>
-                  <div><Image src="mint_banner1.png" alt="NFT To Mint" /></div>
+                  <div><img src="mint_banner1.png" alt="NFT To Mint" className='rounded-lg'/></div>
                   {!isActive && !isEnded && candyMachine?.state.goLiveDate && (!isWLOnly || whitelistTokenBalance > 0) ? (
                     <Countdown
                       date={toDate(candyMachine?.state.goLiveDate)}
@@ -526,13 +606,21 @@ export const MintView: FC<HomeProps> = (props) => {
                         </GatewayProvider>
                       ) : (
                         <div className="p-5 rounded-box bg-secondary">
-
                           {wallet && isActive &&
-                            <div className="flex justify-between">
-                              <p className="rounded-box mx-5 font-bold text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
-                              <p className="rounded-box mx-5 font-bold text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
-                              <p className="rounded-box mx-5 font-bold text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
-                            </div>}
+                            <div>
+                              <div className="justify-between hidden lg:flex">
+                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
+                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                              </div>
+
+                              <div className="block lg:hidden">
+                                <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                                <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">BRICE: 0.01 $SOL</p>
+                                <p className="rounded-box font-pixel text-md p-1 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                              </div>
+                            </div>
+                          }
                           <br />
                           <MultiMintButton
                             candyMachine={candyMachine}
@@ -545,7 +633,7 @@ export const MintView: FC<HomeProps> = (props) => {
                           />
                         </div>
                       ) :
-                      <h1>Mint is private.</h1>
+                      <h1 className='font-pixel '>Mint is private.</h1>
                   )}
                   <br />
                   {wallet && isActive && solanaExplorerLink &&
@@ -567,7 +655,7 @@ export const MintView: FC<HomeProps> = (props) => {
             {alertState.message}
           </Alert>
         </Snackbar>
-        {/*<Footer />*/}
+        <Footer />
       </div>
     </div>
   );

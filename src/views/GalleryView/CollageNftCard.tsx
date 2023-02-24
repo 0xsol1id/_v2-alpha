@@ -107,7 +107,7 @@ export const CollageNftCard: FC<Props> = ({
   }, [data, error]);
 
   const onImageError = () => setFallbackImage(true);
-  const { image, description } = data ?? {};
+  const { image, attributes } = data ?? {};
 
   const tokenMintAddress = details.mint;
   const [rarityData, setRarityData] = useState<any>()
@@ -453,7 +453,7 @@ export const CollageNftCard: FC<Props> = ({
 
             <TabPanel>
               <div className="grid grid-cols-3 gap-1 w-[50rem] h-44">
-                {data?.attributes?.map((num: any, index: any) => (
+                {data && data.attributes?.map && data?.attributes?.map((num: any, index: any) => (
                   <div key={index}>
                     <div className="bg-gray-700 font-pixel text-sm rounded p-1 flex justify-between h-full">
                       <div className="text-bold underline">{num.trait_type}:</div>

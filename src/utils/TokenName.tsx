@@ -18,11 +18,13 @@ export const TokenName = (props: { mint: string }) => {
         // create an entry point to Metaplex SDK
         const metaplex = new Metaplex(connection);
         // get the nft object with the mint publickey address
-        const nft = await metaplex.nfts().findByMint({ mintAddress: mintPublickey });
+        //const nft = await metaplex.nfts().findByMint({ mintAddress: mintPublickey });
 
+        const response = await fetch(`https://fudility.xyz:3420/collectionname/${props.mint}`)
+        const jsonData = await response.json()
         // get the name of the nft object
-        const name = nft.name
-        const logo: any = nft.json?.image
+        const name = jsonData.name
+        const logo: any = jsonData.image
 
         // test if the name is defined
         // if it is, it means it is the token is an nft so we set its name
