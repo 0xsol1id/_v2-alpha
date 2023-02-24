@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { resolveToWalletAddress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
+import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { Metaplex, bundlrStorage, walletAdapterIdentity, MetaplexFileTag, toMetaplexFileFromBrowser, MetaplexFile } from "@metaplex-foundation/js";
@@ -309,7 +309,6 @@ export const GalleryView: FC = ({ }) => {
   const onChange = async () => {
     setOpenTab(1)
     const val = value
-
     if (val.includes(".sol")) {
       const { pubkey } = await getDomainKey(val.trim());
       const { registry, nftOwner } = await NameRegistryState.retrieve(
@@ -326,7 +325,7 @@ export const GalleryView: FC = ({ }) => {
       walletPublicKey = address
     }
     else {
-      const address = await resolveToWalletAddress({ text: val.trim() })
+      const address = await resolveToWalletAddrress({ text: val.trim() })
       if (value == publicKey?.toBase58())
         isConnectedWallet = true
       else
@@ -944,7 +943,7 @@ export const GalleryView: FC = ({ }) => {
             <h1 className="font-pixel lg:text-2xl">Send a NFT Message</h1>
             <div>
               <form className="mt-[5%] mb-[3%]">
-                <input className="font-pixel mb-[1%] text-black pl-1 border-1 border-black sm:w-[520px] w-[320px] w-[100%] text-center h-12"
+                <input className="font-pixel mb-[1%] text-black pl-1 border-1 border-black sm:w-[520px] w-[320px] text-center h-12"
                   type="text"
                   required
                   placeholder="Message"

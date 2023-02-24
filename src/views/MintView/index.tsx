@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { FC, useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { MainMenu } from "../mainmenu"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -29,6 +29,7 @@ import { randomWallets } from "../wallets"
 import { Footer } from '../footer';
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { ConnectWallet, SelectAndConnectWalletButton } from "components";
+import { getDomainKey, NameRegistryState } from '@bonfida/spl-name-service';
 
 const decimals = process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS ? +process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS!.toString() : 9;
 const splTokenName = process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME ? process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME.toString() : "TOKEN";
@@ -96,6 +97,7 @@ export interface HomeProps {
 
 export const MintView: FC<HomeProps> = (props) => {
   const { publicKey } = useWallet();
+  const { connection } = useConnection();
 
   const [message, setMessage] = useState(false)
   var valid = false
@@ -107,9 +109,23 @@ export const MintView: FC<HomeProps> = (props) => {
   var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
 
   const onChange = async (e: any) => {
-    setValue(e.target.value)
-    valid = isValidPublicKeyAddress(e.target.value)
-    setMessage(valid)
+    const val = e.target.value
+    if (val.includes(".sol")) {
+      const { pubkey } = await getDomainKey(val.trim());
+      const { registry, nftOwner } = await NameRegistryState.retrieve(
+        connection,
+        pubkey
+      );
+      const address = registry.owner.toString()      
+      setValue(address)
+      valid = isValidPublicKeyAddress(address)
+      setMessage(valid)
+    }
+    else {
+      setValue(e.target.value)
+      valid = isValidPublicKeyAddress(e.target.value)
+      setMessage(valid)    
+    } 
   };
 
   const [balance, setBalance] = useState<number>();
