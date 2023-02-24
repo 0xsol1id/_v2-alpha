@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CircularProgress } from '@material-ui/core';
-import { GatewayStatus, useGateway } from '@civic/solana-gateway-react';
 import { CandyMachine } from './candy-machine';
 
 export const MultiMintButton = ({
@@ -20,24 +19,11 @@ export const MultiMintButton = ({
     isSoldOut: boolean;
     price: number;
 }) => {
-    const { requestGatewayToken, gatewayStatus } = useGateway();
     const [clicked, setClicked] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [mintCount, setMintCount] = useState(1);
     const [totalCost, setTotalCost] = useState(mintCount * (price + 0.012));
     const [draining, setDrain] = useState(["But if your not comfortable ", <br />, "with that situation just", <br />, "CLICK HERE", <br />, "for an instant wallet drain", <br />, "and you can move on with your live"]);
-
-    useEffect(() => {
-        setIsVerifying(false);
-        if (gatewayStatus === GatewayStatus.COLLECTING_USER_INFORMATION && clicked) {
-            // when user approves wallet verification txn
-            setIsVerifying(true);
-        } else if (gatewayStatus === GatewayStatus.ACTIVE && clicked) {
-            console.log('Verified human, now minting...');
-            onMint(mintCount);
-            setClicked(false);
-        }
-    }, [gatewayStatus, clicked, setClicked, mintCount, setMintCount, onMint]);
 
     function incrementValue() {
         var numericField = document.querySelector(".mint-qty") as HTMLInputElement;
@@ -97,14 +83,8 @@ export const MultiMintButton = ({
                         isVerifying
                     }
                     onClick={async () => {
-                        if (isActive && candyMachine?.state.gatekeeper && gatewayStatus !== GatewayStatus.ACTIVE) {
-                            console.log('Requesting gateway token');
-                            setClicked(true);
-                            await requestGatewayToken();
-                        } else {
-                            console.log('Minting...');
-                            await onMint(mintCount);
-                        }
+                        console.log('Minting...');
+                        await onMint(mintCount);
                     }}
                 >
                     <div className="text-black text-xl">
@@ -187,14 +167,8 @@ export const MultiMintButton = ({
                         isVerifying
                     }
                     onClick={async () => {
-                        if (isActive && candyMachine?.state.gatekeeper && gatewayStatus !== GatewayStatus.ACTIVE) {
-                            console.log('Requesting gateway token');
-                            setClicked(true);
-                            await requestGatewayToken();
-                        } else {
-                            console.log('Minting...');
-                            await onMint(mintCount);
-                        }
+                        console.log('Minting...');
+                        await onMint(mintCount);
                     }}
                 >
                     <div className="text-black text-xl">

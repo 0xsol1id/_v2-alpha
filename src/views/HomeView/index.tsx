@@ -7,7 +7,6 @@ import { Footer } from '../footer';
 import Link from "next/link";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { ConnectWallet } from "components";
-import { resolveToWalletAddrress } from "@nfteyez/sol-rayz";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
 
 export const HomeView: FC = ({ }) => {
@@ -48,6 +47,30 @@ export const HomeView: FC = ({ }) => {
       <div className="">
         <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
           <MainMenu />
+          <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
+            <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
+              <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
+            </button>
+            <input
+              type="text"
+              placeholder="Enter Wallet Address"
+              className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
+              value={value}
+              onChange={onChange}
+            />
+            {message == true ? (
+              <div className="tooltip tooltip-right" data-tip="Load wallet">
+                <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
+                  <Link href={`/showme?wallet=${value}`}>👁️</Link>
+                </button>
+              </div>
+            ) : (
+              <div className="tooltip tooltip-right" data-tip="no valid wallet">
+                <button className="bg-gray-700 hover:bg-gray-800 rounded-r-md h-10 w-12">👁️</button>
+              </div>
+            )
+            }
+          </div>
           <div>
             <div>
               {publicKey ?
@@ -62,9 +85,9 @@ export const HomeView: FC = ({ }) => {
             <ConnectWallet />
           </div>
         </div>
-        <div className="hero my-auto">
+        <div className="hero my-auto lg:hidden block">
           <div className="text-center hero-content items-center">
-            <div className="border-2 rounded-lg border-gray-700 bg-gray-700 lg:hidden block">
+            <div className="border-2 rounded-lg border-gray-700 bg-gray-700">
               <button className="btn btn-primary mb-3 font-pixel w-full">
                 <Link href={`/showme?wallet=${randomWallet}`}>Load random wallet</Link>
               </button>
@@ -87,34 +110,15 @@ export const HomeView: FC = ({ }) => {
 
           </div>
         </div>
-        <div className="hero my-auto">
-          <div className="text-center hero-content items-center">
-            <img src="./bg_home.png" className="w-5/6" />
-            <span className="absolute z-10 items-center border-8 rounded-lg border-gray-700 bg-gray-700 hidden lg:flex">
-              <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
-                <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
-              </button>
-              <input
-                type="text"
-                placeholder="Enter Wallet Address"
-                className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
-                value={value}
-                onChange={onChange}
-              />
-              {message == true ? (
-                <div className="tooltip tooltip-right" data-tip="Load wallet">
-                  <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
-                    <Link href={`/showme?wallet=${value}`}>👁️</Link>
-                  </button>
-                </div>
-              ) : (
-                <div className="tooltip tooltip-right" data-tip="no valid wallet">
-                  <button className="bg-gray-700 hover:bg-gray-800 rounded-r-md h-10 w-12">👁️</button>
-                </div>
-              )
-              }
-            </span>
-
+        <div className="hidden lg:hero">
+          <div className="items-center mt-10" style={{
+            backgroundImage: `url("./bg_home.png")`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            width: '85%',
+            height: '800px',
+          }}>
           </div>
         </div>
         <Footer />

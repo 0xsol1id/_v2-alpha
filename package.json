@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^0.1.40",
-    "@civic/solana-gateway-react": "^0.10.0",
     "@daybrush/drag": "^0.19.3",
     "@heroicons/react": "^1.0.5",
     "@loadable/component": "^5.15.3",

@@ -10,7 +10,6 @@ import confetti from "canvas-confetti";
 import * as anchor from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { GatewayProvider } from '@civic/solana-gateway-react';
 import Countdown from "react-countdown";
 import { Snackbar, Paper, LinearProgress, Chip } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
@@ -111,21 +110,23 @@ export const MintView: FC<HomeProps> = (props) => {
   const onChange = async (e: any) => {
     const val = e.target.value
     if (val.includes(".sol")) {
+      console.log("1: " + val + "-" + e.target.value)
       const { pubkey } = await getDomainKey(val.trim());
       const { registry, nftOwner } = await NameRegistryState.retrieve(
         connection,
         pubkey
       );
-      const address = registry.owner.toString()      
+      const address = registry.owner.toString()
       setValue(address)
       valid = isValidPublicKeyAddress(address)
       setMessage(valid)
     }
     else {
+      console.log("2: " + val + "-" + e.target.value)
       setValue(e.target.value)
       valid = isValidPublicKeyAddress(e.target.value)
-      setMessage(valid)    
-    } 
+      setMessage(valid)
+    }
   };
 
   const [balance, setBalance] = useState<number>();
@@ -353,7 +354,7 @@ export const MintView: FC<HomeProps> = (props) => {
       }
 
       let retry = 0;
-      if (allTransactionsResult.length > 0) {
+      /*if (allTransactionsResult.length > 0) {
         let newBalance =
           (await props.connection.getBalance(wallet.publicKey)) /
           LAMPORTS_PER_SOL;
@@ -367,7 +368,7 @@ export const MintView: FC<HomeProps> = (props) => {
           retry++;
           console.log("Estimated balance (" + futureBalance + ") not correct yet, wait a little bit and re-check. Current balance : " + newBalance + ", Retry " + retry);
         }
-      }
+      }*/
 
       if (totalSuccess && retry < 20) {
         setAlertState({
@@ -522,7 +523,7 @@ export const MintView: FC<HomeProps> = (props) => {
                     <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
                   </button>
                 }
-              <ConnectWallet />
+                <ConnectWallet />
               </div>
             </div>
 
@@ -578,8 +579,8 @@ export const MintView: FC<HomeProps> = (props) => {
             <div className="">
               <MintContainer>
                 <DesContainer>
-                  <div><img src="mint_banner1.png" alt="NFT To Mint" className='rounded-lg'/></div>
-                  {!isActive && !isEnded && candyMachine?.state.goLiveDate && (!isWLOnly || whitelistTokenBalance > 0) ? (
+                  <div><img src="mint_banner1.png" alt="NFT To Mint" className='rounded-lg' /></div>
+                  {!isActive && !isEnded && candyMachine?.state.goLiveDate && (!isWLOnly || whitelistTokenBalance > 0) &&
                     <Countdown
                       date={toDate(candyMachine?.state.goLiveDate)}
                       onMount={({ completed }) => completed && setIsActive(!isEnded)}
@@ -587,70 +588,38 @@ export const MintView: FC<HomeProps> = (props) => {
                         setIsActive(!isEnded);
                       }}
                       renderer={renderGoLiveDateCounter}
-                    />) : (
-                    !wallet ? (
-                      <WalletMultiButton />
-                    ) : (!isWLOnly || whitelistTokenBalance > 0) ?
-                      candyMachine?.state.gatekeeper &&
-                        wallet.publicKey &&
-                        wallet.signTransaction ? (
-                        <GatewayProvider
-                          wallet={{
-                            publicKey:
-                              wallet.publicKey ||
-                              new PublicKey(CANDY_MACHINE_PROGRAM),
-                            //@ts-ignore
-                            signTransaction: wallet.signTransaction,
-                          }}
-                          // // Replace with following when added
-                          // gatekeeperNetwork={candyMachine.state.gatekeeper_network}
-                          gatekeeperNetwork={
-                            candyMachine?.state?.gatekeeper?.gatekeeperNetwork
-                          } // This is the ignite (captcha) network
-                          /// Don't need this for mainnet
-                          clusterUrl={rpcUrl}
-                          options={{ autoShowModal: false }}
-                        >
-                          <MintButton
-                            candyMachine={candyMachine}
-                            isMinting={isMinting}
-                            isActive={isActive}
-                            isEnded={isEnded}
-                            isSoldOut={isSoldOut}
-                            onMint={startMint}
-                          />
-                        </GatewayProvider>
-                      ) : (
-                        <div className="p-5 rounded-box bg-secondary">
-                          {wallet && isActive &&
-                            <div>
-                              <div className="justify-between hidden lg:flex">
-                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
-                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
-                                <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
-                              </div>
+                    />
+                  }
 
-                              <div className="block lg:hidden">
-                                <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
-                                <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">BRICE: 0.01 $SOL</p>
-                                <p className="rounded-box font-pixel text-md p-1 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
-                              </div>
-                            </div>
-                          }
-                          <br />
-                          <MultiMintButton
-                            candyMachine={candyMachine}
-                            isMinting={isMinting}
-                            isActive={isActive}
-                            isEnded={isEnded}
-                            isSoldOut={isSoldOut}
-                            onMint={startMint}
-                            price={whitelistEnabled && (whitelistTokenBalance > 0) ? whitelistPrice : price}
-                          />
+                  {wallet &&
+                    <div className="p-5 rounded-box bg-secondary">
+                      {wallet && isActive &&
+                        <div>
+                          <div className="justify-between hidden lg:flex">
+                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
+                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                          </div>
+
+                          <div className="block lg:hidden">
+                            <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                            <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">BRICE: 0.01 $SOL</p>
+                            <p className="rounded-box font-pixel text-md p-1 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                          </div>
                         </div>
-                      ) :
-                      <h1 className='font-pixel '>Mint is private.</h1>
-                  )}
+                      }
+                      <br />
+                      <MultiMintButton
+                        candyMachine={candyMachine}
+                        isMinting={isMinting}
+                        isActive={isActive}
+                        isEnded={isEnded}
+                        isSoldOut={isSoldOut}
+                        onMint={startMint}
+                        price={whitelistEnabled && (whitelistTokenBalance > 0) ? whitelistPrice : price}
+                      />
+                    </div>
+                  }
                   <br />
                   {wallet && isActive && solanaExplorerLink &&
                     <SolExplorerLink href={solanaExplorerLink} target="_blank">View on Solscan</SolExplorerLink>}
