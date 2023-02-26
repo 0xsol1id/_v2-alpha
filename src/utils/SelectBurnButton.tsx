@@ -18,10 +18,9 @@ export const SelectBurnButton: FC<Props> = ({
     isConnectedWallet,
 }) => {
 
-    const [accountExist, setAccountExist] = useState<boolean>();
+    const [accountExist, setAccountExist] = useState<boolean>(true);
 
     useEffect(() => {
-
         async function BalanceIsNull() {
             const mintPublickey = new PublicKey(tokenMintAddress);
             try {
@@ -52,28 +51,25 @@ export const SelectBurnButton: FC<Props> = ({
                 console.log(err)
             }
         }
-        BalanceIsNull();
+        //BalanceIsNull();
     }, []);
 
     const [isSelected, setIsSelected] = useState(false);
 
-
     return (
         <div>
             {publicKey && isConnectedWallet &&
-                <div className=''>
+                <div className='p-2'>
                     {!isSelected && accountExist == true &&
-                        <button className="btn btn-xs btn-ghost tooltip tooltip-top font-pixel" data-tip="Select to burn" onClick={() => { setIsSelected(true); toBurn.push(tokenMintAddress) }}>🔥</button>
+                        <button className="btn btn-ghost tooltip tooltip-top font-pixel text-2xl bg-gray-900 bg-opacity-30" data-tip="Select to burn" onClick={() => { setIsSelected(true); toBurn.push(tokenMintAddress) }}>🔥</button>
                     }
                     {isSelected && accountExist == true &&
-                        <button className="btn btn-xs btn-ghost tooltip tooltip-top font-pixel" data-tip="Deselect from burn" onClick={() => { setIsSelected(false); toBurn.splice(toBurn.indexOf(tokenMintAddress), 1) }}>♨️</button>
+                        <button className="btn btn-ghost tooltip tooltip-top text-2xl font-pixel bg-gray-900 bg-opacity-30" data-tip="Deselect from burn" onClick={() => { setIsSelected(false); toBurn.splice(toBurn.indexOf(tokenMintAddress), 1) }}>✅</button>
                     }
 
                     {accountExist == false &&
                         <p className="">🚫</p>
                     }
-
-
                 </div>
             }
         </div>

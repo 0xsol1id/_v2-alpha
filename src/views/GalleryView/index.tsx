@@ -10,8 +10,8 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/sp
 import { PublicKey, LAMPORTS_PER_SOL, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, getAllDomains, performReverseLookup, getFavoriteDomain } from "@bonfida/spl-name-service";
 
-import { NftCard } from "./NftCard";
 import { BurnButton } from "utils/BurnButton";
+import { NftCard } from "./NftCard";
 import { useWalletTokens } from "../../utils/useWalletTokens"
 import { CloseButton } from "utils/CloseButton";
 import { RevokeButton } from "utils/RevokeButton";
@@ -28,14 +28,13 @@ import { Footer } from 'views/footer';
 import { fetcher } from 'utils/fetcher';
 import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
-import { TokenName } from "utils/TokenName";
+import React from "react";
 
 Modal.setAppElement("#__next");
 
-var isConnectedWallet = false
 var walletPublicKey = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
 
-const NFTstoBurn: string[] = []
+//const NFTstoBurn: string[] = []
 const NFTstoSend: string[] = []
 
 function convertTimestamp(timestamp: any) {
@@ -69,17 +68,53 @@ function randomInt(low: number, high: number) {
 }
 
 export const GalleryView: FC = ({ }) => {
-  const { connection } = useConnection();
+  const [NFTstoBurn, setNFTstoBurn] = useState<string[]>([])
+  const [NFTstoBurnNames, setNFTstoBurnNames] = useState<string[]>([])
+  const [NFTstoBurnImages, setNFTstoBurnImages] = useState<string[]>([])
+
+  const addNFTtoBurn = (newNFT: string, newNFTName: string, newNFTImage: string) => {
+    setNFTstoBurn(state => [...state, newNFT])
+    setNFTstoBurnNames(state => [...state, newNFTName])
+    setNFTstoBurnImages(state => [...state, newNFTImage])
+  }
+
+  const delNFTtoBurn = (newNFT: string, newNFTName: string, newNFTImage: string) => {
+    var array1 = [...NFTstoBurn]
+    var array2 = [...NFTstoBurnNames]
+    var array3 = [...NFTstoBurnImages]
+    const tmp1 = array1.splice(array1.indexOf(newNFT), 1)
+    const tmp2 = array2.splice(array2.indexOf(newNFTName), 1)
+    const tmp3 = array3.splice(array3.indexOf(newNFTImage), 1)
+    setNFTstoBurn(array1)
+    setNFTstoBurnNames(array2)
+    setNFTstoBurnImages(array3)
+  }
+
+  const delNFTtoBurnByName = (newNFTName: string) => {
+    var array1 = [...NFTstoBurn]
+    var array2 = [...NFTstoBurnNames]
+    var array3 = [...NFTstoBurnImages]
+    const index = array2.indexOf(newNFTName)
+    const tmp1 = array1.splice(index, 1)
+    const tmp2 = array2.splice(index, 1)
+    const tmp3 = array3.splice(index, 1)
+    setNFTstoBurn(array1)
+    setNFTstoBurnNames(array2)
+    setNFTstoBurnImages(array3)
+  }
+
+  const [isConnectedWallet, setIsConnectedWallet] = useState(false)
+  const { connection } = useConnection()
   const queryParameters = new URLSearchParams(window.location.search)
   const walletParam: any = queryParameters.get("wallet")
   const collectionParam: any = queryParameters.get("collection")
 
-  const [openTab, setOpenTab] = useState(1);
+  const [openTab, setOpenTab] = useState(1)
   const [walletToParsePublicKey, setWalletToParsePublicKey] =
-    useState<string>(walletParam == "" ? walletPublicKey : walletParam);
+    useState<string>(walletParam == "" ? walletPublicKey : walletParam)
 
-  const { publicKey } = useWallet();
-  const wallet = useWallet();
+  const { publicKey } = useWallet()
+  const wallet = useWallet()
 
   const [message, setMessage] = useState(false)
   var valid = false
@@ -89,7 +124,7 @@ export const GalleryView: FC = ({ }) => {
   const { nfts, isLoading, error } = useWalletNfts({
     publicAddress: walletToParsePublicKey,
     connection,
-  });
+  })
 
   const { tokens } = useWalletTokens({
     publicAddress: walletToParsePublicKey,
@@ -107,6 +142,18 @@ export const GalleryView: FC = ({ }) => {
     publicAddress: walletToParsePublicKey,
     connection,
   });
+
+  const [selectedMode, setSelectedMode] = useState(false)
+  const selectMode = () => {
+    if (selectedMode) {
+      setNFTstoBurn([])
+      setNFTstoBurnNames([])
+      setNFTstoBurnImages([])
+      setSelectedMode(false)
+    }
+    else
+      setSelectedMode(true)
+  }
 
   let errorMessage
   if (error) {
@@ -223,7 +270,7 @@ export const GalleryView: FC = ({ }) => {
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {nfts?.map((nft: any, index) => (
             selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
-              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toSend={NFTstoSend} />
+              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} />
             ) : (null)
           ))}
         </div>
@@ -317,9 +364,9 @@ export const GalleryView: FC = ({ }) => {
       );
       const address = registry.owner.toString()
       if (value == registry.owner.toString())
-        isConnectedWallet = true
+        setIsConnectedWallet(true)
       else
-        isConnectedWallet = false
+        setIsConnectedWallet(false)
 
       setWalletToParsePublicKey(address)
       walletPublicKey = address
@@ -327,9 +374,9 @@ export const GalleryView: FC = ({ }) => {
     else {
       const address = await resolveToWalletAddrress({ text: val.trim() })
       if (value == publicKey?.toBase58())
-        isConnectedWallet = true
+        setIsConnectedWallet(true)
       else
-        isConnectedWallet = false
+        setIsConnectedWallet(false)
       setWalletToParsePublicKey(address)
       walletPublicKey = address
     }
@@ -338,9 +385,9 @@ export const GalleryView: FC = ({ }) => {
   const onChangeME = async (address: any) => {
     setOpenTab(1)
     if (value == publicKey?.toBase58())
-      isConnectedWallet = true
+      setIsConnectedWallet(true)
     else
-      isConnectedWallet = false
+      setIsConnectedWallet(false)
     setWalletToParsePublicKey(address)
     walletPublicKey = address
     setValue(address)
@@ -350,9 +397,9 @@ export const GalleryView: FC = ({ }) => {
     setOpenTab(1)
     var wallet = randomWallets[randomInt(0, randomWallets.length)]
     if (value == publicKey?.toBase58())
-      isConnectedWallet = true
+      setIsConnectedWallet(true)
     else
-      isConnectedWallet = false
+      setIsConnectedWallet(false)
     setWalletToParsePublicKey(wallet.Wallet)
     walletPublicKey = wallet.Wallet
     setValue(wallet.Wallet)
@@ -361,7 +408,7 @@ export const GalleryView: FC = ({ }) => {
   const onUseWalletClick = () => {
     if (publicKey) {
       setOpenTab(1)
-      isConnectedWallet = true
+      setIsConnectedWallet(true)
       setWalletToParsePublicKey(publicKey?.toBase58())
       walletPublicKey = publicKey?.toBase58()
       setValue(publicKey?.toBase58())
@@ -403,6 +450,11 @@ export const GalleryView: FC = ({ }) => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   function toggleUploadModal() {
     setIsUploadOpen(!isUploadOpen);
+  }
+
+  const [isBurnOpen, setIsBurnOpen] = useState(false);
+  function toggleBurnModal() {
+    setIsBurnOpen(!isBurnOpen);
   }
 
   //Message related
@@ -567,14 +619,21 @@ export const GalleryView: FC = ({ }) => {
 
   useEffect(() => {
     if (value == publicKey?.toBase58())
-      isConnectedWallet = true
+      setIsConnectedWallet(true)
     else
-      isConnectedWallet = false
+      setIsConnectedWallet(false)
     GetHistory(`https://fudility.xyz:3420/history/${walletToParsePublicKey}`)
     //getTransactions(walletPublicKey, 5)
     setSearch(walletToParsePublicKey)
     setSearch2("")
   }, [walletToParsePublicKey])
+
+  useEffect(() => {
+    if (value == publicKey?.toBase58())
+      setIsConnectedWallet(true)
+    else
+      setIsConnectedWallet(false)
+  }, [publicKey])
 
   const saveCollage = async () => {
     const canvas = await html2canvas(document.getElementById('collage')!);
@@ -598,9 +657,7 @@ export const GalleryView: FC = ({ }) => {
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen">
       <div className="">
-        <div className="hidden lg:block navbar sticky top-0 z-50 justify-between text-neutral-content bg-gray-900">
-
-
+        <div className="hidden lg:block navbar sticky top-0 z-0 justify-between text-neutral-content bg-gray-900">
           <div className="flex justify-between"><div>
             <MainMenu />
           </div> {/*desktop view*/}
@@ -630,6 +687,22 @@ export const GalleryView: FC = ({ }) => {
               </button>
             </div>
 
+            {isConnectedWallet &&
+              <div className="flex justify-between ml-2">
+                {selectedMode ? (
+                  <div>
+                    <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                    <p className="text-2xs font-pixel">BURN MODE</p>
+                  </div>
+                ) : (
+                  <div>
+                    <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                    <p className="text-2xs font-pixel">VIEW MODE</p>
+                  </div>
+                )
+                }
+              </div>
+            }
             <div className="flex gap-2 items-center bg-gray-700 rounded-xl p-2">
               <p className="font-pixel text-xs">GRID</p>
               <input
@@ -760,8 +833,6 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   </li>
                   <li>
-                  </li>
-                  <li>
                     <a href="#allNFTs"
                       onClick={() => setOpenTab(1)}
                       className={` ${openTab === 1 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn btn-sm w-full rounded`}
@@ -776,9 +847,6 @@ export const GalleryView: FC = ({ }) => {
                   <div className="w-full">
                     {isConnectedWallet ? (
                       <div>
-                        {openTab === 1 || openTab === 2 &&
-                          <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
-                        }
                         {tokens.length > 0 &&
                           <div className="mt-2 mb-2">
                             <CloseButton toClose={tokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
@@ -836,86 +904,188 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   )}
                 </ul>
-                <div className="col-span-2 lg:col-span-8 w-full">
-                  <div className={openTab === 1 ? "block" : "hidden"}>
-                    <div className="overflow-auto lg:h-[55.7rem] scrollbar">
-                      <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
+                {!selectedMode ? (
+                  <div className="col-span-2 lg:col-span-8 w-full">
+                    <div className={openTab === 1 ? "block" : "hidden"}>
+                      <div className="overflow-auto lg:h-[55.7rem] scrollbar">
+                        <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
+                      </div>
                     </div>
-                  </div>
-                  <div className={openTab === 2 ? "block" : "hidden"}>
-                    <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
-                      {history?.map((num: any, index: any) => (
-                        <div key={index}>
-                          {num.type != "bid" ? (
-                            <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
-                              <div className='my-auto p-1'>
-                                <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
-                                  <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
-                                    {/*<TokenName mint={num.tokenMint} />*/}
-                                  </a>
-                                </button>
-                              </div>
-                              {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
-                                <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto">BUY for {num.price.toFixed(2)}◎</p>
-                              ) : (
-                                num.type == "list" ? (
-                                  <p className="font-pixel text-center rounded bg-yellow-400 w-48 my-auto">LIST for {num.price.toFixed(2)}◎</p>
+                    <div className={openTab === 2 ? "block" : "hidden"}>
+                      <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
+                        {history?.map((num: any, index: any) => (
+                          <div key={index}>
+                            {num.type != "bid" ? (
+                              <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
+                                <div className='my-auto p-1'>
+                                  <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
+                                    <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
+                                      {/*<TokenName mint={num.tokenMint} />*/}
+                                    </a>
+                                  </button>
+                                </div>
+                                {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
+                                  <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto">BUY for {num.price.toFixed(2)}◎</p>
                                 ) : (
-                                  num.type == "delist" ? (
-                                    <p className="font-pixel text-center rounded bg-gray-500 w-48 my-auto">DELIST for {num.price.toFixed(2)}◎</p>
+                                  num.type == "list" ? (
+                                    <p className="font-pixel text-center rounded bg-yellow-400 w-48 my-auto">LIST for {num.price.toFixed(2)}◎</p>
                                   ) : (
-                                    num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
-                                      <p className="font-pixel text-center rounded bg-red-600 w-48  my-auto">SELL for {num.price.toFixed(2)}◎</p>
+                                    num.type == "delist" ? (
+                                      <p className="font-pixel text-center rounded bg-gray-500 w-48 my-auto">DELIST for {num.price.toFixed(2)}◎</p>
                                     ) : (
-                                      num.type == "cancelBid" ? (
-                                        <p className="font-pixel text-center rounded bg-blue-600 w-48 my-auto">CANCEL for {num.price.toFixed(2)}◎</p>
+                                      num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
+                                        <p className="font-pixel text-center rounded bg-red-600 w-48  my-auto">SELL for {num.price.toFixed(2)}◎</p>
                                       ) : (
-                                        <p className="rounded w-40h-8 my-auto">{num.type}</p>
+                                        num.type == "cancelBid" ? (
+                                          <p className="font-pixel text-center rounded bg-blue-600 w-48 my-auto">CANCEL for {num.price.toFixed(2)}◎</p>
+                                        ) : (
+                                          <p className="rounded w-40h-8 my-auto">{num.type}</p>
+                                        )
                                       )
                                     )
                                   )
-                                )
-                              )}
-                              <div className='flex justify-between my-auto'>
-                                <p className="font-pixel text-xs my-auto ml-2">{convertTimestamp(num.blockTime)}</p>
-                              </div>
-                              <div className='flex justify-between'>
-                                {num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
-                                  <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                    <button onClick={() => onChangeME(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
-                                      {num.buyer}
-                                    </button>
-                                  </p>
-                                ) : (
-                                  null
                                 )}
-                                {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
-                                  <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                    <button onClick={() => onChangeME(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
-                                      {num.seller}
-                                    </button>
-                                  </p>
-                                ) : (
-                                  null
-                                )}
+                                <div className='flex justify-between my-auto'>
+                                  <p className="font-pixel text-xs my-auto ml-2">{convertTimestamp(num.blockTime)}</p>
+                                </div>
+                                <div className='flex justify-between'>
+                                  {num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
+                                    <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
+                                      <button onClick={() => onChangeME(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
+                                        {num.buyer}
+                                      </button>
+                                    </p>
+                                  ) : (
+                                    null
+                                  )}
+                                  {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
+                                    <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
+                                      <button onClick={() => onChangeME(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
+                                        {num.seller}
+                                      </button>
+                                    </p>
+                                  ) : (
+                                    null
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ) : (null)}
+                            ) : (null)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className={openTab === 3 ? "block" : "hidden"}>
+                      <CreatePonziView />
+                    </div>
+                    <div className={openTab === 4 ? "block" : "hidden"}>
+                      <MultiSenderView />
+                    </div>
+                  </div >
+                ) : (
+                  <div className="col-span-8 w-full">
+                    <div className="grid grid-cols-5">
+                      <div className="col-span-4">
+                        <div className={openTab === 1 ? "block" : "hidden"}>
+                          <div className="overflow-auto lg:h-[55.7rem] scrollbar">
+                            <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
+                          </div>
                         </div>
-                      ))}
+                        <div className={openTab === 2 ? "block" : "hidden"}>
+                          <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
+                            {history?.map((num: any, index: any) => (
+                              <div key={index}>
+                                {num.type != "bid" ? (
+                                  <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
+                                    <div className='my-auto p-1'>
+                                      <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
+                                        <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
+                                          {/*<TokenName mint={num.tokenMint} />*/}
+                                        </a>
+                                      </button>
+                                    </div>
+                                    {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
+                                      <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto">BUY for {num.price.toFixed(2)}◎</p>
+                                    ) : (
+                                      num.type == "list" ? (
+                                        <p className="font-pixel text-center rounded bg-yellow-400 w-48 my-auto">LIST for {num.price.toFixed(2)}◎</p>
+                                      ) : (
+                                        num.type == "delist" ? (
+                                          <p className="font-pixel text-center rounded bg-gray-500 w-48 my-auto">DELIST for {num.price.toFixed(2)}◎</p>
+                                        ) : (
+                                          num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
+                                            <p className="font-pixel text-center rounded bg-red-600 w-48  my-auto">SELL for {num.price.toFixed(2)}◎</p>
+                                          ) : (
+                                            num.type == "cancelBid" ? (
+                                              <p className="font-pixel text-center rounded bg-blue-600 w-48 my-auto">CANCEL for {num.price.toFixed(2)}◎</p>
+                                            ) : (
+                                              <p className="rounded w-40h-8 my-auto">{num.type}</p>
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )}
+                                    <div className='flex justify-between my-auto'>
+                                      <p className="font-pixel text-xs my-auto ml-2">{convertTimestamp(num.blockTime)}</p>
+                                    </div>
+                                    <div className='flex justify-between'>
+                                      {num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
+                                        <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
+                                          <button onClick={() => onChangeME(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
+                                            {num.buyer}
+                                          </button>
+                                        </p>
+                                      ) : (
+                                        null
+                                      )}
+                                      {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
+                                        <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
+                                          <button onClick={() => onChangeME(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
+                                            {num.seller}
+                                          </button>
+                                        </p>
+                                      ) : (
+                                        null
+                                      )}
+                                    </div>
+                                  </div>
+                                ) : (null)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className={openTab === 3 ? "block" : "hidden"}>
+                          <CreatePonziView />
+                        </div>
+                        <div className={openTab === 4 ? "block" : "hidden"}>
+                          <MultiSenderView />
+                        </div>
+                      </div >
+                      <div className="cols-span-1 bg-gray-900 p-2">
+                        <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                        <ul className="overflow-auto h-[49rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                          {NFTstoBurnNames.map((num: any, index: any) => (
+                            <li className="bg-gray-700 rounded-lg font-pixel p-2 mb-1 flex justify-between items-center break">
+                              <img src={NFTstoBurnImages[index]} className="h-16" />
+                              <h1 className="text-center">{num}</h1>
+                              <button onClick={(e) => delNFTtoBurnByName(num)} className="btn btn-ghost">
+                                x
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="flex justify-between">
+                          <h1 className="font-pixel">SELECTED: {NFTstoBurn.length}</h1>
+                          <h1 className="font-pixel">SOL: {(NFTstoBurn.length) * 0.01}</h1>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className={openTab === 3 ? "block" : "hidden"}>
-                    <CreatePonziView />
-                  </div>
-                  <div className={openTab === 4 ? "block" : "hidden"}>
-                    <MultiSenderView />
-                  </div>
-                </div >
+                )}
               </div>
             }
           </div>
-        </div>
+        </div >
+
         <Modal
           isOpen={isOpen}
           onRequestClose={toggleModal}
@@ -1085,9 +1255,9 @@ export const GalleryView: FC = ({ }) => {
 
           </div>
         </Modal>
-      </div>
+      </div >
       <Footer />
-    </div>
+    </div >
   );
 };
 

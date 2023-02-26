@@ -19,7 +19,6 @@ export const BurnButton: FC<Props> = ({
     wallet,
     setRefresh
 }) => {
-
     const { setVisible } = useWalletModal();
     const [isburning, setIsburning] = useState(false);
     const [message, setMessage] = useState('');
@@ -29,7 +28,7 @@ export const BurnButton: FC<Props> = ({
     return (
         <div>
             {!isburning &&
-                <button className="btn btn-primary uppercase w-full" onClick={() => { if (publicKey) burnTokenAndCloseAccount(toBurn, publicKey, wallet, connection, setIsburning, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>burn all selected</button>
+                <button className="btn btn-primary uppercase w-full font-pixel" onClick={() => { if (publicKey) burnTokenAndCloseAccount(toBurn, publicKey, wallet, connection, setIsburning, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>BURN ALL SELECTED NFTS</button>
             }
 
             {isburning &&
