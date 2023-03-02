@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from "react";
+import { FC, useState, useEffect, useCallback, SetStateAction, Dispatch } from "react";
 import useSWR from "swr";
 import proxy from './proxy.png'
 
@@ -9,6 +9,13 @@ import { PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LegitOrScam } from '../../utils/LegitOrScam';
 import { SelectSendButton } from '../../utils/SelectSendButton';
+import { SingleBurnButton } from '../../utils/SingleBurnButton';
+
+import { LoadRarityFile } from 'utils/LoadRarityFiles'
+const junks: any = LoadRarityFile(0)
+const smb: any = LoadRarityFile(1)
+const faces: any = LoadRarityFile(2)
+const rektiez: any = LoadRarityFile(3)
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
@@ -17,7 +24,6 @@ import loadable from '@loadable/component';
 const ReactJson = loadable(() => import('react-json-view'));
 
 import Zoom from 'react-img-zoom'
-
 import Modal from 'react-modal';
 import {
   Chart as ChartJS,
@@ -72,6 +78,7 @@ type Props = {
   isConnectedWallet: boolean,
   onSelect: (id: string) => void;
   onTokenDetailsFetched?: (props: any) => unknown;
+  setRefresh: Dispatch<SetStateAction<boolean>>
   toBurn: any;
   toSend: any;
   selectedMode: boolean;
@@ -84,6 +91,7 @@ export const NftCard: FC<Props> = ({
   isConnectedWallet,
   onSelect,
   onTokenDetailsFetched = () => { },
+  setRefresh,
   toBurn,
   toSend,
   selectedMode,
@@ -96,7 +104,7 @@ export const NftCard: FC<Props> = ({
 
   const [fallbackImage, setFallbackImage] = useState(false);
 
-  const { name, uri } = details?.data ?? {};
+  const { uri } = details?.data ?? {};
 
   const { data, error } = useSWR(
     // uri || url ? getMetaUrl(details) : null,
@@ -109,28 +117,52 @@ export const NftCard: FC<Props> = ({
     }
   );
 
-  useEffect(() => {
-    //CheckRarity(`https://fudility.xyz:3420/rarity/${details.updateAuthority}/${tokenMintAddress}`)
-    if (!error && !!data) {
-      onTokenDetailsFetched(data);
-    }
-  }, [data, error]);
+  const updateAuthority = details.updateAuthority
+
+  const burnThis: string[] = [details.mint]
 
   const onImageError = () => setFallbackImage(true);
-  const { image, attributes } = data ?? {};
+  const { name, image } = data ?? {};
 
   const tokenMintAddress = details.mint;
   const [rarityData, setRarityData] = useState<any>()
 
   //RARITY RANKING  
-  async function CheckRarity(url: string) {
-    try {
-      const response = await fetch(url)
-      setRarityData(await response.json())
-    } catch (e) {
-      console.log(e)
+  async function CheckRarity(id: number, mint: string) {
+    if (id == 0) {
+      setRarityData(junks[0].nfts.find((element: { MintHash: any; }) => element.MintHash === tokenMintAddress))
+    }
+    else if (id == 1) {
+      setRarityData(smb[0].nfts.find((element: { MintHash: any; }) => element.MintHash === tokenMintAddress))
+    }
+    else if (id == 2) {
+      setRarityData(faces[0].nfts.find((element: { MintHash: any; }) => element.MintHash === tokenMintAddress))
+    }
+    else if (id == 3) {
+      setRarityData(rektiez[0].nfts.find((element: { MintHash: any; }) => element.MintHash === tokenMintAddress))
     }
   }
+
+  useEffect(() => {
+    if (updateAuthority == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
+      CheckRarity(0, tokenMintAddress)
+    }
+    if (updateAuthority == "FEtQrCx12b9ebbTZq8Un11RNJUYxiDQF4zQCJctzRYH6") {
+      CheckRarity(1, tokenMintAddress)
+    }
+    if (updateAuthority == "8DQoDXZvWrUHjp4DbjFTW8AhXsdTBgYVicwieJ6FzKVe") {
+      CheckRarity(2, tokenMintAddress)
+    }
+    /*if (updateAuthority == "5XZrWyd6hmMcUScak7S2ef92rQW4hftkJDMDg6uYHssp") {
+      CheckRarity(2, tokenMintAddress)
+    }*/
+    if (updateAuthority == "PnsQRTnqXBPshHpPj2kHWZwyrWABa5GTrPA6MDkwV4p") {
+      CheckRarity(3, tokenMintAddress)
+    }
+    if (!error && !!data) {
+      onTokenDetailsFetched(data);
+    }
+  }, [data, error]);
 
   const creators = details.data?.creators;
   let firstCreator;
@@ -157,6 +189,7 @@ export const NftCard: FC<Props> = ({
       console.log(e)
     }
   }
+
   const [profit, setProfit] = useState("-")
   const handleChangeProfit = (val: string) => {
     setProfit(val)
@@ -172,6 +205,7 @@ export const NftCard: FC<Props> = ({
       console.log(e)
     }
   }
+
   const [collectionName, setcollectionName] = useState("-")
   const handleChangecollectionName = (val: string) => {
     if (collectionName != null) {
@@ -192,6 +226,7 @@ export const NftCard: FC<Props> = ({
       console.log(e)
     }
   }
+
   const [listed, setListed] = useState("-")
   const handleChangeListed = (val: string) => {
     setListed(val)
@@ -596,25 +631,24 @@ export const NftCard: FC<Props> = ({
             {!selectedMode ? (
               <a onClick={toggleModal} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
                 <div>
-                  <h1 className="tracking-wider font-pixel bg-black bg-opacity-40 rounded p-1 text-xs border-2 border-opacity-20" >
+                  <h1 className="tracking-wider font-pixel bg-black bg-opacity-60 rounded p-3 text-xs border-2 border-opacity-20" >
                     {name ? (
-                      <p>{name}</p>
+                      <div>
+                        <p className="font-pixel text-md text-center">{name}</p>
+                        {rarityData &&
+                          <div>
+                            <br />
+                            <p className="font-pixel text-sm text-center">RANK: {rarityData?.Rank}</p>
+                            <p className="font-pixel text-sm text-center">SCORE: {rarityData?.Score.toFixed(0)}</p>
+                          </div>
+                        }
+                      </div>
                     ) : (
                       <p>...no name...</p>
                     )}
                   </h1>
 
                 </div>
-                {rarityData &&
-                  <div>
-                    <span className="absolute top-[1rem] left-[1rem] bg-gray-900 bg-opacity-50 p-1 rounded">
-                      <p className="font-pixel text-md text-center">#{rarityData?.Rank}</p>
-                    </span>
-                    <span className="absolute bottom-[1rem] right-[1rem] bg-gray-900 bg-opacity-50 bg-o p-1 rounded">
-                      <p className="font-pixel text-md text-center">{rarityData?.Score}</p>
-                    </span>
-                  </div>
-                }
               </a>
             ) : (
               <div>
@@ -682,7 +716,7 @@ export const NftCard: FC<Props> = ({
         contentLabel="NFT Details"
       >
         <div className="flex justify-between">
-          <div />
+          <div className="hidden lg:block"><SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} /></div>
           <a href={`https://explorer.solana.com/address/${tokenMintAddress}`} target="_blank">
             <p className="font-pixel text-bold text-lg text-center hover:text-red-300">{name}</p>
           </a>
@@ -726,7 +760,7 @@ export const NftCard: FC<Props> = ({
                     </div>
                   )}
                   <div className="w-full grid content-center">
-                    <div className="lg:bg-gray-700 font-pixel rounded-lg p-2">
+                    <div className="font-pixel rounded-lg p-3">
                       <div className="bg-gray-700 font-pixel rounded-lg p-2 hidden lg:block">{/* DESKTOP VIEW */}
                         <div className="flex justify-between">
                           <p>Mint:</p>
@@ -765,6 +799,18 @@ export const NftCard: FC<Props> = ({
                           </a>
                         </div>
                       </div>
+                      {rarityData &&
+                        <div className="bg-gray-700 rounded mt-3 p-2">
+                          <div className="flex justify-between">
+                            <p>Rarity Rank:</p>
+                            <p>{rarityData?.Rank}</p>
+                          </div>
+                          <div className="flex justify-between">
+                            <p>Rarity Score:</p>
+                            <p>{rarityData?.Score}</p>
+                          </div>
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -809,7 +855,7 @@ export const NftCard: FC<Props> = ({
 
                   <TabPanel>
                     <div className="bg-gray-800 rounded h-64 w-[50rem] ">
-                      <Line options={options} data={chartData} height="60px" />
+                      <Line options={options} data={chartData} height="90px" />
                     </div>
                   </TabPanel>
 
@@ -1006,7 +1052,7 @@ export const NftCard: FC<Props> = ({
         </div>
 
         {/* ----------- MOBILE VIEW ----------- */}
-        <div className="lg:hidden block">
+        <div className="lg:hidden block mt-2">
           <div className="lg:grid lg:grid-cols-2">
             {!fallbackImage && !error ? (
               <div>
@@ -1032,6 +1078,7 @@ export const NftCard: FC<Props> = ({
                     <img className="w-5 h-5" src="./solscan_logo.png" />
                   </a>
                 </div>
+                <div className="lg:hidden block"><SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} /></div>
                 <div>
                   {collectionName != "-" ? (
                     <div className="text-center">{collectionName != undefined ? (
