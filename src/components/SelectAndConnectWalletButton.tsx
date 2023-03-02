@@ -39,11 +39,11 @@ export const SelectAndConnectWalletButton: FC<Props> = ({
     <div>
       {publicKey ?
       <button
-        className="btn btn-primary mr-2 block"
+        className="flex btn btn-primary btn-sm mr-2"
         onClick={handleWalletClick}
         disabled={connecting}
       >
-        <img src="./profil.png" className="w-6 h-6"/>        
+        <img src="./profil.png" className="w-4 h-4"/>        
         <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
       </button> : null}
     </div>

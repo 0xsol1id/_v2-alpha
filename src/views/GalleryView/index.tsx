@@ -11,6 +11,7 @@ import { PublicKey, LAMPORTS_PER_SOL, Transaction, TransactionInstruction, Syste
 import { getDomainKey, getHashedName, getNameAccountKey, getTwitterRegistry, NameRegistryState, transferNameOwnership, getAllDomains, performReverseLookup, getFavoriteDomain } from "@bonfida/spl-name-service";
 
 import { BurnButton } from "utils/BurnButton";
+import { BurnAllButton } from "utils/BurnAllButton";
 import { NftCard } from "./NftCard";
 import { useWalletTokens } from "../../utils/useWalletTokens"
 import { CloseButton } from "utils/CloseButton";
@@ -29,6 +30,13 @@ import { fetcher } from 'utils/fetcher';
 import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
 import React from "react";
+
+import { LoadRarityFile } from 'utils/LoadRarityFiles'
+const junks: any = LoadRarityFile(0)
+const smb: any = LoadRarityFile(1)
+const faces: any = LoadRarityFile(2)
+const rektiez: any = LoadRarityFile(3)
+const harrddyjunks: any = LoadRarityFile(4)
 
 Modal.setAppElement("#__next");
 
@@ -68,6 +76,14 @@ function randomInt(low: number, high: number) {
 }
 
 export const GalleryView: FC = ({ }) => {
+  const [randomState, setRandomState] = useState(true)
+  const timer = () => {
+    setTimeout(() => {
+      setRandomState(true);
+    }, 10000);
+  }
+
+  var AllNFTstoBurn: string[] = []
   const [NFTstoBurn, setNFTstoBurn] = useState<string[]>([])
   const [NFTstoBurnNames, setNFTstoBurnNames] = useState<string[]>([])
   const [NFTstoBurnImages, setNFTstoBurnImages] = useState<string[]>([])
@@ -270,7 +286,11 @@ export const GalleryView: FC = ({ }) => {
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {nfts?.map((nft: any, index) => (
             selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
-              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} />
+              (nft.data.sellerFeeBasisPoints == 0 && nft.primarySaleHappened == 0) ? (
+                null
+              ) : (
+                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
+              )
             ) : (null)
           ))}
         </div>
@@ -298,8 +318,14 @@ export const GalleryView: FC = ({ }) => {
   var facesCount: number = 0
   var rektiezCount: number = 0
   var harrddyJunksCount: number = 0
-  var score = 0
-  var trukClaim = ""
+  var gen1Score: number = 0
+  var gen2Score: number = 0
+  var smbScore: number = 0
+  var facesScore: number = 0
+  var rektiezScore: number = 0
+  var harrddyJunksScore: number = 0
+  var score: number = 0
+  var trukClaim: number = 0
 
   let collections: any[] = []
   let collectionsUri: any[] = []
@@ -307,23 +333,30 @@ export const GalleryView: FC = ({ }) => {
   let collectionsNames: any[] = []
 
   nfts.forEach(async (element: any) => {
+    AllNFTstoBurn.push(element.mint)
     if (element.updateAuthority == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
       gen1Count++
+      gen1Score += parseFloat(junks[0].nfts.find((el: { MintHash: any; }) => el.MintHash === element.mint).Score)
     }
     if (element.updateAuthority == "FEtQrCx12b9ebbTZq8Un11RNJUYxiDQF4zQCJctzRYH6") {
       smbCount++
+      smbScore += parseFloat(smb[0].nfts.find((el: { MintHash: any; }) => el.MintHash === element.mint).Score)
     }
     if (element.updateAuthority == "8DQoDXZvWrUHjp4DbjFTW8AhXsdTBgYVicwieJ6FzKVe") {
       facesCount++
+      facesScore += parseFloat(faces[0].nfts.find((el: { MintHash: any; }) => el.MintHash === element.mint).Score)
     }
     if (element.updateAuthority == "5XZrWyd6hmMcUScak7S2ef92rQW4hftkJDMDg6uYHssp") {
       gen2Count++
+      gen2Score+= 6.9
     }
     if (element.updateAuthority == "PnsQRTnqXBPshHpPj2kHWZwyrWABa5GTrPA6MDkwV4p") {
       rektiezCount++
+      rektiezScore += parseFloat(rektiez[0].nfts.find((el: { MintHash: any; }) => el.MintHash === element.mint).Score)
     }
     if (element.updateAuthority == "G14Wu9xSqL2yLHCrQHqajvhK7zApwdEM6iWhbBxcFQXS") {
       harrddyJunksCount++
+      harrddyJunksScore += 6969
     }
     if (!collections.includes(element.updateAuthority)) {
       collections.push(element.updateAuthority)
@@ -332,13 +365,12 @@ export const GalleryView: FC = ({ }) => {
       collectionsNames.push(element.data.name)
     }
   });
-  score = (gen1Count * 1) +
-    (gen2Count * 1) +
-    (smbCount * 5) +
-    (facesCount * 10) +
-    (rektiezCount * 50) +
-    (harrddyJunksCount * 100)
-  trukClaim = (score / 6.9).toFixed(2)
+  score = (gen1Score +
+    smbScore +
+    facesScore +
+    rektiezScore +
+    harrddyJunksScore)
+  trukClaim = score / 69
 
   const [rarityData, setRarityData] = useState<any>()
   //RARITY RANKING  
@@ -394,6 +426,8 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const randomWallet = () => {
+    setRandomState(false)
+    timer()
     setOpenTab(1)
     var wallet = randomWallets[randomInt(0, randomWallets.length)]
     if (value == publicKey?.toBase58())
@@ -452,9 +486,9 @@ export const GalleryView: FC = ({ }) => {
     setIsUploadOpen(!isUploadOpen);
   }
 
-  const [isBurnOpen, setIsBurnOpen] = useState(false);
-  function toggleBurnModal() {
-    setIsBurnOpen(!isBurnOpen);
+  const [isBurnAllOpen, setIsBurnAllOpen] = useState(false);
+  function toggleBurnAllModal() {
+    setIsBurnAllOpen(!isBurnAllOpen);
   }
 
   //Message related
@@ -601,9 +635,7 @@ export const GalleryView: FC = ({ }) => {
       (async () => {
         try {
           const user = new PublicKey(walletToParsePublicKey)
-          console.log("USER: " + user)
           const domains = await getAllDomains(connection, user);
-          console.log("DOMAIN: " + domain)
           handleChangeDomain(await performReverseLookup(connection, domains[0]) + ".sol")
         } catch (err) {
           console.log("DOMAIN ERROR:" + err)
@@ -650,9 +682,35 @@ export const GalleryView: FC = ({ }) => {
   const [selectedCollection, setSelectedCollection] = useState<string>(getInitialState);
 
   const handleCollectionChange = (e: any) => {
-    console.log(e.target.value)
-    setSelectedCollection(e.target.value);
+    console.log(e.target.selectedIndex)
+    if (e.target.selectedIndex != 0)
+      setSelectedCollection(collections[(e.target.selectedIndex - 1)]);
+    else
+      setSelectedCollection(e.target.value)
   };
+
+  const CollectionObject = (m: any) => {
+    const [collectionName, setcollectionName] = useState("-")
+    const handleChangecollectionName = (val: string) => {
+      setcollectionName(val)
+    }
+    async function GetCollectionName(url: string) {
+      try {
+        const response = await fetch(url)
+        const jsonData = await response.json()
+        handleChangecollectionName(jsonData?.collection)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    useEffect(() => {
+      GetCollectionName(`https://fudility.xyz:3420/collectionname/${m.mint}`)
+    }, [])
+
+    return (
+      <option>{collectionName}</option>
+    )
+  }
 
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen">
@@ -662,9 +720,12 @@ export const GalleryView: FC = ({ }) => {
             <MainMenu />
           </div> {/*desktop view*/}
             <div className="flex border-2 rounded-lg border-gray-700 bg-gray-700">
-              <button onClick={randomWallet} className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
-                🤷‍♂️
-              </button>
+              {randomState &&
+                <button onClick={randomWallet} className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12 font-pixel" data-tip="Show a random wallet">🤷‍♂️</button>
+              }
+              {!randomState &&
+                <div className="bg-gray-800 rounded-l-md h-10 w-12 font-pixel countdown grid items-center text-center">🚫</div>
+              }
               <input
                 type="text"
                 placeholder="Enter Wallet Address"
@@ -672,7 +733,7 @@ export const GalleryView: FC = ({ }) => {
                 value={value}
                 onChange={(e) => { setValue(e.target.value) }}
               />
-              <div className="tooltip tooltip-right" data-tip="Load wallet">
+              <div className="tooltip tooltip-left font-pixel" data-tip="Load wallet">
                 <button onClick={onChange} className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
                   👁️
                 </button>
@@ -704,22 +765,21 @@ export const GalleryView: FC = ({ }) => {
               </div>
             }
             <div className="flex gap-2 items-center bg-gray-700 rounded-xl p-2">
-              <p className="font-pixel text-xs">GRID</p>
               <input
                 type="range"
                 max="12"
                 min="2"
                 value={columnsSize}
-                className="range w-32 range-primary"
+                className="range w-32 range-primary tooltip tooltip-left font-pixel" data-tip="Change Grid size"
                 onChange={(e) => { setcolumnsSize(parseInt(e.target.value)) }}
               />
               <p className="font-pixel text-xs">{columnsSize}</p>
             </div>
 
-            <select onChange={handleCollectionChange} className="select select-bordered w-full max-w-xs font-pixel">
+            <select onChange={handleCollectionChange} className="select w-80 select-primary font-pixel">
               <option selected>Show all collections</option>
-              {collections?.map((num: any, index: any) => (
-                <option>{num}</option>
+              {collectionsMint?.map((num: any, index: any) => (
+                <CollectionObject mint={num} />
               ))
               }
             </select>
@@ -748,7 +808,7 @@ export const GalleryView: FC = ({ }) => {
               </div>
             ) : null}
             {!error && isLoading &&
-              <div className="grid grid-flow-row auto-rows-max content-center h-[55.7rem] w-screen">
+              <div className="grid grid-flow-row auto-rows-max content-center h-[54rem] w-screen">
                 <Loader />
               </div>
             }
@@ -756,21 +816,21 @@ export const GalleryView: FC = ({ }) => {
             {/*MOBILE VIEW */}
             {!error && !isLoading && !refresh &&
               <div className="lg:grid lg:grid-cols-9">
-                <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-0 z-50 w-screen">
+                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-50 w-screen">
                   <div className="flex justify-between">
                     <div className="flex">
                       <div className="font-pixel">
-                        <button onClick={randomWallet} className="btn btn-primary ml-2">
+                        <button onClick={randomWallet} className="btn btn-primary btn-sm">
                           🤷‍♂️
                         </button>
                       </div>
                       <div className="">
-                        <button onClick={onChange} className="btn btn-primary ml-2">
+                        <button onClick={onChange} className="btn btn-primary btn-sm ml-1">
                           👁️
                         </button>
                       </div>
                       <div className="">
-                        <button onClick={copyWalletAddress} className="btn btn-primary ml-2 mr-2">
+                        <button onClick={copyWalletAddress} className="btn btn-primary btn-sm ml-1 mr-2">
                           💾
                         </button>
                       </div>
@@ -778,7 +838,7 @@ export const GalleryView: FC = ({ }) => {
                     <div>
                       {publicKey &&
                         <div className="flex">
-                          <button onClick={toggleModal} className="btn btn-primary mr-2">
+                          <button onClick={toggleModal} className="btn btn-primary btn-sm mr-1">
                             ✉️
                           </button>
                           <SelectAndConnectWalletButton
@@ -793,7 +853,7 @@ export const GalleryView: FC = ({ }) => {
                   <input
                     type="text"
                     placeholder="Enter Wallet Address"
-                    className="font-pixel input input-bordered h-8 w-full bg-base-200"
+                    className="font-pixel input input-bordered h-6 w-full bg-base-200"
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
                   />
@@ -804,12 +864,12 @@ export const GalleryView: FC = ({ }) => {
                         <Balance />
                         {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
                         <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
-                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Score:&nbsp;</p><p className="font-pixel">{score}</p></div>
+                        <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
                       </div>
                     </div>
                   </li>
                 </ul>
-                <ul className="space-y-2 bg-gray-900 h-[55.7rem] p-2 hidden lg:block">
+                <ul className="space-y-2 bg-gray-900 h-[54rem] p-2 hidden lg:block">
                   <li className="">
                     <div className="">
                       <DomainName />
@@ -820,15 +880,15 @@ export const GalleryView: FC = ({ }) => {
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
                       <div className="flex justify-between text-sm ml-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
                       <br />
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{gen1Count}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">$olana Money Bu$ine$$:&nbsp;</p><p className="font-pixel">{smbCount}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Faces of $MB:&nbsp;</p><p className="font-pixel">{facesCount}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Lil Rektiez:&nbsp;</p><p className="font-pixel">{rektiezCount}</p></div>
-                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">$olana Money Bu$ine$$:&nbsp;</p><p className="font-pixel">{smbCount}/{smbScore.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Faces of $MB:&nbsp;</p><p className="font-pixel">{facesCount}/{facesScore.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">Lil Rektiez:&nbsp;</p><p className="font-pixel">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
                       <br />
-                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score}</p></div>
-                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim}</p></div>
+                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
+                      <div className="flex justify-between text-sm ml-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim.toFixed(2)}</p></div>
                       <br />
                     </div>
                   </li>
@@ -894,7 +954,7 @@ export const GalleryView: FC = ({ }) => {
                           <a href="#updateNFT"
                             onClick={() => setOpenTab(4)}
                             className={` ${openTab === 12 ? "bg-purple-600 text-white" : "bg-gray-700"} font-pixel btn w-full rounded mb-2`}
-                          >Multi Send Token</a>
+                          >Transfer Tool</a>
                         </li>
                       </div>
                     </div>
@@ -907,12 +967,12 @@ export const GalleryView: FC = ({ }) => {
                 {!selectedMode ? (
                   <div className="col-span-2 lg:col-span-8 w-full">
                     <div className={openTab === 1 ? "block" : "hidden"}>
-                      <div className="overflow-auto lg:h-[55.7rem] scrollbar">
+                      <div className="overflow-auto lg:h-[54rem] scrollbar">
                         <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
                       </div>
                     </div>
                     <div className={openTab === 2 ? "block" : "hidden"}>
-                      <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
+                      <div className="rounded h-[54rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
                         {history?.map((num: any, index: any) => (
                           <div key={index}>
                             {num.type != "bid" ? (
@@ -986,12 +1046,12 @@ export const GalleryView: FC = ({ }) => {
                     <div className="grid grid-cols-5">
                       <div className="col-span-4">
                         <div className={openTab === 1 ? "block" : "hidden"}>
-                          <div className="overflow-auto lg:h-[55.7rem] scrollbar">
+                          <div className="overflow-auto lg:h-[54rem] scrollbar">
                             <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
                           </div>
                         </div>
                         <div className={openTab === 2 ? "block" : "hidden"}>
-                          <div className="rounded h-[55.7rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
+                          <div className="rounded h-[54rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
                             {history?.map((num: any, index: any) => (
                               <div key={index}>
                                 {num.type != "bid" ? (
@@ -1061,8 +1121,13 @@ export const GalleryView: FC = ({ }) => {
                         </div>
                       </div >
                       <div className="cols-span-1 bg-gray-900 p-2">
-                        <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
-                        <ul className="overflow-auto h-[49rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                        <div className="flex justify-between">
+                          <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                          <button onClick={toggleBurnAllModal} className="font-pixel btn btn-primary">
+                            Burn ALL
+                          </button>
+                        </div>
+                        <ul className="overflow-auto h-[47rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                           {NFTstoBurnNames.map((num: any, index: any) => (
                             <li className="bg-gray-700 rounded-lg font-pixel p-2 mb-1 flex justify-between items-center break">
                               <img src={NFTstoBurnImages[index]} className="h-16" />
@@ -1211,7 +1276,7 @@ export const GalleryView: FC = ({ }) => {
 
           }}
           ariaHideApp={false}
-          contentLabel="BATTLE WINDOW"
+          contentLabel="Upload WINDOW"
         >
 
           <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleUploadModal}>X</button>
@@ -1253,6 +1318,40 @@ export const GalleryView: FC = ({ }) => {
               </div>
             </div>
 
+          </div>
+        </Modal>
+
+        <Modal
+          isOpen={isBurnAllOpen}
+          onRequestClose={toggleBurnAllModal}
+          style={{
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            },
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              marginRight: '-50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'white',
+              backgroundColor: 'rgba(45, 45, 65, 1)'
+            },
+
+          }}
+          ariaHideApp={false}
+          contentLabel="BATTLE WINDOW"
+        >
+          <div className="flex justify-between">
+            <div></div>
+            <h1 className="font-pixel">BURN WHOLE WALLET</h1>
+            <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleBurnAllModal}>X</button>
+          </div>
+          <div className="text-center">
+            <h1 className="font-pixel text-2xl">You are about to burn {AllNFTstoBurn.length} NFTs...</h1>
+            <img src="./burnAll.png" className="h-96 mb-3 mt-3" />
+            <BurnAllButton toBurn={AllNFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
           </div>
         </Modal>
       </div >
@@ -1298,7 +1397,7 @@ const CreatePonziView = ({ }) => {
         <div className="my-2 uppercase underline flex font-pixel text-2xl text-center">Create your own scam token</div>
         <div className='flex justify-between'>
           <label className="flex font-pixel">Token Name</label>
-          <input className="my-[1%] md:w-[200px] text-left text-black pl-1 border-2 border-black"
+          <input className="my-[1%] md:w-[200px] text-left input input-bordered font-pixel"
             type="text"
             placeholder="Token Name"
             onChange={(e) => setTokenName(e.target.value)}
@@ -1307,7 +1406,7 @@ const CreatePonziView = ({ }) => {
 
         <div className='flex justify-between'>
           <label className="flex font-pixel">Symbol</label>
-          <input className="my-[1%] md:w-[200px] text-left text-black pl-1 border-2 border-black"
+          <input className="my-[1%] md:w-[200px] text-left input input-bordered font-pixel"
             type="text"
             placeholder="Symbol"
             onChange={(e) => setSymbol(e.target.value)}
@@ -1316,7 +1415,7 @@ const CreatePonziView = ({ }) => {
 
         <div className='flex justify-between'>
           <label className="flex font-pixel">Number of tokens to mint</label>
-          <input className="my-[1%] md:w-[200px] text-left text-black pl-1 border-2 border-black"
+          <input className="my-[1%] md:w-[200px] text-left input input-bordered font-pixel"
             type="number"
             min="0"
             value={quantity}
@@ -1326,7 +1425,7 @@ const CreatePonziView = ({ }) => {
 
         <div className='flex justify-between'>
           <label className="flex font-pixel">Number of decimals</label>
-          <input className="my-[1%] md:w-[200px] text-left text-black pl-1 border-2 border-black"
+          <input className="my-[1%] md:w-[200px] text-left input input-bordered font-pixel"
             type="number"
             min="0"
             value={decimals}
@@ -1359,7 +1458,7 @@ const CreatePonziView = ({ }) => {
           <div>
             <div>
               <label className="mt-2 flex font-pixel">Metadata Url</label>
-              <input className="my-[1%] md:w-[480px] text-left text-black pl-1 border-2 border-black"
+              <input className="my-[1%] md:w-[480px] text-left input input-bordered font-pixel"
                 type="text"
                 placeholder="Metadata Url"
                 onChange={(e) => setMetadataURL(e.target.value)}
@@ -1373,7 +1472,7 @@ const CreatePonziView = ({ }) => {
           <div>
             <div className=''>
               <label className="mt-2 flex font-pixel">Description</label>
-              <input className="my-[1%] md:w-[480px] text-left text-black pl-1 border-2 border-black"
+              <input className="my-[1%] md:w-[480px] text-left input input-bordered font-pixel"
                 type="text"
                 placeholder="Description of the token"
                 onChange={(e) => setTokenDescription(e.target.value)}
@@ -2439,65 +2538,44 @@ const MultiSenderView = ({ }) => {
 
   return (
     <div className="text-center pt-2">
-      <div className="hero min-h-16 p-0 pt-10">
+      <div className="hero min-h-16 p-0">
         <div className="text-center hero-content w-full">
           <div className="w-full">
-            <h1 className="font-pixel mb-5 text-5xl">
-              Multi Send Token
-            </h1>
-            <h3 className="font-pixel text-xl pb-5" >Supports public address, .sol domain name and Twitter handle with @</h3>
-
             {nbToken == '' && CurrencyType == '' &&
               <div>
-                <div className="max-w-4xl mx-auto">
-                  <ul className="text-left leading-10">
-                    <li className="m-5" onClick={() => { setNbToken('one'); reset() }}>
-                      <div className="p-4 hover:border">
-                        <a className="font-pixel text-4xl font-bold mb-5">
-                          1 token - Multiple receivers
-                        </a>
-                        <div className='font-pixel'>Send one token to multiple receivers</div>
-                      </div>
-                    </li>
+                <div className="p-2 border-2 rounded-lg bg-gray-900">
+                  <h1 className="font-pixel mb-5 text-5xl underline">
+                    Multi Send Token
+                  </h1>
+                  <h3 className="font-pixel text-xl pb-5" >Supports public address, .sol domain name and Twitter handle with @</h3>
+                </div>
 
-                    <li className="m-5" onClick={() => { setNbToken('multi'); reset() }}>
-                      <div className="p-4 hover:border">
-                        <a className="font-pixel text-4xl font-bold mb-5">
-                          Multiple token - 1 receiver
-                        </a>
-                        <div className='font-pixel'>Send multiple tokens to one receiver</div>
-                      </div>
-                    </li>
-                    <li className="m-5" onClick={() => { setCurrencyType('domain'); reset() }}>
-                      <div className="p-4 hover:border">
-                        <a className="font-pixel text-4xl font-bold mb-5">
-                          Domains transfer
-                        </a>
-                        <div className='font-pixel'>Transfer multiple Solana domains name to one receiver</div>
-                      </div>
-                    </li>
-                    <li className="m-5" onClick={() => { setCurrencyType('csv'); reset() }}>
-                      <div className="p-4 hover:border">
-                        <a className="font-pixel text-4xl font-bold mb-5">
-                          Upload CSV file
-                        </a>
-                        <div className='font-pixel'>Use a CSV file to multi send tokens and solana domains</div>
-                      </div>
-                    </li>
-                  </ul>
+                <div className="border-2">
+                  <button className="btn btn-primary font-pixel m-5" onClick={() => { setNbToken('one'); reset() }}>
+                    Send one token to multiple receivers
+                  </button>
+                  <button className="font-pixel btn btn-primary m-5" onClick={() => { setNbToken('multi'); reset() }}>
+                    Send multiple tokens to one receiver
+                  </button>
+                  <button className="font-pixel btn btn-primary m-5" onClick={() => { setCurrencyType('domain'); reset() }}>
+                    Transfer multiple Solana domains name to one receiver
+                  </button>
+                  <button className="font-pixel btn btn-primary m-5" onClick={() => { setCurrencyType('csv'); reset() }}>
+                    Use a CSV file to multi send tokens and solana domains
+                  </button>
                 </div>
               </div>
             }
 
             {nbToken != '' && CurrencyType == '' &&
               <div className="flex">
-                <button className="text-white font-pixel text-xl w-[6rem] h-[2rem] mb-2 bg-[#2C3B52] hover:bg-[#566274] rounded-xl border"
+                <button className="btn btn-primary font-pixel "
                   onClick={() => { setNbToken(''); setCurrencyType('') }}>← Back</button>
               </div>
             }
             {CurrencyType != '' &&
               <div className="flex">
-                <button className="text-white font-pixel text-xl w-[6rem] h-[2rem] mb-2 bg-[#2C3B52] hover:bg-[#566274] rounded-xl border"
+                <button className="btn btn-primary font-pixel "
                   onClick={() => { setCurrencyType('') }}>← Back</button>
               </div>
             }
@@ -2505,40 +2583,31 @@ const MultiSenderView = ({ }) => {
             {nbToken == 'one' &&
               <div>
                 {CurrencyType == '' &&
-                  <div className="max-w-4xl mx-auto">
-                    <ul className="text-left leading-10">
-                      <li className="m-5" onClick={() => { setCurrencyType('SOL'); reset() }}>
-                        <div className="p-4 hover:border">
-                          <a className="font-pixel text-4xl font-bold mb-5">
-                            SOL sending
-                          </a>
-                          <div className='font-pixel'>Send SOL to multiple receivers</div>
-                        </div>
-                      </li>
+                  <div>
+                    <div className="p-2 border-2 rounded-lg bg-gray-900">
+                      <h1 className="font-pixel mb-5 text-5xl underline">
+                        SEND SOL
+                      </h1>
+                    </div>
+                    <div className="max-w-4xl mx-auto">
+                      <button className="btn btn-primary font-pixel m-5" onClick={() => { setCurrencyType('SOL'); reset() }}>
+                        Send SOL to multiple receivers
+                      </button>
 
-                      <li className="m-5" onClick={() => { setCurrencyType('SPL'); reset() }}>
-                        <div className="p-4 hover:border">
-                          <a className="font-pixel text-4xl font-bold mb-5">
-                            SPL token sending
-                          </a>
-                          <div className='font-pixel'>Send one SPL token type to multiple receivers</div>
-                        </div>
-                      </li>
-                    </ul>
+                      <button className="btn btn-primary font-pixel m-5" onClick={() => { setCurrencyType('SPL'); reset() }}>
+                        Send one SPL token type to multiple receivers
+                      </button>
+                    </div>
                   </div>
                 }
 
                 <div>
-
                   {/* form when SOL is selected */}
                   {CurrencyType == 'SOL' &&
                     <div>
-
-                      <h1 className="font-bold mb-5 text-3xl uppercase">SOL sending</h1>
-                      <form className="mt-[3%] mb-[2%]">
-
-                        <div className="flex justify-center mb-[2%]">
-                          <div className="my-auto mx-2">Send same amount</div>
+                      <form className="">
+                        <div className="flex justify-center mb-[2%] p-2 ">
+                          <div className="my-auto mx-2 font-pixel">Send same SOL amount</div>
                           <input className="my-auto mx-2"
                             type="checkbox"
                             checked={isChecked}
@@ -2546,7 +2615,7 @@ const MultiSenderView = ({ }) => {
                           />
                           {isChecked &&
                             <div className="flex items-center">
-                              <input className="w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                              <input className="w-[150px] mx-4 input input-bordered"
                                 type="number"
                                 step="any"
                                 min="0"
@@ -2564,7 +2633,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #1"
@@ -2576,7 +2645,7 @@ const MultiSenderView = ({ }) => {
                           />
 
                           {!isChecked &&
-                            <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                            <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                               type="number"
                               step="any"
                               min="0"
@@ -2593,7 +2662,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #2"
@@ -2604,7 +2673,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2619,7 +2688,7 @@ const MultiSenderView = ({ }) => {
                         </div>
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #3"
@@ -2630,7 +2699,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2646,7 +2715,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #4"
@@ -2657,7 +2726,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2673,7 +2742,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #5"
@@ -2684,7 +2753,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2700,7 +2769,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #6"
@@ -2711,7 +2780,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2727,7 +2796,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #7"
@@ -2738,7 +2807,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2754,7 +2823,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #8"
@@ -2765,7 +2834,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2781,7 +2850,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #9"
@@ -2792,7 +2861,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2808,7 +2877,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #10"
@@ -2819,7 +2888,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2832,8 +2901,6 @@ const MultiSenderView = ({ }) => {
                             }}
                           />}
                         </div>
-
-
                       </form>
                     </div>
                   }
@@ -2841,48 +2908,46 @@ const MultiSenderView = ({ }) => {
                   {/* form when SPL is selected */}
                   {CurrencyType == 'SPL' &&
                     <div>
-
-                      <h1 className="font-bold mb-5 text-3xl uppercase">SPL token sending</h1>
-                      <form className="mt-[3%] mb-[2%]">
-
-                        <input className="mb-[2%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
-                          type="text"
-                          required
-                          placeholder="Token Mint Address"
-                          onChange={(e) => setMintAddress(e.target.value)}
-                          style={{
-                            borderRadius:
-                              "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
-                          }}
-                        />
-                        <div className="flex justify-center mb-[2%]">
-                          <div className="my-auto mx-2">Send same amount</div>
-                          <input className="my-auto mx-2"
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={(e) => setIsChecked(!isChecked)}
+                      <form className="mt-2">
+                        <div className="flex justify-between">
+                          <input className="mb-[2%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
+                            type="text"
+                            required
+                            placeholder="Token Mint Address"
+                            onChange={(e) => setMintAddress(e.target.value)}
+                            style={{
+                              borderRadius:
+                                "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
+                            }}
                           />
-                          {isChecked &&
-                            <div className="flex items-center">
-                              <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
-                                type="number"
-                                step="any"
-                                min="0"
-                                required
-                                placeholder="Amount"
-                                onChange={(e) => setQuantity(parseFloat(e.target.value))}
-                                style={{
-                                  borderRadius:
-                                    "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
-                                }}
-                              /></div>
-                          }
-
+                          <div className="flex justify-center mb-[2%]">
+                            <div className="my-auto mx-2 font-pixel">Send same token amount</div>
+                            <input className="my-auto mx-2"
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => setIsChecked(!isChecked)}
+                            />
+                            {isChecked &&
+                              <div className="flex items-center">
+                                <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
+                                  type="number"
+                                  step="any"
+                                  min="0"
+                                  required
+                                  placeholder="Amount"
+                                  onChange={(e) => setQuantity(parseFloat(e.target.value))}
+                                  style={{
+                                    borderRadius:
+                                      "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
+                                  }}
+                                /></div>
+                            }
+                          </div>
                         </div>
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #1"
@@ -2894,7 +2959,7 @@ const MultiSenderView = ({ }) => {
                           />
 
                           {!isChecked &&
-                            <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                            <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                               type="number"
                               step="any"
                               min="0"
@@ -2911,7 +2976,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #2"
@@ -2922,7 +2987,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2937,7 +3002,7 @@ const MultiSenderView = ({ }) => {
                         </div>
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #3"
@@ -2948,7 +3013,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2964,7 +3029,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #4"
@@ -2975,7 +3040,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -2991,7 +3056,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #5"
@@ -3002,7 +3067,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3018,7 +3083,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #6"
@@ -3029,7 +3094,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3045,7 +3110,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #7"
@@ -3056,7 +3121,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3072,7 +3137,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #8"
@@ -3083,7 +3148,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3099,7 +3164,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #9"
@@ -3110,7 +3175,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3126,7 +3191,7 @@ const MultiSenderView = ({ }) => {
 
                         <div>
 
-                          <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                          <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                             type="text"
                             required
                             placeholder="Receiver #10"
@@ -3137,7 +3202,7 @@ const MultiSenderView = ({ }) => {
                             }}
                           />
 
-                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                          {!isChecked && <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                             type="number"
                             step="any"
                             min="0"
@@ -3154,10 +3219,10 @@ const MultiSenderView = ({ }) => {
                     </div>}
 
                   {!isSending && CurrencyType != '' &&
-                    <button className="text-white font-pixel text-xl bg-[#414e63] hover:bg-[#2C3B52] w-[160px] rounded-full shadow-xl border" onClick={SendOnClick}>Send</button>
+                    <button className="font-pixel btn btn-primary" onClick={SendOnClick}>Send</button>
                   }
                   {isSending && CurrencyType != '' &&
-                    <button className="text-white font-pixel text-xl bg-[#414e63] hover:bg-[#2C3B52] w-[160px] rounded-full shadow-xl border">
+                    <button className="font-pixel btn btn-primary">
                       <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
                         <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
@@ -3178,9 +3243,8 @@ const MultiSenderView = ({ }) => {
             {nbToken == 'multi' &&
               <div>
 
-                <form className="mt-[3%] mb-[2%]">
-
-                  <input className="mb-[2%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                <form className="">
+                  <input className="mb-[2%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                     type="text"
                     required
                     placeholder="Receiver Address"
@@ -3199,7 +3263,7 @@ const MultiSenderView = ({ }) => {
                     />
                     {isSOLChecked &&
                       <div className="flex items-center">
-                        <input className="mb-[1%] w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                        <input className="mb-[1%] w-[150px] mx-4 input input-bordered font-pixel"
                           type="number"
                           step="any"
                           min="0"
@@ -3212,12 +3276,10 @@ const MultiSenderView = ({ }) => {
                           }}
                         /></div>
                     }
-
                   </div>
 
                   <div>
-
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #1"
@@ -3228,7 +3290,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3240,12 +3302,10 @@ const MultiSenderView = ({ }) => {
                           "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
                       }}
                     />
-
                   </div>
 
                   <div>
-
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #2"
@@ -3255,7 +3315,7 @@ const MultiSenderView = ({ }) => {
                           "var(--rounded-btn,.5rem) var(--rounded-btn,.5rem)",
                       }}
                     />
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3269,8 +3329,7 @@ const MultiSenderView = ({ }) => {
                     />
                   </div>
                   <div>
-
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #3"
@@ -3281,7 +3340,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3294,10 +3353,8 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
                   </div>
-
                   <div>
-
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #4"
@@ -3308,7 +3365,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3321,10 +3378,9 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
                   </div>
-
                   <div>
 
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #5"
@@ -3335,7 +3391,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3351,7 +3407,7 @@ const MultiSenderView = ({ }) => {
 
                   <div>
 
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #6"
@@ -3362,7 +3418,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3378,7 +3434,7 @@ const MultiSenderView = ({ }) => {
 
                   <div>
 
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #7"
@@ -3389,7 +3445,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3405,7 +3461,7 @@ const MultiSenderView = ({ }) => {
 
                   <div>
 
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #8"
@@ -3416,7 +3472,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3432,7 +3488,7 @@ const MultiSenderView = ({ }) => {
 
                   <div>
 
-                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #9"
@@ -3443,7 +3499,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="mb-[1%] w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3459,7 +3515,7 @@ const MultiSenderView = ({ }) => {
 
                   <div>
 
-                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder="Token Mint Address #10"
@@ -3470,7 +3526,7 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
 
-                    <input className="mb-[1%] w-[150px] mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] w-[150px] mx-4 input input-bordered font-pixel"
                       type="number"
                       step="any"
                       min="0"
@@ -3483,15 +3539,13 @@ const MultiSenderView = ({ }) => {
                       }}
                     />
                   </div>
-
-
                 </form>
 
                 {!isSending &&
-                  <button className="text-white font-pixel text-xl bg-[#414e63] hover:bg-[#2C3B52] w-[160px] rounded-full shadow-xl border" onClick={SendOnClickMulti}>Send</button>
+                  <button className="btn btn-primary font-pixel" onClick={SendOnClickMulti}>Send</button>
                 }
                 {isSending &&
-                  <button className="text-white font-pixel text-xl bg-[#414e63] hover:bg-[#2C3B52] w-[160px] rounded-full shadow-xl border">
+                  <button className="btn-primary font-pixel">
                     <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
                       <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
@@ -3513,7 +3567,7 @@ const MultiSenderView = ({ }) => {
                 <h1 className="font-bold mb-5 text-3xl uppercase">Domains sending</h1>
                 <form className="mt-[3%] mb-[2%]">
 
-                  <input className="mb-[2%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                  <input className="mb-[2%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                     type="text"
                     required
                     placeholder="Receiver Address"
@@ -3525,7 +3579,7 @@ const MultiSenderView = ({ }) => {
                   />
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #1"
@@ -3538,7 +3592,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #2"
@@ -3551,7 +3605,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #3"
@@ -3564,7 +3618,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #4"
@@ -3577,7 +3631,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #5"
@@ -3590,7 +3644,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #6"
@@ -3603,7 +3657,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #7"
@@ -3616,7 +3670,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="mb-[1%] md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="mb-[1%] md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #8"
@@ -3629,7 +3683,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #9"
@@ -3642,7 +3696,7 @@ const MultiSenderView = ({ }) => {
                   </div>
 
                   <div>
-                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 text-black pl-1 border-2 border-black"
+                    <input className="sm:mb-[1%] mb-2 md:w-[480px] text-center mx-4 input input-bordered font-pixel"
                       type="text"
                       required
                       placeholder=".sol domain name #10"

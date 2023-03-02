@@ -17,7 +17,7 @@ export async function burnTokenAndCloseAccount(NFTstoBurn: string[], owner: Publ
             setIsburning(true)
 
             // define the number of burn/close done in one Tx
-            const nbPerTx = 6
+            const nbPerTx = 10
 
             // calculate the number of Tx to do
             let nbTx: number
