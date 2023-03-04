@@ -5,8 +5,6 @@ import { Dispatch, SetStateAction } from 'react';
 import { PROGRAM_ID, DataV2, createCreateMetadataAccountV2Instruction } from '@metaplex-foundation/mpl-token-metadata';
 import { bundlrStorage, Metaplex, MetaplexFileTag, walletAdapterIdentity } from '@metaplex-foundation/js';
 
-
-
 export async function createSPLToken(owner: PublicKey, wallet: WalletContextState, connection: Connection, quantity: number, decimals: number, isChecked: boolean, tokenName: string, symbol: string, metadataURL: string, description: string, file: Readonly<{
     buffer: Buffer;
     fileName: string;

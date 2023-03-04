@@ -1056,8 +1056,8 @@ export const NftCard: FC<Props> = ({
         </div>
 
         {/* ----------- MOBILE VIEW ----------- */}
-        <div className="lg:hidden block mt-2">
-          <div className="lg:grid lg:grid-cols-2">
+        <div className="lg:hidden block">
+          <div className="">
             {!fallbackImage && !error ? (
               <div>
                 <div className="justify-center">
@@ -1075,7 +1075,7 @@ export const NftCard: FC<Props> = ({
                 </div>
               </div>
             )}
-            <div className="font-pixel p-1">
+            <div className="font-pixel p-2">
               <div className="flex justify-between">
                 <div>
                   <a target="_blank" className="btn btn-primary font-pixel btn-sm" href={"https://solscan.io/token/" + tokenMintAddress}>
