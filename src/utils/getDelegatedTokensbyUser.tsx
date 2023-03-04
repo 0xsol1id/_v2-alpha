@@ -30,7 +30,6 @@ export const getDelegatedTokensbyUser = async ({
             const data = t.account.data;
             const info = AccountLayout.decode(data);
             const delegateOption = info.delegateOption;
-            console.log(delegateOption);
             return delegateOption != 0;
         })
         .map((t) => {

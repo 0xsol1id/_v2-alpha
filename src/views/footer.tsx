@@ -140,7 +140,10 @@ export const Footer: React.FC = ({ }) => {
                     </ul>
                 </div>
                 <div className="grid items-center">
-                <h1 className="font-pixel text-xs">DegenBags V0.1.AlPHA</h1>
+                    <div className="text-center">
+                        <h1 className="font-pixel text-xs">DegenBags V0.1_AlPHA</h1>
+                        <h1 className="font-pixel text-xs">Get more options on desktop</h1>
+                    </div>
                 </div>
             </div>
             <Modal

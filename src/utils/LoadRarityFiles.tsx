@@ -4,6 +4,7 @@ import Faces from './rarityData/faces.json'
 import Rektiez from './rarityData/rektiez.json'
 import HarrddyJunks from './rarityData/harrddyjunks.json'
 
+//ABFRAGE DER JSON FILES MUSS ÜBER EXPRESS SERVER PASSIEREN, DRINGEND UMBAUEN
 export const LoadRarityFile = (id: number) => {
     if (id == 0)
         return SolJunk

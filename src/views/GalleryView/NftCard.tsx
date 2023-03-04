@@ -716,7 +716,11 @@ export const NftCard: FC<Props> = ({
         contentLabel="NFT Details"
       >
         <div className="flex justify-between">
-          <div className="hidden lg:block"><SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} /></div>
+          <div className="hidden lg:block">
+            {isConnectedWallet &&
+              <SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+            }
+          </div>
           <a href={`https://explorer.solana.com/address/${tokenMintAddress}`} target="_blank">
             <p className="font-pixel text-bold text-lg text-center hover:text-red-300">{name}</p>
           </a>
@@ -1078,7 +1082,11 @@ export const NftCard: FC<Props> = ({
                     <img className="w-5 h-5" src="./solscan_logo.png" />
                   </a>
                 </div>
-                <div className="lg:hidden block"><SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} /></div>
+                <div className="lg:hidden block">
+                  {isConnectedWallet &&
+                    <SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                  }
+                </div>
                 <div>
                   {collectionName != "-" ? (
                     <div className="text-center">{collectionName != undefined ? (

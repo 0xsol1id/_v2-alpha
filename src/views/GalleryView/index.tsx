@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FC, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
@@ -32,6 +32,7 @@ import { randomWallets } from "../wallets"
 import React from "react";
 
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
+import { TokenName } from "utils/TokenName";
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -76,6 +77,26 @@ function randomInt(low: number, high: number) {
 }
 
 export const GalleryView: FC = ({ }) => {
+  var postsPerPage = 28;
+  const [postNumber, setPostNumber] = useState(postsPerPage);
+  const handleScroll = (e: any) => {
+    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight
+    if (isAtBottom && postNumber < nfts.length) {
+      // Load next posts   
+      setPostNumber(postNumber + postsPerPage)
+    }
+  }
+
+  var historysPerPage = 25;
+  const [historyNumber, setHistoryNumber] = useState(historysPerPage);
+  const handleHistoryScroll = (e: any) => {
+    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight
+    if (isAtBottom && historyNumber < history.length) {
+      // Load next posts   
+      setHistoryNumber(historyNumber + historysPerPage)
+    }
+  }
+
   const [randomState, setRandomState] = useState(true)
   const timer = () => {
     setTimeout(() => {
@@ -194,7 +215,6 @@ export const GalleryView: FC = ({ }) => {
             )
           }).then(res => res.json())
             .then(json => {
-              console.log(json.result?.value + "-" + walletPublicKey)
               handleChangeBalance((json.result?.value / LAMPORTS_PER_SOL).toFixed(3))
             });
         } catch (e) {
@@ -248,6 +268,7 @@ export const GalleryView: FC = ({ }) => {
 
     return [query, updateUrl];
   };
+
   const [search, setSearch] = useQueryParam('wallet', '');
   const [search2, setSearch2] = useQueryParam('collection', '');
 
@@ -260,6 +281,52 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const CollageList = ({ nfts, error, setRefresh }: CollageListProps) => {
+    if (error) {
+      return null;
+    }
+
+    if (!nfts?.length) {
+      return (
+        <div className="font-pixel text-center text-2xl pt-16">
+          No NFTs found in this wallet
+        </div>
+      );
+    }
+    const [nftList, setNftList] = useState(nfts.slice(0, postNumber))
+
+    return (
+      <div className="rounded" id="collage">
+        <div className={`${columnsSize == 12 ? "lg:grid-cols-12" :
+          columnsSize == 11 ? "lg:grid-cols-11" :
+            columnsSize == 10 ? "lg:grid-cols-10" :
+              columnsSize == 9 ? "lg:grid-cols-9" :
+                columnsSize == 8 ? "lg:grid-cols-8" :
+                  columnsSize == 7 ? "lg:grid-cols-7" :
+                    columnsSize == 6 ? "lg:grid-cols-6" :
+                      columnsSize == 5 ? "lg:grid-cols-5" :
+                        columnsSize == 4 ? "lg:grid-cols-4" :
+                          columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
+          {nftList?.map((nft: any, index: React.Key | null | undefined) => (
+            selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
+              (nft.data.sellerFeeBasisPoints == 0 && nft.primarySaleHappened == 0) ? (
+                null
+              ) : (
+                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
+              )
+            ) : (null)
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  type MobileListProps = {
+    nfts: NftTokenAccount[];
+    error?: Error;
+    setRefresh: Dispatch<SetStateAction<boolean>>
+  };
+
+  const MobileList = ({ nfts, error, setRefresh }: MobileListProps) => {
     if (error) {
       return null;
     }
@@ -284,7 +351,7 @@ export const GalleryView: FC = ({ }) => {
                       columnsSize == 5 ? "lg:grid-cols-5" :
                         columnsSize == 4 ? "lg:grid-cols-4" :
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
-          {nfts?.map((nft: any, index) => (
+          {nfts?.map((nft: any, index: React.Key | null | undefined) => (
             selectedCollection == "Show all collections" || nft.updateAuthority == selectedCollection ? (
               (nft.data.sellerFeeBasisPoints == 0 && nft.primarySaleHappened == 0) ? (
                 null
@@ -299,8 +366,10 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const [history, setHistory] = useState([])
+  const [historyList, setHistoryList] = useState([])
   const handleChangeHistory = (val: []) => {
     setHistory(val)
+    setHistoryList(val.slice(0, historyNumber))
   }
   async function GetHistory(url: string) {
     try {
@@ -311,6 +380,7 @@ export const GalleryView: FC = ({ }) => {
       console.log(e)
     }
   }
+
 
   var gen1Count: number = 0
   var gen2Count: number = 0
@@ -348,7 +418,7 @@ export const GalleryView: FC = ({ }) => {
     }
     if (element.updateAuthority == "5XZrWyd6hmMcUScak7S2ef92rQW4hftkJDMDg6uYHssp") {
       gen2Count++
-      gen2Score+= 6.9
+      gen2Score += 6.9
     }
     if (element.updateAuthority == "PnsQRTnqXBPshHpPj2kHWZwyrWABa5GTrPA6MDkwV4p") {
       rektiezCount++
@@ -386,6 +456,7 @@ export const GalleryView: FC = ({ }) => {
   const [value, setValue] = useState(walletToParsePublicKey);
 
   const onChange = async () => {
+    setPostNumber(postsPerPage)
     setOpenTab(1)
     const val = value
     if (val.includes(".sol")) {
@@ -415,6 +486,7 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const onChangeME = async (address: any) => {
+    setPostNumber(postsPerPage)
     setOpenTab(1)
     if (value == publicKey?.toBase58())
       setIsConnectedWallet(true)
@@ -426,6 +498,7 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const randomWallet = () => {
+    setPostNumber(postsPerPage)
     setRandomState(false)
     timer()
     setOpenTab(1)
@@ -440,6 +513,7 @@ export const GalleryView: FC = ({ }) => {
   };
 
   const onUseWalletClick = () => {
+    setPostNumber(postsPerPage)
     if (publicKey) {
       setOpenTab(1)
       setIsConnectedWallet(true)
@@ -667,6 +741,10 @@ export const GalleryView: FC = ({ }) => {
       setIsConnectedWallet(false)
   }, [publicKey])
 
+  useEffect(() => {
+    setHistoryList(history.slice(0, historyNumber))
+  }, [historyNumber])
+
   const saveCollage = async () => {
     const canvas = await html2canvas(document.getElementById('collage')!);
     const img = canvas.toDataURL('image/png');
@@ -771,7 +849,7 @@ export const GalleryView: FC = ({ }) => {
                 min="2"
                 value={columnsSize}
                 className="range w-32 range-primary tooltip tooltip-left font-pixel" data-tip="Change Grid size"
-                onChange={(e) => { setcolumnsSize(parseInt(e.target.value)) }}
+                onChange={(e) => { setcolumnsSize(parseInt(e.target.value)); setPostNumber(postNumber + postsPerPage) }}
               />
               <p className="font-pixel text-xs">{columnsSize}</p>
             </div>
@@ -967,37 +1045,40 @@ export const GalleryView: FC = ({ }) => {
                 {!selectedMode ? (
                   <div className="col-span-2 lg:col-span-8 w-full">
                     <div className={openTab === 1 ? "block" : "hidden"}>
-                      <div className="overflow-auto lg:h-[54rem] scrollbar">
+                      <div className="overflow-auto lg:h-[54rem] scrollbar hidden lg:block" onScroll={handleScroll}>
                         <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
+                      </div>
+                      <div className="overflow-auto lg:h-[54rem] scrollbar lg:hidden block" onScroll={handleScroll}>
+                        <MobileList nfts={nfts} error={error} setRefresh={setRefresh} />
                       </div>
                     </div>
                     <div className={openTab === 2 ? "block" : "hidden"}>
-                      <div className="rounded h-[54rem] mr-2 overflow-auto min-w-full p-2 scrollbar">
-                        {history?.map((num: any, index: any) => (
+                      <div className="rounded h-[54rem] mr-2 overflow-auto min-w-full p-2 scrollbar" onScroll={handleHistoryScroll}>
+                        {historyList?.map((num: any, index: any) => (
                           <div key={index}>
                             {num.type != "bid" ? (
-                              <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-14 text-center rounded-lg mb-1 border-2 border-gray-800">
+                              <div className="grid grid-cols-4 bg-gray-900 text-sm justify-between h-18 text-center rounded-lg mb-1 border-2 border-gray-800">
                                 <div className='my-auto p-1'>
                                   <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-pixel tooltip tooltip-right w-48" data-tip="Show on ME">
                                     <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
-                                      {/*<TokenName mint={num.tokenMint} />*/}
+                                      <TokenName mint={num.tokenMint} />
                                     </a>
                                   </button>
                                 </div>
                                 {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
-                                  <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto">BUY for {num.price.toFixed(2)}◎</p>
+                                  <p className="font-pixel text-center rounded bg-green-600 w-48 my-auto p-2">BOUGHT for {num.price.toFixed(2)}◎</p>
                                 ) : (
                                   num.type == "list" ? (
-                                    <p className="font-pixel text-center rounded bg-yellow-400 w-48 my-auto">LIST for {num.price.toFixed(2)}◎</p>
+                                    <p className="font-pixel text-center rounded bg-yellow-400 w-48 my-auto p-2">LISTED for {num.price.toFixed(2)}◎</p>
                                   ) : (
                                     num.type == "delist" ? (
-                                      <p className="font-pixel text-center rounded bg-gray-500 w-48 my-auto">DELIST for {num.price.toFixed(2)}◎</p>
+                                      <p className="font-pixel text-center rounded bg-gray-500 w-48 my-auto p-2">DELISTED for {num.price.toFixed(2)}◎</p>
                                     ) : (
                                       num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
-                                        <p className="font-pixel text-center rounded bg-red-600 w-48  my-auto">SELL for {num.price.toFixed(2)}◎</p>
+                                        <p className="font-pixel text-center rounded bg-red-600 w-48  my-auto p-2">SOLD for {num.price.toFixed(2)}◎</p>
                                       ) : (
                                         num.type == "cancelBid" ? (
-                                          <p className="font-pixel text-center rounded bg-blue-600 w-48 my-auto">CANCEL for {num.price.toFixed(2)}◎</p>
+                                          <p className="font-pixel text-center rounded bg-blue-600 w-48 my-auto p-2">CANCELED for {num.price.toFixed(2)}◎</p>
                                         ) : (
                                           <p className="rounded w-40h-8 my-auto">{num.type}</p>
                                         )
@@ -1046,7 +1127,7 @@ export const GalleryView: FC = ({ }) => {
                     <div className="grid grid-cols-5">
                       <div className="col-span-4">
                         <div className={openTab === 1 ? "block" : "hidden"}>
-                          <div className="overflow-auto lg:h-[54rem] scrollbar">
+                          <div className="overflow-auto lg:h-[54rem] scrollbar" onScroll={handleScroll} style={{ overflowY: 'scroll' }}>
                             <CollageList nfts={nfts} error={error} setRefresh={setRefresh} />
                           </div>
                         </div>
