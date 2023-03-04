@@ -784,7 +784,7 @@ export const GalleryView: FC = ({ }) => {
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen w-full">
       <div className="">
-        <div className="hidden lg:block navbar sticky top-0 z-0 justify-between text-neutral-content bg-gray-900">
+        <div className="hidden lg:block navbar sticky top-0 z-0 justify-between text-neutral-content bg-gray-900 w-screen">
           <div className="flex justify-between"><div>
             <MainMenu />
           </div> {/*desktop view*/}
@@ -867,8 +867,8 @@ export const GalleryView: FC = ({ }) => {
             }
 
             {!error && !isLoading && !refresh &&
-              <div className="lg:flex">
-                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-50 w-screen">
+              <div className="lg:flex min-w-screen">
+                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-50">
                   <div className="flex justify-between">
                     <div className="flex">
                       <div className="font-pixel">
@@ -1042,7 +1042,7 @@ export const GalleryView: FC = ({ }) => {
                   )}
                 </ul>
                 {!selectedMode ? (
-                  <div className="col-span-2 w-full">
+                  <div className="w-full">
                     <div className={openTab === 1 ? "block" : "hidden"}>
                       <div className="overflow-auto lg:h-[54rem] scrollbar hidden lg:block" onScroll={handleScroll}>
                         <NftList nfts={nfts} error={error} setRefresh={setRefresh} />
@@ -1052,7 +1052,7 @@ export const GalleryView: FC = ({ }) => {
                       </div>
                     </div>
                     <div className={openTab === 2 ? "block" : "hidden"}>
-                      <div className="rounded h-[54rem] mr-2 overflow-auto min-w-full p-2 scrollbar" onScroll={handleHistoryScroll}>
+                      <div className="overflow-auto lg:h-[54rem] scrollbar hidden lg:block p-1" onScroll={handleHistoryScroll}>
                         {historyList?.map((num: any, index: any) => (
                           <div key={index}>
                             {num.type != "bid" ? (
@@ -1200,7 +1200,7 @@ export const GalleryView: FC = ({ }) => {
                           <MultiSenderView />
                         </div>
                       </div >
-                      <div className="cols-span-1 bg-gray-900 p-2">
+                      <div className="bg-gray-900 p-2">
                         <div className="flex justify-between">
                           <BurnButton toBurn={NFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
                           <button onClick={toggleBurnAllModal} className="font-pixel btn btn-primary">

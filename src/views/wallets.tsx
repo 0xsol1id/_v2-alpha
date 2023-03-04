@@ -115,7 +115,6 @@ export const randomWallets = [
     { "Wallet": "F1xvQU6HfjBQYuUjgCB8TmAbQCQrM8J8H7Rte1sAwiWS" },
     { "Wallet": "J66nm4GPswvq9T9eJDSdMTgdck7T8BP3zTTK49621uB" },
     { "Wallet": "EGa4JBrNTDafetNXgb5EaQGomaAgTcZJNf1F19vgDqd7" },
-    { "Wallet": "BMWHPCit73cKF4biqsTpakf1ubW9g58gciZwPcRe33Ff" },
     { "Wallet": "69uq5XWdDqTqoa5VNfkSTKgnvqKBCoUAVXe9GAijnvNF" },
     { "Wallet": "4qzjkQueYSf3XJJGrWvzxJedTtVhWjZPCgeuvGfV2rG2" },
     { "Wallet": "8pPYZ9sX8cLFqxdfNHrqP3xXBBPmnYDpnoPrAA5KDV1Q" },
