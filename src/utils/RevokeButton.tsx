@@ -29,7 +29,7 @@ export const RevokeButton: FC<Props> = ({
     return (
         <div>
             {!isRevoking &&
-                <button className="btn btn-primary uppercase w-16 font-pixel tooltip tooltip-right" data-tip='Revoke delegated Authoritys' onClick={() => { if (publicKey) revokeAuthority(toRevoke, publicKey, wallet, connection, setIsRevoking, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>{toRevoke.length}</button>
+                <button className="btn btn-ghost border-gray-800  w-full font-pixel tooltip tooltip-right" data-tip='Revoke delegated Authoritys' onClick={() => { if (publicKey) revokeAuthority(toRevoke, publicKey, wallet, connection, setIsRevoking, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>REVOKE {toRevoke.length} AUTHORITYS</button>
             }
 
 

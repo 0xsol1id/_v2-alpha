@@ -6,7 +6,6 @@ export const Footer: React.FC = ({ }) => {
     return (
         <div>
             <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-2 lg:p-1 lg:flex justify-between hidden">
-                <div></div>
                 <h1 className="font-pixel mr-3 text-sm">DegenBags V0.1_ALPHA</h1>
             </div>
             <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-2 lg:p-1 flex justify-between lg:hidden">

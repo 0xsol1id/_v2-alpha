@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { DiscordLogo, TwitterLogo, GithubLogo, GameLogo } from "components"
 import Modal from 'react-modal';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Zoom from 'react-img-zoom'
@@ -62,21 +61,7 @@ export const SocialsAndInfo: React.FC = ({ }) => {
     return (
         <div className="">
             <div className="grid">
-                <button className="btn btn-ghost text-white w-16 mb-2">
-                    <a href="https://discord.gg/WC6GHBuSMG" target="_blank">
-                        <DiscordLogo />
-                    </a>
-                </button>
-                <button className="btn btn-ghost w-16 mb-2">
-                    <a href="https://twitter.com/soljunksNFT" target="_blank">
-                        <TwitterLogo />
-                    </a>
-                </button>
-                <button className="btn btn-ghost w-16 mb-2">
-                    <a href="https://github.com/0xsol1id" target="_blank">
-                        <GithubLogo />
-                    </a>
-                </button>
+                
                 <button className="btn btn-ghost w-16t mb-2">
                     <a href="http://mintgame.soljunks.io/" target="_blank">
                         <img src="./button/game.png" className="w-8" />

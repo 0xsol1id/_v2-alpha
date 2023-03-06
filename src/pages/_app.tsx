@@ -6,6 +6,7 @@ import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import "tailwindcss/tailwind.css";
 import "../styles/globals.css";
 import "../styles/App.css";
+import { ProSidebarProvider } from "react-pro-sidebar";
 
 // set custom RPC server endpoint for the final website
 // const endpoint = "https://explorer-api.devnet.solana.com";
@@ -29,7 +30,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     <div>      
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
+      <ProSidebarProvider>
         <Component {...pageProps} />
+        </ProSidebarProvider>
       </WalletProvider>
     </ConnectionProvider>
     </div>

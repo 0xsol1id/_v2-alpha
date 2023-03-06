@@ -28,9 +28,8 @@ export const CloseButton: FC<Props> = ({
 
     return (
         <div>
-
             {!isclosing &&
-                <button className="btn btn-primary uppercase font-pixel tooltip tooltip-right w-16" data-tip="Close empty accounts" onClick={() => { if (publicKey) CloseAccount(toClose, publicKey, wallet, connection, setIsClosing, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>{toClose.length}</button>
+                <button className="btn btn-ghost border-gray-800 w-full font-pixel tooltip tooltip-right" data-tip="Close empty accounts" onClick={() => { if (publicKey) CloseAccount(toClose, publicKey, wallet, connection, setIsClosing, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>CLOSE {toClose.length} EMPTY ACCOUNTS</button>
             }
 
             {isclosing && 
@@ -49,8 +48,6 @@ export const CloseButton: FC<Props> = ({
             {isclosing && currentTx != undefined && totalTx != undefined &&
                 <div className='font-pixel text-xs text-center'>TX: {currentTx}/{totalTx}</div>
             }
-
-
         </div>
     );
 };

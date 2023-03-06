@@ -8,6 +8,7 @@ import Link from "next/link";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { ConnectWallet } from "components";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
+import { CommercialAlert } from "utils/CommercialAlert";
 
 export const HomeView: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -45,7 +46,7 @@ export const HomeView: FC = ({ }) => {
   return (
     <div className="min-h-full">
       <div className="">
-        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
+        <div className="navbar sticky top-0 z-40 text-neutral-content flex justify-between bg-gray-900">
           <MainMenu />
           <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
             <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
@@ -85,6 +86,8 @@ export const HomeView: FC = ({ }) => {
             <ConnectWallet />
           </div>
         </div>
+
+        <CommercialAlert isDismissed={false}/>
         <div className="hero my-auto lg:hidden block">
           <div className="text-center hero-content items-center">
             <div className="border-2 rounded-lg border-gray-700 bg-gray-700">

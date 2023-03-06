@@ -58,6 +58,7 @@
     "react-modal": "^3.16.1",
     "react-moveable": "^0.45.1",
     "react-paginate": "^8.1.4",
+    "react-pro-sidebar": "^1.0.0",
     "react-router-dom": "^6.8.1",
     "react-tabs": "^4.0.0",
     "styled-components": "^5.3.6"

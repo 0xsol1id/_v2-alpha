@@ -1,5 +1,7 @@
 import { Dispatch, FC, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { Sidebar, Menu, MenuItem, useProSidebar, sidebarClasses, SubMenu } from 'react-pro-sidebar';
 
+import { DiscordLogo, TwitterLogo, GithubLogo, GameLogo } from "components"
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { resolveToWalletAddrress, isValidSolanaAddress } from "@nfteyez/sol-rayz";
 import { useWalletNfts, NftTokenAccount } from "@nfteyez/sol-rayz-react";
@@ -34,11 +36,17 @@ import React from "react";
 
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
 import { TokenName } from "utils/TokenName";
+import { CommercialAlert } from "utils/CommercialAlert";
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
 const rektiez: any = LoadRarityFile(3)
 const harrddyjunks: any = LoadRarityFile(4)
+
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Zoom from 'react-img-zoom'
+import ReactPaginate from 'react-paginate';
+import Link from "next/link";
 
 Modal.setAppElement("#__next");
 
@@ -78,6 +86,7 @@ function randomInt(low: number, high: number) {
 }
 
 export const GalleryView: FC = ({ }) => {
+  const [commercial, setCommercial] = useState(false);
   var postsPerPage = 20;
   const [postNumber, setPostNumber] = useState(35);
   const handleScroll = (e: any) => {
@@ -781,10 +790,58 @@ export const GalleryView: FC = ({ }) => {
     downloadjs(img, 'download.png', 'image/png');
   };
 
+  const { collapseSidebar } = useProSidebar();
+
+  //INFO RELATED
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  function toggleInfoModal() {
+    setSite(0)
+    setIsInfoOpen(!isInfoOpen);
+  }
+
+  const [site, setSite] = useState(0)
+  const handleSetSite = (num: any, col: any) => {
+    setSite(num)
+    handleChangeCollection(col, true)
+  }
+
+  const [collection, setCollection] = useState(junks)
+
+  const handleChangeCollection = (val: any, rank: boolean) => {
+    setCollection(val)
+    const mode = rank == true ? val[0].nfts : val[0].edition
+    setPagination((prevState) => ({
+      ...prevState,
+      offset: 0,
+      data: mode,
+      pageCount: mode.length / prevState.numberPerPage,
+      currentData: mode.slice(pagination.offset, pagination.offset + pagination.numberPerPage)
+    }))
+  }
+  const [pagination, setPagination] = useState({
+    data: collection[0].nfts,
+    offset: 0,
+    numberPerPage: 18,
+    pageCount: 0,
+    currentData: []
+  });
+  useEffect(() => {
+    setPagination((prevState) => ({
+      ...prevState,
+      pageCount: prevState.data.length / prevState.numberPerPage,
+      currentData: prevState.data.slice(pagination.offset, pagination.offset + pagination.numberPerPage)
+    }))
+  }, [pagination.numberPerPage, pagination.offset])
+  const handlePageClick = (event: { selected: any; }) => {
+    const selected = event.selected;
+    const offset = selected * pagination.numberPerPage
+    setPagination({ ...pagination, offset })
+  }
+
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen w-full">
       <div className="">
-        <div className="hidden lg:block navbar sticky top-0 z-0 justify-between text-neutral-content bg-gray-900 w-screen">
+        <div className="hidden lg:block navbar top-0 z-0 justify-between text-neutral-content bg-gray-900 w-screen">
           <div className="flex justify-between"><div>
             <MainMenu />
           </div> {/*desktop view*/}
@@ -850,7 +907,14 @@ export const GalleryView: FC = ({ }) => {
               <ConnectWallet />
             )}
           </div>
-
+          <div className="bg-gray-900 flex justify-between h-4 mt-1 text-xs items-center">
+            <div className="flex justify-between mx-2 text-center"><p className="font-pixel">Domain:&nbsp;</p><p className="font-pixel">{domain}</p></div>
+            <div className="flex justify-between mx-2"><p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p></div>
+            <div className="flex justify-between mx-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
+            <div className="flex justify-between mx-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
+            <div className="flex justify-between mx-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
+            <div className="flex justify-between mx-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
+          </div>
         </div>
         <div className="">
           <div className="tab-content" id="tabs-tabContent">
@@ -868,7 +932,7 @@ export const GalleryView: FC = ({ }) => {
 
             {!error && !isLoading && !refresh &&
               <div className="lg:flex min-w-screen">
-                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-50">
+                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-0">
                   <div className="flex justify-between">
                     <div className="flex">
                       <div className="font-pixel">
@@ -923,12 +987,23 @@ export const GalleryView: FC = ({ }) => {
                     </div>
                   </li>
                 </ul>
-                <ul className="space-y-2 bg-gray-900 h-[54rem] p-2 hidden lg:block">
-                  <li className="">
-                    <div className='flex'>
-                      <div className="dropdown dropdown-right tooltip tooltip-right font-pixel" data-tip="Wallet Info">
-                        <div tabIndex={0} className="btn btn-primary font-pixel w-16">INFO</div>
-                        <ul tabIndex={0} className="menu dropdown-content bg-base-300 rounded border border-gray-500 w-[20rem]">
+
+                <div className="space-y-2 bg-gray-900 h-[54rem] hidden lg:grid justify-between z-0">
+                  <Sidebar backgroundColor="#111827" rootStyles={{ border: 'none', }}>
+                    <Menu menuItemStyles={{
+                      button: ({ level, active, disabled }) => {
+                        // only apply styles on first level elements of the tree
+                        if (level === 0)
+                          return {
+                            backgroundColor: active ? '#22444' : undefined,
+                            '&:hover': {
+                              backgroundColor: '#2D2D41',
+                            },
+                          };
+                      },
+                    }}>
+                      <SubMenu icon={<img src="./button/buy_button.png"></img>} label="INFO" className="font-pixel z-50">
+                        <div className="bg-gray-900">
                           <div className="flex justify-between text-sm mx-2 text-center"><p className="font-pixel">Domain:&nbsp;</p><p className="font-pixel">{domain}</p></div>
                           <div className="flex justify-between text-sm mx-2">
                             <p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p>
@@ -948,99 +1023,77 @@ export const GalleryView: FC = ({ }) => {
                           <br />
                           <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
                           <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim.toFixed(2)}</p></div>
-                        </ul>
-                      </div>
+                        </div>
+                      </SubMenu>
+                      <MenuItem icon={<div>V</div>} className="font-pixel" onClick={() => setOpenTab(1)}>VIEW / BURN</MenuItem>
+                      <MenuItem icon={<MagicEdenLogo />} className="font-pixel" onClick={() => setOpenTab(2)}>HISTORY</MenuItem>
+                      {publicKey &&
+                        <div>
+                          <MenuItem icon={<img src="./message.png"></img>} className="font-pixel" onClick={toggleModal}>SEND NFT MAIL</MenuItem>
+                          <MenuItem icon={<img src="./ponzi.png"></img>} className="font-pixel" onClick={() => setOpenTab(3)}>PONZI MAKER</MenuItem>
+                          <MenuItem icon={<div>U</div>} className="font-pixel" onClick={toggleUploadModal}>UPLOAD TO ARWEAVE</MenuItem>
+                          <MenuItem icon={<img src="./transfer.png"></img>} className="font-pixel" onClick={() => setOpenTab(4)}>TRANSFER TOOL</MenuItem>
+                        </div>
+                      }
+                      <MenuItem icon={<DiscordLogo />} className="font-pixel">Discord</MenuItem>
+                      <MenuItem icon={<TwitterLogo />} className="font-pixel">Twitter</MenuItem>
+                      <MenuItem icon={<GithubLogo />} className="font-pixel">GitHub</MenuItem>
+                      <MenuItem icon={<img src="./heads/1.png" />} className="font-pixel" onClick={toggleInfoModal}>PROJECT INFO</MenuItem>
+                      <MenuItem icon={<img src="./button/game.png" className="w-8" />} className="font-pixel">
+                        <a href="http://mintgame.soljunks.io/" target="_blank">
+                          LEGACY GAME
+                        </a>
+                      </MenuItem>
+                      {isConnectedWallet ? (
+                        <div className="p-2">
+                          {tokens.length > 0 ? (
+                            <div className="mt-2 mb-2">
+                              <CloseButton toClose={tokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                            </div>
+                          ) : (
+                            <div className="mt-2 mb-2">
+                              <div className="btn btn-primary tooltip tooltip-right rounded-lg" data-tip="No empty account to close">No Empty Accounts</div>
+                            </div>
+                          )
+                          }
+                          {delegatedTokens.length > 0 ? (
+                            <div>
+                              <RevokeButton toRevoke={delegatedTokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
+                            </div>
+                          ) : (
+                            <div className="mt-2 mb-2">
+                              <div className="btn btn-primary tooltip tooltip-right rounded-lg" data-tip="No delegated Auhtoritys to revoke">Nothing to Revoke</div>
+                            </div>
+                          )
+                          }
+                        </div>
+                      ) : (
+                        <div />
+                      )}
+                    </Menu>
+                  </Sidebar>
+                  {isConnectedWallet &&
+                    <div className="flex justify-between ml-2">
+                      {selectedMode ? (
+                        <div>
+                          <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                          <p className="text-2xs font-pixel text-center">BURN</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                          <p className="text-2xs font-pixel text-center">VIEW</p>
+                        </div>
+                      )
+                      }
                     </div>
-                  </li>
-                  <li>
-                    {isConnectedWallet &&
-                      <div className="flex justify-between ml-2">
-                        {selectedMode ? (
-                          <div>
-                            <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
-                            <p className="text-2xs font-pixel text-center">BURN</p>
-                          </div>
-                        ) : (
-                          <div>
-                            <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
-                            <p className="text-2xs font-pixel text-center">VIEW</p>
-                          </div>
-                        )
-                        }
-                      </div>
-                    }
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => setOpenTab(1)}
-                      className="btn btn-primary rounded-lg tooltip tooltip-right font-pixel w-16" data-tip="View NFTs"
-                    >NFT</button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => setOpenTab(2)}
-                      className="btn btn-primary rounded-lg tooltip tooltip-right font-pixel w-16" data-tip="View ME History"
-                    ><MagicEdenLogo /></button>
-                  </li>
-                  <div className="w-full">
-                    {isConnectedWallet ? (
-                      <div>
-                        {tokens.length > 0 ? (
-                          <div className="mt-2 mb-2">
-                            <CloseButton toClose={tokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
-                          </div>
-                        ) : (
-                          <div className="mt-2 mb-2">
-                            <div className="btn btn-primary tooltip tooltip-right rounded-lg" data-tip="No empty account to close">0</div>
-                          </div>
-                        )
-                        }
-                        {delegatedTokens.length > 0 ? (
-                          <div>
-                            <RevokeButton toRevoke={delegatedTokens} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
-                          </div>
-                        ) : (
-                          <div className="mt-2 mb-2">
-                            <div className="btn btn-primary tooltip tooltip-right rounded-lg" data-tip="No delegated Auhtoritys to revoke">0</div>
-                          </div>
-                        )
-                        }
-                      </div>
-                    ) : (
-                      <div />
-                    )}
+                  }
+                  <div className="p-2">
+                    <main className="">
+                      <button onClick={() => collapseSidebar()} className="font-pixel btn btn-ghost text-center w-full text-xl">↔️</button>
+                    </main>
                   </div>
-                  {publicKey ? (
-                    <div className='mt-8'>
-                      <li>
-                        <button onClick={toggleModal} className="font-pixel btn btn-primary rounded-lg mb-2 tooltip tooltip-right w-16 text-2xl" data-tip="Send message">
-                          ✉️
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => setOpenTab(3)}
-                          className="btn btn-primary rounded-lg tooltip tooltip-right font-pixel w-16 mb-2 text-2xl" data-tip="View NFTs"
-                        >💰</button>
-                      </li>
-                      <li>
-                        <button onClick={toggleUploadModal} className="btn btn-primary rounded-lg tooltip tooltip-right font-pixel w-16 mb-2 text-2xl" data-tip="Upload">
-                          📤
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => setOpenTab(4)}
-                          className="btn btn-primary rounded tooltip tooltip-right font-pixel w-16 mb-2 text-2xl" data-tip="Transfer"
-                        >🔁</button>
-                      </li>
-                      <SocialsAndInfo />
-                    </div>
-                  ) : (
-                    <div>
-                    </div>
-                  )}
-                </ul>
+                </div>
                 {!selectedMode ? (
                   <div className="w-full">
                     <div className={openTab === 1 ? "block" : "hidden"}>
@@ -1434,7 +1487,372 @@ export const GalleryView: FC = ({ }) => {
             <BurnAllButton toBurn={AllNFTstoBurn} connection={connection} publicKey={publicKey} wallet={wallet} setRefresh={setRefresh} />
           </div>
         </Modal>
+
+        <Modal
+          isOpen={isInfoOpen}
+          onRequestClose={toggleInfoModal}
+          style={{
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            },
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              marginRight: '-50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'white',
+              backgroundColor: 'rgba(45, 45, 65, 1)'
+            },
+
+          }}
+          ariaHideApp={false}
+          contentLabel="INFO WINDOW"
+        >
+
+          {site == 0 &&
+            <div>
+              <div className="flex justify-between">
+                <p className="font-pixel mb-1"></p>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right mb-1" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="text-center">
+                <img src="./info/1 collection overview.png" useMap="#infomap" />
+                <map id="infomap" name="infomap">
+                  <area shape="rect" coords="59, 103, 236, 280" onClick={() => handleSetSite(1, junks)} className="hover:cursor-pointer" />
+                  <area shape="rect" coords="391, 103, 568, 280" onClick={() => handleSetSite(2, faces)} className="hover:cursor-pointer" />
+                  <area shape="rect" coords="723, 103, 899, 280" onClick={() => handleSetSite(3, smb)} className="hover:cursor-pointer" />
+
+                  <area shape="rect" coords="59, 328, 236, 505" onClick={() => setSite(4)} className="hover:cursor-pointer" />
+                  <area shape="rect" coords="391, 328, 568, 505" onClick={() => handleSetSite(5, harrddyjunks)} className="hover:cursor-pointer" />
+                  <area shape="rect" coords="723, 328, 899, 505" onClick={() => handleSetSite(6, rektiez)} className="hover:cursor-pointer" />
+                </map>
+                <h1 className="font-pixel">Click frame for NFT collection info</h1>
+              </div>
+            </div>
+          }
+          {site == 1 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <a href="https://magiceden.io/marketplace/soljunk" target="_blank" className="btn bg-green-500"><img src="./button/buy_button.png" /></a>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY Tabel</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY View</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/2 soljunk collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <Zoom
+                      img="./info/3 soljunk rarity.png"
+                      zoomScale={3}
+                      width={960}
+                      height={520}
+                      className="rounded"
+                    />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-start max-h-[54rem] w-[60rem]">
+                      {pagination.currentData && pagination.currentData.map((nft: any, index) => (
+                        <div key={index} className="relative post rounded text-sm">
+                          <img className="w-38 rounded" src={nft.Image} loading="lazy" />
+                          <span className="absolute top-1 left-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <p className="font-pixel text-center">{nft.Name}</p>
+                          </span>
+                          <span className="absolute bottom-1 right-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <div className="rounded font-pixel">👑{nft.Rank}</div>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded mt-1 bg-base-300 w-[60rem]">
+                      <ReactPaginate
+                        previousLabel={'<'}
+                        nextLabel={'>'}
+                        breakLabel={'...'}
+                        pageCount={pagination.pageCount}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={2}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                        className="flex justify-between font-pixel"
+                      />
+                    </div>
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+
+          {site == 2 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <a href="https://magiceden.io/marketplace/faces_of_solana_money_business" target="_blank" className="btn bg-green-500"><img src="./button/buy_button.png" /></a>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY View</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/4 faces collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-start max-h-[54rem] w-[60rem]">
+                      {pagination.currentData && pagination.currentData.map((nft: any, index) => (
+                        <div key={index} className="relative post rounded text-sm">
+                          <img className="w-38 rounded" src={nft.Image} loading="lazy" />
+                          <span className="absolute top-1 left-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <p className="font-pixel text-center">{nft.Name}</p>
+                          </span>
+                          <span className="absolute bottom-1 right-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <div className="rounded font-pixel">👑{nft.Rank}</div>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded mt-1 bg-base-300 w-[60rem]">
+                      <ReactPaginate
+                        previousLabel={'<'}
+                        nextLabel={'>'}
+                        breakLabel={'...'}
+                        pageCount={pagination.pageCount}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={2}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                        className="flex justify-between font-pixel"
+                      />
+                    </div>
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+
+          {site == 3 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <a href="https://magiceden.io/marketplace/solana_money_business" target="_blank" className="btn bg-green-500"><img src="./button/buy_button.png" /></a>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY Table</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY View</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/5 smb collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <Zoom
+                      img="./info/6 smb rarity.png"
+                      zoomScale={3}
+                      width={960}
+                      height={540}
+                      className="rounded"
+                    />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-start max-h-[54rem] w-[60rem]">
+                      {pagination.currentData && pagination.currentData.map((nft: any, index) => (
+                        <div key={index} className="relative post rounded text-sm">
+                          <img className="w-38 rounded" src={nft.Image} loading="lazy" />
+                          <span className="absolute top-1 left-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <p className="font-pixel text-center">{nft.Name}</p>
+                          </span>
+                          <span className="absolute bottom-1 right-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <div className="rounded font-pixel">👑{nft.Rank}</div>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded mt-1 bg-base-300 w-[60rem]">
+                      <ReactPaginate
+                        previousLabel={'<'}
+                        nextLabel={'>'}
+                        breakLabel={'...'}
+                        pageCount={pagination.pageCount}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={2}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                        className="flex justify-between font-pixel"
+                      />
+                    </div>
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+
+          {site == 4 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <button className="btn bg-green-500 mb-2 mx-2">
+                  <Link href="/mint">
+                    <img src="./button/mint_gen2.png" />
+                  </Link>
+                </button>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/7 soljunk gen2 collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <Zoom
+                      img="./info/8 soljunk gen2 rarity.png"
+                      zoomScale={3}
+                      width={960}
+                      height={540}
+                      className="rounded"
+                    />
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+
+          {site == 5 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <a href="https://magiceden.io/marketplace/harrddyjunks" target="_blank" className="btn bg-green-500"><img src="./button/buy_button.png" /></a>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY View</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/9 harrddyjunks collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-start max-h-[54rem] w-[60rem]">
+                      {pagination.currentData && pagination.currentData.map((nft: any, index) => (
+                        <div key={index} className="relative post rounded text-sm">
+                          <img className="w-38 rounded" src={nft.Image} loading="lazy" />
+                          <span className="absolute top-1 left-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <p className="font-pixel text-center">{nft.Name}</p>
+                          </span>
+                          <span className="absolute bottom-1 right-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <div className="rounded font-pixel">👑{nft.Rank}</div>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded mt-1 bg-base-300 w-[60rem]">
+                      <ReactPaginate
+                        previousLabel={'<'}
+                        nextLabel={'>'}
+                        breakLabel={'...'}
+                        pageCount={pagination.pageCount}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={2}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                        className="flex justify-between font-pixel"
+                      />
+                    </div>
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+
+          {site == 6 &&
+            <div>
+              <div className="flex justify-between">
+                <button onClick={() => setSite(0)} className="btn btn-primary btn-sm font-pixel">BACK</button>
+                <a href="https://magiceden.io/marketplace/lil_rektie" target="_blank" className="btn bg-green-500"><img src="./button/buy_button.png" /></a>
+                <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleInfoModal}>X</button>
+              </div>
+              <div className="">
+                <Tabs>
+                  <TabList>
+                    <Tab><h1 className="font-pixel">INFO</h1></Tab>
+                    <Tab><h1 className="font-pixel">RARITY View</h1></Tab>
+                  </TabList>
+
+                  <TabPanel>
+                    <img src="./info/10 lil rektie collection card.png" useMap="#workmap" />
+                  </TabPanel>
+
+                  <TabPanel>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-start max-h-[54rem] w-[60rem]">
+                      {pagination.currentData && pagination.currentData.map((nft: any, index) => (
+                        <div key={index} className="relative post rounded text-sm">
+                          <img className="w-38 rounded" src={nft.Image} loading="lazy" />
+                          <span className="absolute top-1 left-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <p className="font-pixel text-center">{nft.Name}</p>
+                          </span>
+                          <span className="absolute bottom-1 right-1 z-10 flex justify-between bg-gray-900 bg-opacity-70 rounded p-1">
+                            <div className="rounded font-pixel">👑{nft.Rank}</div>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded mt-1 bg-base-300 w-[60rem]">
+                      <ReactPaginate
+                        previousLabel={'<'}
+                        nextLabel={'>'}
+                        breakLabel={'...'}
+                        pageCount={pagination.pageCount}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={2}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                        className="flex justify-between font-pixel"
+                      />
+                    </div>
+                  </TabPanel>
+                </Tabs>
+              </div>
+            </div>
+          }
+        </Modal>
       </div >
+
+      <CommercialAlert isDismissed={commercial} />
       <Footer />
     </div >
   );
