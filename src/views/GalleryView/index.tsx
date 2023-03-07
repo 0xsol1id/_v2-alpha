@@ -91,8 +91,8 @@ export const GalleryView: FC = ({ }) => {
   var postsPerPage = 20;
   const [postNumber, setPostNumber] = useState(35);
   const handleScroll = (e: any) => {
-    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight
-    console.log(isAtBottom + "_" + e.target.clientHeight + "-" + (e.target.scrollHeight - e.target.scrollTop))
+    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight+1)
+    //console.log(isAtBottom + "_" + e.target.clientHeight + "-" + (e.target.scrollHeight - e.target.scrollTop))
     if (isAtBottom && postNumber < nfts.length) {
       // Load next posts   
       setPostNumber(postNumber + postsPerPage)
