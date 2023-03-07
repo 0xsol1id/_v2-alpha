@@ -1,4 +1,4 @@
-import { Dispatch, FC, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FC, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
 import { Sidebar, Menu, MenuItem, useProSidebar, sidebarClasses, SubMenu } from 'react-pro-sidebar';
 
 import { DiscordLogo, TwitterLogo, GithubLogo, GameLogo } from "components"
@@ -87,10 +87,12 @@ function randomInt(low: number, high: number) {
 
 export const GalleryView: FC = ({ }) => {
   const [commercial, setCommercial] = useState(false);
+
   var postsPerPage = 20;
   const [postNumber, setPostNumber] = useState(35);
   const handleScroll = (e: any) => {
     var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight
+    console.log(isAtBottom + "_" + e.target.clientHeight + "-" + (e.target.scrollHeight - e.target.scrollTop))
     if (isAtBottom && postNumber < nfts.length) {
       // Load next posts   
       setPostNumber(postNumber + postsPerPage)
@@ -286,17 +288,14 @@ export const GalleryView: FC = ({ }) => {
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
           {selectedCollection == "Show all collections" ? (
             (nftList?.map((nft: any, index: any) => (
-              (nft.data.sellerFeeBasisPoints == 0 && nft.primarySaleHappened == 0) ? (
-                null //DON´T VIEW SPL TOKENS
-              ) : (
-                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
-              )
+              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} changeWallet={onChangeWallet} />
+
             )
             ))
           ) : (
             (nfts?.map((nft: any, index: any) => (
               (nft.updateAuthority == selectedCollection &&
-                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
+                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} changeWallet={onChangeWallet} />
               )
             )
             ))
@@ -343,7 +342,7 @@ export const GalleryView: FC = ({ }) => {
               (nft.data.sellerFeeBasisPoints == 0 && nft.primarySaleHappened == 0) ? (
                 null
               ) : (
-                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
+                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} changeWallet={onChangeWallet} />
               )
             ) : (null)
           ))}
@@ -497,7 +496,7 @@ export const GalleryView: FC = ({ }) => {
     }
   };
 
-  const onChangeME = async (address: any) => {
+  const onChangeWallet = async (address: any) => {
     setPostNumber(35)
     setOpenTab(1)
     if (value == publicKey?.toBase58())
@@ -575,6 +574,11 @@ export const GalleryView: FC = ({ }) => {
   const [isBurnAllOpen, setIsBurnAllOpen] = useState(false);
   function toggleBurnAllModal() {
     setIsBurnAllOpen(!isBurnAllOpen);
+  }
+
+  const [isWalletInfoOpen, setIsWalletInfoOpen] = useState(false);
+  function toggleWalletInfoModal() {
+    setIsWalletInfoOpen(!isWalletInfoOpen);
   }
 
   //Message related
@@ -838,10 +842,70 @@ export const GalleryView: FC = ({ }) => {
     setPagination({ ...pagination, offset })
   }
 
+  const [comments, setComments] = useState([
+    {
+      wallet: "4ZVYJvxt9b6fpRTpMTHQnE3jHWEmLx8wjLYYMBKAgNc9",
+      timestamp: "1678184565",
+      comment: "Your wallet sucks so bad bro, pls burn it all!"
+    },
+  ])
+
+  const addComment = (com: any) => {
+    inputRef.current.value = ""
+    const user: any = publicKey?.toBase58()
+    const time: any = new Date().getTime() / 1000
+    setComments(state => [...state, {
+      wallet: user,
+      timestamp: time,
+      comment: com
+    }])
+  }
+
+  const inputRef = useRef<any>(null);
+
+  const WalletComments = () => {
+    return (
+      <div>
+        <div className="font-pixel overflow-auto h-[48.75rem] scrollbar p-2">
+          {comments.slice(0).reverse().map((num: any, index: any) => (
+            <div id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2">
+              <div className="flex justify-between mb-5">
+                <div className="flex">
+                  <button onClick={() => onChangeWallet(num.wallet)} className="btn btn-ghost border-2 border-primary btn-sm mr-2">{num.wallet}</button>
+                  <h1>said:</h1>
+                </div>
+                <h1 className="text-right text-xs">{convertTimestamp(num.timestamp)}</h1>
+              </div>
+              <h1 className="p-5 bg-gray-800 rounded">{num.comment}</h1>
+            </div>
+          ))}
+        </div>
+
+        {publicKey ? (
+          <div className="bg-gray-900 w-full font-pixel p-2 flex justify-between mt-5">
+            <input 
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={(e) => { setValue(e.target.value) }}
+            placeholder="write comment"
+            className="input w-full mr-5 input-bordered"            
+            maxLength={150}/>
+            <h1>{inputRef.current?.value.length}/150</h1>
+            <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary">Send</button>
+          </div>
+        ) : (
+          <h1 className="bg-gray-900 w-full font-pixel p-2 flex justify-between mt-5">connect your wallet to write comments</h1>
+        )
+        }
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-wrap flex-col md:flex-row items-center h-screen w-full">
       <div className="">
-        <div className="hidden lg:block navbar top-0 z-0 justify-between text-neutral-content bg-gray-900 w-screen">
+        <div className="hidden lg:block navbar top-0 z-10 justify-between text-neutral-content bg-gray-900 w-screen">
           <div className="flex justify-between"><div>
             <MainMenu />
           </div> {/*desktop view*/}
@@ -873,6 +937,23 @@ export const GalleryView: FC = ({ }) => {
                 💾
               </button>
             </div>
+
+            {isConnectedWallet &&
+              <div className="flex justify-between ml-2">
+                {selectedMode ? (
+                  <div>
+                    <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                    <p className="text-2xs font-pixel text-center">BURN</p>
+                  </div>
+                ) : (
+                  <div>
+                    <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
+                    <p className="text-2xs font-pixel text-center">VIEW</p>
+                  </div>
+                )
+                }
+              </div>
+            }
 
             <div className="flex gap-2 items-center bg-gray-700 rounded-xl p-2">
               <input
@@ -932,7 +1013,7 @@ export const GalleryView: FC = ({ }) => {
 
             {!error && !isLoading && !refresh &&
               <div className="lg:flex min-w-screen">
-                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-0">
+                <ul className="space-y-2 bg-gray-900 p-1 lg:hidden block sticky top-0 z-10">
                   <div className="flex justify-between">
                     <div className="flex">
                       <div className="font-pixel">
@@ -988,7 +1069,7 @@ export const GalleryView: FC = ({ }) => {
                   </li>
                 </ul>
 
-                <div className="space-y-2 bg-gray-900 h-[54rem] hidden lg:grid justify-between z-0">
+                <div className="space-y-2 bg-gray-900 h-[54rem] hidden lg:grid justify-between z-10">
                   <Sidebar backgroundColor="#111827" rootStyles={{ border: 'none', }}>
                     <Menu menuItemStyles={{
                       button: ({ level, active, disabled }) => {
@@ -1002,48 +1083,36 @@ export const GalleryView: FC = ({ }) => {
                           };
                       },
                     }}>
-                      <SubMenu icon={<img src="./button/buy_button.png"></img>} label="INFO" className="font-pixel z-50">
-                        <div className="bg-gray-900">
-                          <div className="flex justify-between text-sm mx-2 text-center"><p className="font-pixel">Domain:&nbsp;</p><p className="font-pixel">{domain}</p></div>
-                          <div className="flex justify-between text-sm mx-2">
-                            <p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p>
-                          </div>
-                          {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
-                          <br />
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
-                          <br />
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">$olana Money Bu$ine$$:&nbsp;</p><p className="font-pixel">{smbCount}/{smbScore.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Faces of $MB:&nbsp;</p><p className="font-pixel">{facesCount}/{facesScore.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Lil Rektiez:&nbsp;</p><p className="font-pixel">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
-                          <br />
-                          <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
-                          <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim.toFixed(2)}</p></div>
-                        </div>
-                      </SubMenu>
+                      <MenuItem icon={<img src="./button/buy_button.png"></img>} className="font-pixel" onClick={toggleWalletInfoModal}>WALLET INFO</MenuItem>
                       <MenuItem icon={<div>V</div>} className="font-pixel" onClick={() => setOpenTab(1)}>VIEW / BURN</MenuItem>
                       <MenuItem icon={<MagicEdenLogo />} className="font-pixel" onClick={() => setOpenTab(2)}>HISTORY</MenuItem>
+                      <MenuItem icon={<div>C</div>} className="font-pixel" onClick={() => setOpenTab(3)}>COMMENTS</MenuItem>
+                      <br />
+                      <br />
                       {publicKey &&
-                        <div>
-                          <MenuItem icon={<img src="./message.png"></img>} className="font-pixel" onClick={toggleModal}>SEND NFT MAIL</MenuItem>
-                          <MenuItem icon={<img src="./ponzi.png"></img>} className="font-pixel" onClick={() => setOpenTab(3)}>PONZI MAKER</MenuItem>
-                          <MenuItem icon={<div>U</div>} className="font-pixel" onClick={toggleUploadModal}>UPLOAD TO ARWEAVE</MenuItem>
-                          <MenuItem icon={<img src="./transfer.png"></img>} className="font-pixel" onClick={() => setOpenTab(4)}>TRANSFER TOOL</MenuItem>
-                        </div>
+                        <SubMenu icon={<p>🛠️</p>} label="TOOLS" className="font-pixel">
+                          <div className="bg-gray-900">
+                            <MenuItem icon={<img src="./message.png"></img>} className="font-pixel text-xs" onClick={toggleModal}>SEND NFT MAIL</MenuItem>
+                            <MenuItem icon={<img src="./ponzi.png"></img>} className="font-pixel text-xs" onClick={() => setOpenTab(4)}>PONZI MAKER</MenuItem>
+                            <MenuItem icon={<div>U</div>} className="font-pixel text-xs" onClick={toggleUploadModal}>UPLOAD TO ARWEAVE</MenuItem>
+                            <MenuItem icon={<img src="./transfer.png"></img>} className="font-pixel text-xs" onClick={() => setOpenTab(5)}>TRANSFER TOOL</MenuItem>
+                          </div>
+                        </SubMenu>
                       }
-                      <MenuItem icon={<DiscordLogo />} className="font-pixel">Discord</MenuItem>
-                      <MenuItem icon={<TwitterLogo />} className="font-pixel">Twitter</MenuItem>
-                      <MenuItem icon={<GithubLogo />} className="font-pixel">GitHub</MenuItem>
-                      <MenuItem icon={<img src="./heads/1.png" />} className="font-pixel" onClick={toggleInfoModal}>PROJECT INFO</MenuItem>
-                      <MenuItem icon={<img src="./button/game.png" className="w-8" />} className="font-pixel">
-                        <a href="http://mintgame.soljunks.io/" target="_blank">
-                          LEGACY GAME
-                        </a>
-                      </MenuItem>
+                      <br />
+                      <SubMenu icon={<img src="./button/buy_button.png"></img>} label="ABOUT" className="font-pixel z-50">
+                        <div className="bg-gray-900">
+                          <MenuItem icon={<img src="./heads/1.png" />} className="font-pixel text-xs" onClick={toggleInfoModal}>PROJECT INFO</MenuItem>
+                          <MenuItem icon={<DiscordLogo />} className="font-pixel text-xs">Discord</MenuItem>
+                          <MenuItem icon={<TwitterLogo />} className="font-pixel text-xs">Twitter</MenuItem>
+                          <MenuItem icon={<GithubLogo />} className="font-pixel text-xs">GitHub</MenuItem>
+                          <MenuItem icon={<img src="./button/game.png" className="w-8" />} className="font-pixel text-xs">
+                            <a href="http://mintgame.soljunks.io/" target="_blank">
+                              LEGACY GAME
+                            </a>
+                          </MenuItem>
+                        </div>
+                      </SubMenu>
                       {isConnectedWallet ? (
                         <div className="p-2">
                           {tokens.length > 0 ? (
@@ -1072,25 +1141,10 @@ export const GalleryView: FC = ({ }) => {
                       )}
                     </Menu>
                   </Sidebar>
-                  {isConnectedWallet &&
-                    <div className="flex justify-between ml-2">
-                      {selectedMode ? (
-                        <div>
-                          <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
-                          <p className="text-2xs font-pixel text-center">BURN</p>
-                        </div>
-                      ) : (
-                        <div>
-                          <input type="checkbox" className="toggle font-pixel" onClick={selectMode} />
-                          <p className="text-2xs font-pixel text-center">VIEW</p>
-                        </div>
-                      )
-                      }
-                    </div>
-                  }
                   <div className="p-2">
+                    <button className="font-pixel btn btn-ghost text-center text-xl border-2 borer-gray-800">⚙️</button>
                     <main className="">
-                      <button onClick={() => collapseSidebar()} className="font-pixel btn btn-ghost text-center w-full text-xl">↔️</button>
+                      <button onClick={() => collapseSidebar()} className="font-pixel btn btn-ghost text-center text-xl border-2 borer-gray-800">↔️</button>
                     </main>
                   </div>
                 </div>
@@ -1144,7 +1198,7 @@ export const GalleryView: FC = ({ }) => {
                                 <div className='flex justify-between'>
                                   {num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
                                     <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                      <button onClick={() => onChangeME(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
+                                      <button onClick={() => onChangeWallet(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
                                         {num.buyer}
                                       </button>
                                     </p>
@@ -1153,7 +1207,7 @@ export const GalleryView: FC = ({ }) => {
                                   )}
                                   {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
                                     <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                      <button onClick={() => onChangeME(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
+                                      <button onClick={() => onChangeWallet(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
                                         {num.seller}
                                       </button>
                                     </p>
@@ -1167,10 +1221,14 @@ export const GalleryView: FC = ({ }) => {
                         ))}
                       </div>
                     </div>
+
                     <div className={openTab === 3 ? "block" : "hidden"}>
-                      <CreatePonziView />
+                      <WalletComments />
                     </div>
                     <div className={openTab === 4 ? "block" : "hidden"}>
+                      <CreatePonziView />
+                    </div>
+                    <div className={openTab === 5 ? "block" : "hidden"}>
                       <MultiSenderView />
                     </div>
                   </div >
@@ -1223,7 +1281,7 @@ export const GalleryView: FC = ({ }) => {
                                     <div className='flex justify-between'>
                                       {num.type == "buyNow" && num.seller == walletToParsePublicKey ? (
                                         <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                          <button onClick={() => onChangeME(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
+                                          <button onClick={() => onChangeWallet(num.buyer)} className="btn bg-gray-700 btn-sm text-xs">
                                             {num.buyer}
                                           </button>
                                         </p>
@@ -1232,7 +1290,7 @@ export const GalleryView: FC = ({ }) => {
                                       )}
                                       {num.type == "buyNow" && num.buyer == walletToParsePublicKey ? (
                                         <p className="font-pixel flex uppercase text-xs rounded my-auto"><p className='mr-2'>Bought by: </p>
-                                          <button onClick={() => onChangeME(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
+                                          <button onClick={() => onChangeWallet(num.seller)} className="btn bg-gray-700 btn-sm text-xs">
                                             {num.seller}
                                           </button>
                                         </p>
@@ -1246,10 +1304,13 @@ export const GalleryView: FC = ({ }) => {
                             ))}
                           </div>
                         </div>
-                        <div className={openTab === 3 ? "block" : "hidden"}>
-                          <CreatePonziView />
+                        <div className={openTab === 3 ? "block " : "hidden"}>
+                          Socials
                         </div>
                         <div className={openTab === 4 ? "block" : "hidden"}>
+                          <CreatePonziView />
+                        </div>
+                        <div className={openTab === 5 ? "block" : "hidden"}>
                           <MultiSenderView />
                         </div>
                       </div >
@@ -1285,6 +1346,56 @@ export const GalleryView: FC = ({ }) => {
         </div >
 
         <Modal
+          isOpen={isWalletInfoOpen}
+          onRequestClose={toggleWalletInfoModal}
+          style={{
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            },
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              marginRight: '-50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'white',
+              backgroundColor: 'rgba(45, 45, 65, 1)'
+            },
+
+          }}
+          ariaHideApp={false}
+          contentLabel="Wallet Info"
+        >
+          <div className="flex justify-between mb-2">
+            <div />
+            <h1 className="font-pixel">Wallet Info</h1>
+            <button className="font-pixel text-white btn btn-xs btn-primary text-right" onClick={toggleWalletInfoModal}>X</button>
+          </div>
+          <div className=" w-96">
+            <div className="flex justify-between text-sm mx-2 text-center"><p className="font-pixel">Domain:&nbsp;</p><p className="font-pixel">{domain}</p></div>
+            <div className="flex justify-between text-sm mx-2">
+              <p className="font-pixel mr-2">SOL:&nbsp;</p><p className="font-pixel">{balance}◎</p>
+            </div>
+            {/*<div className="flex justify-between text-sm ml-2"><p className="font-pixel">Total SPLs:&nbsp;</p><p className="font-pixel">{tokens.length}</p></div>*/}
+            <br />
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Total NFTs:&nbsp;</p><p className="font-pixel">{nfts.length}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Collections:&nbsp;</p><p className="font-pixel">{collections.length}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">NFT Value:&nbsp;</p><p className="font-pixel">tba</p></div>
+            <br />
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">SolJunks GEN1:&nbsp;</p><p className="font-pixel">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">SolJunks GEN2:&nbsp;</p><p className="font-pixel">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">$olana Money Bu$ine$$:&nbsp;</p><p className="font-pixel">{smbCount}/{smbScore.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Faces of $MB:&nbsp;</p><p className="font-pixel">{facesCount}/{facesScore.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">Lil Rektiez:&nbsp;</p><p className="font-pixel">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2"><p className="font-pixel">HarrddyJunks:&nbsp;</p><p className="font-pixel">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
+            <br />
+            <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">Wallet Score:&nbsp;</p><p className="font-pixel">{score.toFixed(0)}</p></div>
+            <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-pixel">$TRUK/Day:&nbsp;</p><p className="font-pixel">{trukClaim.toFixed(2)}</p></div>
+          </div>
+        </Modal>
+
+        <Modal
           isOpen={isOpen}
           onRequestClose={toggleModal}
           style={{
@@ -1292,7 +1403,7 @@ export const GalleryView: FC = ({ }) => {
               backgroundColor: 'rgba(0, 0, 0, 0.75)'
             },
             content: {
-              top: '55%',
+              top: '50%',
               left: '50%',
               right: 'auto',
               bottom: 'auto',

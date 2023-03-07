@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback, SetStateAction, Dispatch } from "react";
+import { FC, useState, useEffect, useCallback, SetStateAction, Dispatch, useRef } from "react";
 import useSWR from "swr";
 import proxy from './proxy.png'
 
@@ -84,6 +84,7 @@ type Props = {
   selectedMode: boolean;
   toBurnChange: any;
   toBurnDelete: any;
+  changeWallet: any;
 };
 
 export const NftCard: FC<Props> = ({
@@ -96,7 +97,8 @@ export const NftCard: FC<Props> = ({
   toSend,
   selectedMode,
   toBurnChange,
-  toBurnDelete
+  toBurnDelete,
+  changeWallet
 }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -618,6 +620,27 @@ export const NftCard: FC<Props> = ({
       handleIsSelectedChange(false)
   }, [toBurnChange])
 
+  const [comments, setComments] = useState([
+    {
+      wallet: "4ZVYJvxt9b6fpRTpMTHQnE3jHWEmLx8wjLYYMBKAgNc9",
+      timestamp: "1678181463",
+      comment: "This NFT sucks, pls burn it!"
+    },
+  ])
+
+  const addComment = (com: any) => {
+    inputRef.current.value = ""
+    const user: any = publicKey?.toBase58()
+    const time: any = new Date().getTime()/1000
+    setComments(state => [...state, {
+      wallet: user,
+      timestamp: time,
+      comment: com
+    }])
+  }
+  
+  const inputRef = useRef<any>(null);
+
   return (
     <div className="text-center">
       <figure className="animation-pulse-color">
@@ -731,6 +754,7 @@ export const NftCard: FC<Props> = ({
             <TabList>
               <Tab><h1 className="font-pixel">INFO</h1></Tab>
               <Tab><h1 className="font-pixel">UPDATE</h1></Tab>
+              <Tab><h1 className="font-pixel">COMMENTS</h1></Tab>
             </TabList>
 
             <TabPanel>
@@ -1050,6 +1074,40 @@ export const NftCard: FC<Props> = ({
                 </div>
                 {success && <div className="font-pixel mt-[1%]">✅ Metadata successfuly updated!</div>}
                 {errorUpdate != '' && <div className="font-pixel mt-[1%]">❌ Ohoh.. An error occurs: {errorUpdate}</div>}
+              </div>
+            </TabPanel>
+
+            <TabPanel>
+              <div>
+                <div className="font-pixel overflow-auto h-[35rem] scrollbar p-2">
+                  {comments?.map((num: any, index: any) => (
+                  <div id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2">
+                    <div className="flex justify-between">
+                      <div className="flex">
+                        <button onClick={() => changeWallet(num.wallet)} className="btn btn-ghost btn-sm mr-2">{num.wallet}</button>
+                        <h1>said:</h1>
+                      </div>
+                      <h1 className="text-right text-xs">{convertTimestamp(num.timestamp)}</h1>
+                    </div>
+                    <h1 className="">{num.comment}</h1>
+                  </div>
+                  ))}
+                </div>
+
+                {publicKey ? (
+                  <div className="bg-gray-900 w-full rounded font-pixel p-2 flex justify-between mt-5">
+                    <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="write comment"
+                    className="input w-full mr-5"            
+                    maxLength={150}/>
+                    <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary">Send</button>
+                  </div>
+                ) : (
+                  <h1>connect your wallet to write comments</h1>
+                )
+                }
               </div>
             </TabPanel>
           </Tabs>

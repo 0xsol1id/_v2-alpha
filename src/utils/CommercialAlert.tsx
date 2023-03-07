@@ -27,7 +27,7 @@ export const CommercialAlert: React.FC<Props> = ({ isDismissed }) => {
                         <img src="./mint_banner1.png" className="lg:h-[170px] rounded" />
                         <button className="btn btn-sm btn-secondary font-pixel">
                             <Link href="/mint">Visit</Link>
-                            </button>
+                        </button>
                     </div>
                 </div>
             }
