@@ -11,7 +11,7 @@ export const CommercialAlert: React.FC<Props> = ({ isDismissed }) => {
         setDismiss(true);
         setTimeout(() => {
             setDismiss(false);
-        }, 30000);
+        }, 180000);
       }
 
     return (
@@ -24,7 +24,7 @@ export const CommercialAlert: React.FC<Props> = ({ isDismissed }) => {
                             <label className="font-pixel underline">MINT NOW!!!</label>
                             <button className="btn btn-sm btn-secondary font-pixel" onClick={dismissAlert}>X</button>
                         </div>
-                        <img src="./mint_banner1.png" className="lg:h-[170px] rounded" />
+                        <img src="/static/images/mint_banner1.png" className="lg:h-[170px] rounded" />
                         <button className="btn btn-sm btn-secondary font-pixel">
                             <Link href="/mint">Visit</Link>
                         </button>

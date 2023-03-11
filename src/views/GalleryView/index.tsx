@@ -91,7 +91,7 @@ export const GalleryView: FC = ({ }) => {
   var postsPerPage = 20;
   const [postNumber, setPostNumber] = useState(35);
   const handleScroll = (e: any) => {
-    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight+1)
+    var isAtBottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 1)
     //console.log(isAtBottom + "_" + e.target.clientHeight + "-" + (e.target.scrollHeight - e.target.scrollTop))
     if (isAtBottom && postNumber < nfts.length) {
       // Load next posts   
@@ -286,10 +286,14 @@ export const GalleryView: FC = ({ }) => {
                       columnsSize == 5 ? "lg:grid-cols-5" :
                         columnsSize == 4 ? "lg:grid-cols-4" :
                           columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1 p-2`}>
+
           {selectedCollection == "Show all collections" ? (
             (nftList?.map((nft: any, index: any) => (
-              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} changeWallet={onChangeWallet} />
-
+              (index % 20 == 0 ? (
+                <Link href="/mint"><img src="./commercial_block1.png" className="hover:border-primary hover:cursor-pointer rounded bg-gray-900 border-2 flex flex-wrap content-center" /></Link>
+              ) : (
+                <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} changeWallet={onChangeWallet} />
+              ))
             )
             ))
           ) : (
@@ -883,14 +887,14 @@ export const GalleryView: FC = ({ }) => {
 
         {publicKey ? (
           <div className="bg-gray-900 w-full font-pixel p-2 flex justify-between mt-5">
-            <input 
-            ref={inputRef}
-            type="text"
-            value={value}
-            onChange={(e) => { setValue(e.target.value) }}
-            placeholder="write comment"
-            className="input w-full mr-5 input-bordered"            
-            maxLength={150}/>
+            <input
+              ref={inputRef}
+              type="text"
+              value={value}
+              onChange={(e) => { setValue(e.target.value) }}
+              placeholder="write comment"
+              className="input w-full mr-5 input-bordered"
+              maxLength={150} />
             <h1>{inputRef.current?.value.length}/150</h1>
             <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary">Send</button>
           </div>
@@ -1069,7 +1073,7 @@ export const GalleryView: FC = ({ }) => {
                   </li>
                 </ul>
 
-                <div className="space-y-2 bg-gray-900 h-[54rem] hidden lg:grid justify-between z-10">
+                <div className="space-y-2 bg-gray-900 h-[54rem] hidden lg:grid justify-between">
                   <Sidebar backgroundColor="#111827" rootStyles={{ border: 'none', }}>
                     <Menu menuItemStyles={{
                       button: ({ level, active, disabled }) => {
@@ -1100,7 +1104,7 @@ export const GalleryView: FC = ({ }) => {
                         </SubMenu>
                       }
                       <br />
-                      <SubMenu icon={<img src="./button/buy_button.png"></img>} label="ABOUT" className="font-pixel z-50">
+                      <SubMenu icon={<img src="./button/buy_button.png"></img>} label="ABOUT" className="font-pixel">
                         <div className="bg-gray-900">
                           <MenuItem icon={<img src="./heads/1.png" />} className="font-pixel text-xs" onClick={toggleInfoModal}>PROJECT INFO</MenuItem>
                           <MenuItem icon={<DiscordLogo />} className="font-pixel text-xs">Discord</MenuItem>
@@ -1141,8 +1145,7 @@ export const GalleryView: FC = ({ }) => {
                       )}
                     </Menu>
                   </Sidebar>
-                  <div className="p-2">
-                    <button className="font-pixel btn btn-ghost text-center text-xl border-2 borer-gray-800">⚙️</button>
+                  <div className="flex p-2">
                     <main className="">
                       <button onClick={() => collapseSidebar()} className="font-pixel btn btn-ghost text-center text-xl border-2 borer-gray-800">↔️</button>
                     </main>

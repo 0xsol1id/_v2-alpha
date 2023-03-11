@@ -5,10 +5,12 @@ import { MainMenu } from "../mainmenu"
 import { randomWallets } from "../wallets"
 import { Footer } from '../footer';
 import Link from "next/link";
-import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
+import { divideAmount, isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { ConnectWallet } from "components";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
 import { CommercialAlert } from "utils/CommercialAlert";
+
+import Video from "./landing.mp4";
 
 export const HomeView: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -50,7 +52,7 @@ export const HomeView: FC = ({ }) => {
           <MainMenu />
           <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
             <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
-              <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
+              <Link href={`/wallet/${randomWallet}`}>🤷‍♂️ </Link>
             </button>
             <input
               type="text"
@@ -62,7 +64,7 @@ export const HomeView: FC = ({ }) => {
             {message == true ? (
               <div className="tooltip tooltip-right" data-tip="Load wallet">
                 <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
-                  <Link href={`/showme?wallet=${value}`}>👁️</Link>
+                  <Link href={`/wallet/${value}`}>👁️</Link>
                 </button>
               </div>
             ) : (
@@ -73,21 +75,72 @@ export const HomeView: FC = ({ }) => {
             }
           </div>
           <div>
-            <div>
-              {publicKey ?
-                <button className="btn btn-primary mr-2 block">
-                  <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
-                    <img src="./profil.png" className="w-6 h-6" />
-                  </Link>
-                  <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
-                </button>
-                : null}
-            </div>
             <ConnectWallet />
           </div>
         </div>
 
-        <CommercialAlert isDismissed={false}/>
+        <div className="grid grid-cols-4">
+          {/* SIDEBAR */}
+          <div className="col-span-1 bg-gray-900 flex flex-col justify-between p-10">
+            <div id="sidebar" className="grid justify-items-end gap-5">
+              <div className="w-1/2 border-2 rounded-lg border-opacity-10">
+                <button className="btn btn-ghost font-pixel w-full">
+                  <Link href="/">Home</Link>
+                </button>
+              </div>
+              <div className="w-1/2 border-2 rounded-lg border-opacity-10">
+                <button className="btn btn-ghost font-pixel w-full hover:bg-gray-800">Explore</button>
+              </div>
+              <div className="w-1/2 border-2 rounded-lg border-opacity-10">
+                <button className="btn btn-ghost font-pixel w-full hover:bg-gray-800">Tools</button>
+              </div>
+              <div className="w-1/2 border-2 rounded-lg border-opacity-10">
+                <button className="btn btn-ghost font-pixel w-full hover:bg-gray-800">
+                  <Link href="/mint">MINT NOW</Link>
+                </button>
+              </div>
+            </div>
+
+            {/* PROFILE */}
+            <div id="sidebar" className="grid justify-items-end">
+              <div className="w-1/2">
+                {publicKey ?
+                  <button className="btn btn-primary w-full flex justify-between">
+                    <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
+                      <img src="./profil.png" className="w-8 h-8" />
+                    </Link>
+                    <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 6)}...{(publicKey?.toBase58()).slice(-6)}</p>
+                  </button>
+                  : <div className="font-pixel">connect wallet</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* CONTENT */}
+          <div className="col-span-2 scrollbar overflow-auto h-[90vh]">
+            <div className="font-pixel navbar sticky top-0 z-40 text-neutral-content flex justify-between bg-gray-900 bg-opacity-50 backdrop-blur">
+              START PAGE
+            </div>
+            <div className="font-pixel p-2">
+              {randomWallets?.map((num: any, index: any) => (
+                <div className="border-2 border-opacity-20 mb-2 rounded-lg">
+                  <button className="btn btn-ghost btn-sm text-xl w-full bg-gray-900 hover:bg-gray-800">
+                    <Link href={`/wallet/${num.Wallet}`}>
+                     <div>WATCH "{num.Wallet}" NOW</div>
+                    </Link></button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT BAR */}
+          <div className="col-span-1 bg-gray-900 h-full p-2">
+            <video className='w-full' autoPlay muted loop><source src={'./landing.mp4'} type='video/mp4' /></video>
+          </div>
+        </div>
+
+        {/*<CommercialAlert isDismissed={false} />
         <div className="hero my-auto lg:hidden block">
           <div className="text-center hero-content items-center">
             <div className="border-2 rounded-lg border-gray-700 bg-gray-700">
@@ -114,16 +167,8 @@ export const HomeView: FC = ({ }) => {
           </div>
         </div>
         <div className="hidden lg:hero">
-          <div className="items-center mt-10" style={{
-            backgroundImage: `url("./bg_home.png")`,
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            width: '85%',
-            height: '800px',
-          }}>
-          </div>
-        </div>
+          <video className='hero-content' autoPlay muted loop><source src={'./landing.mp4'} type='video/mp4' /></video>
+            </div>*/}
         <Footer />
       </div>
     </div>

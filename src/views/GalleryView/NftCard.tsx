@@ -1079,7 +1079,7 @@ export const NftCard: FC<Props> = ({
 
             <TabPanel>
               <div>
-                <div className="font-pixel overflow-auto h-[35rem] scrollbar p-2">
+                <div className="font-pixel overflow-auto h-[37rem] scrollbar p-2">
                   {comments?.map((num: any, index: any) => (
                   <div id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2">
                     <div className="flex justify-between">
@@ -1105,7 +1105,7 @@ export const NftCard: FC<Props> = ({
                     <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary">Send</button>
                   </div>
                 ) : (
-                  <h1>connect your wallet to write comments</h1>
+                  <h1 className="bg-gray-900 w-full font-pixel p-2 flex justify-between mt-5 rounded text-center">connect your wallet to write comments</h1>
                 )
                 }
               </div>
