@@ -127,7 +127,7 @@ export const HomeView: FC = ({ }) => {
                 <div className="border-2 border-opacity-20 mb-2 rounded-lg">
                   <button className="btn btn-ghost btn-sm text-xl w-full bg-gray-900 hover:bg-gray-800">
                     <Link href={`/wallet/${num.Wallet}`}>
-                     <div>WATCH "{num.Wallet}" NOW</div>
+                     <div>WATCH "{num.Wallet}" NOW</div> 
                     </Link></button>
                 </div>
               ))}
