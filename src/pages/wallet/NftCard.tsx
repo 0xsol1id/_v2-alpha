@@ -670,14 +670,14 @@ export const NftCard: FC<Props> = ({
                 {!isSelected &&
                   <a onClick={() => { handleSelectChange(tokenMintAddress, name, image) }} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded tooltip" data-tip="Select to burn">
                     {publicKey && isConnectedWallet &&
-                      <img src="/static/images/sol.png" className='tracking-wider text-9xl w-full h-full' />
+                      <img src="/static/images/sol.png" className='tracking-wider text-9xl w-full h-full' alt="tmp" />
                     }
                   </a>
                 }
                 {isSelected &&
                   <a onClick={() => { handleSelectDelete(tokenMintAddress, name, image) }} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center hover:border-2 border-primary rounded">
                     {publicKey && isConnectedWallet &&
-                      <img src="/static/images/sol.png" className='bg-red-900 bg-opacity-70 text-9xl w-full h-full'></img>
+                      <img src="/static/images/sol.png" className='bg-red-900 bg-opacity-70 text-9xl w-full h-full' alt="tmp"></img>
                     }
                   </a>
                 }

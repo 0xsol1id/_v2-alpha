@@ -280,7 +280,7 @@ const Wallet = () => {
         {selectedCollection == "Show all collections" ? (
           (nftList?.map((nft: any, index: any) => (
             (index % 20 == 0 ? (
-              <Link href="/mint"><img src="/static/images/commercial_block1.png" className="hover:border-primary hover:cursor-pointer rounded bg-gray-900 border-2 flex flex-wrap content-center" /></Link>
+              <Link passHref href="/mint"><img src="/static/images/commercial_block1.png" className="hover:border-primary hover:cursor-pointer rounded bg-gray-900 border-2 flex flex-wrap content-center" /></Link>
             ) : (
               <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
             ))
@@ -564,7 +564,7 @@ const Wallet = () => {
               <select onChange={handleCollectionChange} className="select w-80 select-primary font-pixel">
                 <option>Show all collections</option>
                 {collections?.map((num: any, index: any) => (
-                  <option>{num}</option>
+                  <option key={index}>{num}</option>
                 ))
                 }
               </select>
@@ -607,7 +607,7 @@ const Wallet = () => {
                 <TabPanel>
                   <div className="font-pixel p-2 overflow-auto scrollbar max-h-[45rem]">
                     {comments?.slice(0).reverse().map((num: any, index: any) => (
-                      <div id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                      <div key={index} id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
                         <div className="flex justify-between">
                           <div className="flex">
                             <div className='border-2 rounded-lg border-opacity-10 mr-5'>
@@ -651,7 +651,7 @@ const Wallet = () => {
                 </div>
                 <ul className="overflow-auto h-[47rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   {NFTstoBurnNames.map((num: any, index: any) => (
-                    <li className="bg-gray-700 rounded-lg font-pixel p-2 mb-1 flex justify-between items-center break">
+                    <li key={index} className="bg-gray-700 rounded-lg font-pixel p-2 mb-1 flex justify-between items-center break">
                       <img src={NFTstoBurnImages[index]} className="h-16" alt="tmp" />
                       <h1 className="text-center">{num}</h1>
                       <button onClick={(e) => delNFTtoBurnByName(num)} className="btn btn-ghost">
