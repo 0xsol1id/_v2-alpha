@@ -280,7 +280,7 @@ const Wallet = () => {
         {selectedCollection == "Show all collections" ? (
           (nftList?.map((nft: any, index: any) => (
             (index % 20 == 0 ? (
-              <Link passHref href="/mint"><img src="/static/images/commercial_block1.png" className="hover:border-primary hover:cursor-pointer rounded bg-gray-900 border-2 flex flex-wrap content-center" /></Link>
+              <Link key={index} passHref href="/mint"><img src="/static/images/commercial_block1.png" alt="tmp" className="hover:border-primary hover:cursor-pointer rounded bg-gray-900 border-2 flex flex-wrap content-center" /></Link>
             ) : (
               <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} />
             ))
@@ -515,7 +515,7 @@ const Wallet = () => {
                 <div className="w-1/2 border-2 rounded-lg border-opacity-10">
                   {publicKey ?
                     <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                      <Link href={`/wallet/${publicKey?.toBase58()}`}>
+                      <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                         <div className='w-full flex justify-between items-center'>
                           <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
                           <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
