@@ -10,12 +10,12 @@ import { PublicKey, LAMPORTS_PER_SOL, TokenBalance, Transaction, TransactionInst
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { MainMenu } from "../mainmenu"
-import { randomWallets } from "../wallets"
-import { Footer } from '../footer';
+import { MainMenu } from "../../utils/mainmenu"
+import { randomWallets } from "../../utils/wallets"
+import { Footer } from '../../utils/footer';
 import Link from "next/link";
 import { ConnectWallet } from "components";
-import { NftCard } from './NftCard';
+import { NftCard } from '../../utils/NftCard';
 
 import { BurnButton } from "utils/BurnButton";
 import { BurnAllButton } from "utils/BurnAllButton";

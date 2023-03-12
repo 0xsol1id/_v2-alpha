@@ -7,9 +7,9 @@ import { Metaplex, bundlrStorage, walletAdapterIdentity } from "@metaplex-founda
 import { PublicKey } from "@solana/web3.js";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LegitOrScam } from '../../utils/LegitOrScam';
-import { SelectSendButton } from '../../utils/SelectSendButton';
-import { SingleBurnButton } from '../../utils/SingleBurnButton';
+import { LegitOrScam } from './LegitOrScam';
+import { SelectSendButton } from './SelectSendButton';
+import { SingleBurnButton } from './SingleBurnButton';
 
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
 const junks: any = LoadRarityFile(0)
