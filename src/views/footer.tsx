@@ -10,7 +10,7 @@ export const Footer: React.FC = ({ }) => {
             </div>
             <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-2 lg:p-1 flex justify-between lg:hidden">
                 <button className="btn btn-sm bg-green-500 mx-1">
-                    <Link href="/mint">
+                    <Link passHref href="/mint">
                         <img src="./button/buy_button.png" />
                     </Link>
                 </button>

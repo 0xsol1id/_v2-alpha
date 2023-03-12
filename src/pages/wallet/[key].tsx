@@ -431,7 +431,7 @@ const Wallet = () => {
           <MainMenu />
           <div className="border-2 rounded-lg border-gray-700 bg-gray-700 hidden lg:block">
             <button className="bg-primary hover:bg-gray-800 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
-              <Link href={`/wallet/${randomWallet}`}>🤷‍♂️ </Link>
+              <Link passHref href={`/wallet/${randomWallet}`}>🤷‍♂️ </Link>
             </button>
             <input
               type="text"
@@ -443,7 +443,7 @@ const Wallet = () => {
             {message == true ? (
               <div className="tooltip tooltip-right" data-tip="Load wallet">
                 <button className="bg-primary hover:bg-gray-800 rounded-r-md h-10 w-12">
-                  <Link href={`/wallet/${value}`}>👁️</Link>
+                  <Link passHref href={`/wallet/${value}`}>👁️</Link>
                 </button>
               </div>
             ) : (
@@ -464,7 +464,7 @@ const Wallet = () => {
             <div id="sidebar" className="grid justify-items-end gap-5">
               <div className="w-1/2 border-2 rounded-lg border-opacity-10">
                 <button className="btn btn-ghost font-pixel w-full">
-                  <Link href="/">Home</Link>
+                  <Link passHref href="/">Home</Link>
                 </button>
               </div>
               <div className="w-1/2 border-2 rounded-lg border-opacity-10">
@@ -475,7 +475,7 @@ const Wallet = () => {
               </div>
               <div className="w-1/2 border-2 rounded-lg border-opacity-10">
                 <button className="btn btn-ghost font-pixel w-full hover:bg-gray-800">
-                  <Link href="/mint">MINT NOW</Link>
+                  <Link passHref href="/mint">MINT NOW</Link>
                 </button>
               </div>
             </div>
@@ -501,8 +501,8 @@ const Wallet = () => {
                   <div className="border-2 rounded-lg border-opacity-10">
                     {publicKey ?
                       <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                        <Link href={`/wallet/${publicKey?.toBase58()}`}>
-                          <img src="/static/images/profil.png" className="w-8 h-8" />
+                        <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                          <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp"/>
                         </Link>
 
                       </button>
@@ -517,7 +517,7 @@ const Wallet = () => {
                     <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                       <Link href={`/wallet/${publicKey?.toBase58()}`}>
                         <div className='w-full flex justify-between items-center'>
-                          <img src="/static/images/profil.png" className="w-8 h-8" />
+                          <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
                           <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
                         </div>
                       </Link>
@@ -536,7 +536,7 @@ const Wallet = () => {
               <div>
                 <button onClick={() => router.back()}>🔙</button>
                 <div className="">
-                  <img src='/static/images/heads/1.png' className="w-8 h-8 mr-5" />
+                  <img src='/static/images/heads/1.png' className="w-8 h-8 mr-5" alt="tmp" />
                 </div>
                 <div className='grid'>
                   {key}
@@ -652,7 +652,7 @@ const Wallet = () => {
                 <ul className="overflow-auto h-[47rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   {NFTstoBurnNames.map((num: any, index: any) => (
                     <li className="bg-gray-700 rounded-lg font-pixel p-2 mb-1 flex justify-between items-center break">
-                      <img src={NFTstoBurnImages[index]} className="h-16" />
+                      <img src={NFTstoBurnImages[index]} className="h-16" alt="tmp" />
                       <h1 className="text-center">{num}</h1>
                       <button onClick={(e) => delNFTtoBurnByName(num)} className="btn btn-ghost">
                         x
@@ -727,7 +727,7 @@ const Wallet = () => {
           </div>
           <div className="text-center">
             <h1 className="font-pixel text-2xl">You are about to burn {AllNFTstoBurn.length} NFTs...</h1>
-            <img src="/static/images/burnAll.png" className="h-96 mb-3 mt-3" />
+            <img src="/static/images/burnAll.png" className="h-96 mb-3 mt-3" alt="tmp" />
             <BurnAllButton toBurn={AllNFTstoBurn} connection={connection} publicKey={publicKey} wallet={owner} setRefresh={setRefresh} />
           </div>
         </Modal>
