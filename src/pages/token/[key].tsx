@@ -66,6 +66,7 @@ const Token = () => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const owner = useWallet();
+  const [isConnectedWallet, setIsConnectedWallet] = useState(false)
 
   const metaplex = Metaplex.make(connection)
     .use(walletAdapterIdentity(owner))
@@ -597,7 +598,25 @@ const Token = () => {
     }
   };
 
-  useEffect(() => {
+  const [ownerAddress, setOwnerAddress] = useState<any>()
+
+  const GetOwner = async () => {
+    const largestAccounts = await connection.getTokenLargestAccounts(
+      new PublicKey(tokenMint)
+    );
+    const largestAccountInfo = await connection.getParsedAccountInfo(
+      largestAccounts.value[0].address
+    );
+    const tmp: any = largestAccountInfo.value?.data
+    if (publicKey?.toBase58() == tmp.parsed.info.owner)
+      setIsConnectedWallet(true)
+    else
+      setIsConnectedWallet(false)
+    setOwnerAddress(tmp.parsed.info.owner);
+  }
+
+  useEffect(() => {    
+    GetOwner()
     getMetadata()
   }, []);
 
@@ -696,7 +715,9 @@ const Token = () => {
                   </div>
                 </div>
               </div>
-              <SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={owner} setRefresh={setRefresh} />
+              {isConnectedWallet &&
+                <SingleBurnButton toBurn={burnThis} connection={connection} publicKey={publicKey} wallet={owner} setRefresh={setRefresh} />
+              }
             </div>
             <div className="font-pixel p-2 text-center">              
             <img src={details?.json.image} alt="tmp" className='w-5/6' />
@@ -740,6 +761,12 @@ const Token = () => {
                       <div className="flex justify-between">
                         <p>Royalties:</p>
                         <p>{(details?.sellerFeeBassisPoints) / 100}%</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Owner:</p>                        
+                        <button className="hover:text-red-300" onClick={(e: any) => copyAddress(ownerAddress)}>
+                          {ownerAddress?.slice(0, 5) + "..." + ownerAddress?.slice(-5)}
+                          </button>
                       </div>
                       <br />
                       <div className="">
