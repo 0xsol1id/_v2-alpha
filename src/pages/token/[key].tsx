@@ -743,7 +743,7 @@ const Token = () => {
                       </div>
                       <br />
                       <div className="">
-                        <a href={`${details?.external_url}`} target="_blank">
+                        <a href={`${details?.external_url}`} target="_blank" rel="noreferrer">
                           <p className="font-pixel text-bold text-center text-sm hover:text-red-300">{details?.json.external_url}</p>
                         </a>
                       </div>
@@ -767,7 +767,7 @@ const Token = () => {
                       {collectionName != "-" ? (
                         <div className="text-center">{collectionName != undefined ? (
                           <button className="btn btn-primary">
-                            <a href={`https://magiceden.io/marketplace/${collectionName}`} target="_blank">
+                            <a href={`https://magiceden.io/marketplace/${collectionName}`} target="_blank" rel="noreferrer">
                               <div className="flex">
                                 <p className="font-pixel text-lg">View Collection on Magic Eden</p>
                               </div>
@@ -951,7 +951,7 @@ const Token = () => {
                             <div className=' overflow-auto h-40 border'>
                               {attributesList.map((x, i) => {
                                 return (
-                                  <div className="md:flex items-center mt-2">
+                                  <div key={i} className="md:flex items-center mt-2">
                                     <div className="flex flex-col mx-2">
                                       <input
                                         className="font-pixel my-1 md:w-[230px] text-left text-black pl-1 border-2 border-black"
