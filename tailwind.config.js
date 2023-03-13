@@ -52,7 +52,7 @@ module.exports = {
           "neutral": "#1b1d1d",
           "neutral-focus": "#20203B",
           "neutral-content": "#ffffff",
-          "base-100": "#20203B",
+          "base-100": "#111827",
           "base-200": "#2d2d41",
           "base-300": "#23232d",
           "base-content": "#ffffff",

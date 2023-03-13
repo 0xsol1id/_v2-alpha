@@ -14,7 +14,7 @@ import { MainMenu } from "../../utils/mainmenu"
 import { randomWallets } from "../../utils/wallets"
 import { Footer } from '../../utils/footer';
 import Link from "next/link";
-import { ConnectWallet } from "components";
+import { ConnectWallet, Loader } from "components";
 import { NftCard } from '../../utils/NftCard';
 
 import { BurnButton } from "utils/BurnButton";
@@ -418,7 +418,7 @@ const Wallet = () => {
       setIsConnectedWallet(true)
     else
       setIsConnectedWallet(false)
-  }, [key])
+  }, [wallet])
 
   useEffect(() => {
     setHistoryList(history.slice(0, historyNumber))
@@ -531,8 +531,8 @@ const Wallet = () => {
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-2 scrollbar overflow-auto h-[90vh]" onScroll={handleScroll}>
-            <div className="font-pixel navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-gray-900 bg-opacity-50 backdrop-blur">
+          <div className="col-span-2 scrollbar overflow-auto h-[90vh] border-2 border-opacity-20" onScroll={handleScroll}>
+            <div className="font-pixel navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-gray-900 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div>
                 <button onClick={() => router.back()}>🔙</button>
                 <div className="">
@@ -554,12 +554,10 @@ const Wallet = () => {
                         className="range range-xs w-28 range-primary tooltip tooltip-left font-pixel" data-tip="Change Grid size"
                         onChange={(e) => { setcolumnsSize(parseInt(e.target.value)); setPostNumber(postNumber + postsPerPage) }}
                       />
-                      <p className="font-pixel text-xs">{columnsSize}</p>
                     </div>
                   </div>
                 </div>
               </div>
-
 
               <select onChange={handleCollectionChange} className="select w-80 select-primary font-pixel">
                 <option>Show all collections</option>
@@ -570,7 +568,16 @@ const Wallet = () => {
               </select>
             </div>
             <div className="font-pixel p-2">
-              <NftList nfts={nfts} error={error} setRefresh={setRefresh} />
+              
+            {!error && isLoading ? (
+              <div className="grid grid-flow-row auto-rows-max content-center h-full">
+                <Loader />
+              </div>
+              ):(
+                <NftList nfts={nfts} error={error} setRefresh={setRefresh} />
+              )
+            }
+              
             </div>
           </div>
 
@@ -605,7 +612,7 @@ const Wallet = () => {
                 </TabPanel>
 
                 <TabPanel>
-                  <div className="font-pixel p-2 overflow-auto scrollbar max-h-[45rem]">
+                  <div className="font-pixel p-2 overflow-auto scrollbar h-[45rem]">
                     {comments?.slice(0).reverse().map((num: any, index: any) => (
                       <div key={index} id="Comments" className="bg-gray-900 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
                         <div className="flex justify-between">

@@ -36,6 +36,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import React from "react";
 import { MagicEdenLogo } from "components";
+import Link from "next/link";
 
 ChartJS.register(
   CategoryScale,
@@ -173,47 +174,11 @@ export const NftCard: FC<Props> = ({
     firstCreator = tokenMintAddress;
   }
 
-  const [floor, setFloor] = useState("-")
-  const handleChangeFloor = (val: string) => {
-    setFloor(val)
-    CalcProfit(val)
-  }
-  async function CheckFloor(url: string) {
-    try {
-      const response = await fetch(url)
-      const jsonData = await response.json()
-      handleChangeFloor((parseFloat(jsonData?.floorPrice) / 1000000000).toString())
-      handleChangeListed(jsonData?.listedCount.toString())
-      handleChangeVolume((parseFloat(jsonData?.volumeAll) / 1000000000).toFixed(2).toString())
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const [profit, setProfit] = useState("-")
-  const handleChangeProfit = (val: string) => {
-    setProfit(val)
-  }
-  async function CalcProfit(flo: string) {
-    try {
-      const sFee: number = parseFloat(details.data?.sellerFeeBasisPoints) / 100
-      const mFee: number = 2
-      const f: number = parseFloat(flo)
-      var p: any = (f - (f / 100 * (sFee + mFee))).toFixed(3)
-      handleChangeProfit(p.toString())
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
   const [collectionName, setcollectionName] = useState("-")
   const handleChangecollectionName = (val: string) => {
     if (collectionName != null) {
-      CheckFloor(`https://fudility.xyz:3420/checkfloor/${val}`)
       GetpriceHistory(`https://fudility.xyz:3420/pricehistory/${val}`)
     }
-    else
-      handleChangeFloor("NaN")
 
     setcollectionName(val)
   }
@@ -319,281 +284,6 @@ export const NftCard: FC<Props> = ({
     ],
   }
 
-  //Update Metadata  
-
-  const [NFTAddress, setNFTAddress] = useState('');
-  const [NFTName, setNFTName] = useState('');
-  const [NFTSymbol, setNFTSymbol] = useState('');
-  const [NFTuri, setNFTuri] = useState('');
-  const [NFTSellerFee, setNFTSellerFee] = useState(0);
-  const [NFTDescription, setNFTDescription] = useState('');
-  const [NFTImage, setNFTImage] = useState('');
-  const [isUpdateAuthority, setIsUpdateAuthority] = useState<boolean>(false);
-  const [errorUpdate, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const [newName, setNewName] = useState('');
-  const [newSymbol, setNewSymbol] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newRoyalties, setNewRoyalties] = useState('');
-  const [newImageURI, setNewImageURI] = useState('');
-  const [newAnimationURI, setNewAnimationURI] = useState('');
-  const [newExternalURL, setNewExternalURL] = useState('');
-  const [attributesList, setAttributesList] = useState([{ trait_type: "", value: "" }]);
-
-  const [imageFormat, setImageFormat] = useState('png');
-  const [animationFormat, setAnimationFormat] = useState('mp4');
-
-  const metaplex = Metaplex.make(connection)
-    .use(walletAdapterIdentity(wallet))
-    .use(bundlrStorage());
-
-
-  // allow to fetch the current metadata of the NFT
-  const fetchMetadata = async () => {
-
-    setError('')
-
-    try {
-      const mintPublickey = new PublicKey(tokenMintAddress);
-      //get the nft object of the NFT
-      const nft = await metaplex.nfts().findByMint({ mintAddress: mintPublickey })
-      //get the update authority of the NFT
-      const authority = nft.updateAuthorityAddress.toBase58()
-      // get the current NFT name
-      const name = nft.name
-      setNFTName(name)
-      console.log(nft.name)
-      // get the current NFT symbol
-      const symbol = nft.symbol
-      setNFTSymbol(symbol)
-      // get the current NFT uri
-      const uri = nft.uri
-      setNFTuri(uri)
-      // get the current NFT seller fee
-      const sellerFee = nft.sellerFeeBasisPoints
-      setNFTSellerFee(sellerFee)
-      // get the current NFT description
-      const description = nft.json?.description
-      if (description != undefined && description != '') {
-        setNFTDescription(description)
-      }
-      else {
-        setNFTDescription('No description provided for this NFT')
-      }
-
-      // get the current NFT image
-      const image = nft.json?.image
-      if (image != undefined) {
-        setNFTImage(image)
-      }
-
-      // check if the user is the update authority of the NFT
-      if (authority == publicKey?.toBase58()) {
-        setIsUpdateAuthority(true)
-      }
-      else {
-        setIsUpdateAuthority(false)
-      }
-
-    }
-
-    catch (error) {
-      const err = (error as any)?.message;
-      console.log(err)
-      setError(err)
-    }
-  }
-
-  // allow to reset the states
-  const reset = () => {
-    setNFTAddress('')
-    setNFTName('')
-    setNFTDescription('')
-    setNFTImage('')
-    setError('')
-    setIsUpdateAuthority(false)
-    setNewName('')
-    setNewDescription('')
-    setNewRoyalties('')
-    setNewSymbol('')
-    setNewImageURI('')
-    setNewAnimationURI('')
-    setNewExternalURL('')
-    setAttributesList([{ trait_type: "", value: "" }])
-    setSuccess(false)
-    setIsUpdating(false)
-  }
-
-  // handle when the user changes an attribute field
-  const handleAttributesChange = (e: any, index: any) => {
-    const { name, value } = e.target;
-    const list: any = [...attributesList];
-    list[index][name] = value;
-    setAttributesList(list);
-  };
-
-  // handle when the user deletes an attribute field
-  const handleRemoveClick = (index: any) => {
-    const list = [...attributesList];
-    list.splice(index, 1);
-    setAttributesList(list);
-  };
-
-  //handle when the user adds an attribute field
-  const handleAddClick = () => {
-    setAttributesList([...attributesList, { trait_type: "", value: "" }]);
-  };
-
-
-  // allow to update the NFT metadata
-  const update = async () => {
-    try {
-      setIsUpdating(true)
-      setSuccess(false)
-      setError('')
-      const mintPublickey = new PublicKey(NFTAddress);
-      // get the current NFT metadata
-      const nft = await metaplex.nfts().findByMint({ mintAddress: mintPublickey })
-      const jsonMetadata = nft.json
-
-      // define the object which contains the current NFT metadata
-      const newMetadata = { ...jsonMetadata }
-      // define the object which contains the files attached to the NFT
-      const newFiles: any[] = []
-
-      let newOnChainName: string = NFTName
-      let newOnChainSymbol: string = NFTSymbol
-      let newOnChainuri: string = NFTuri
-      let newOnChainSellerFee: number = NFTSellerFee
-
-      // if a field is not empty, we change its value in the appropriate object
-      if (newName != '') {
-        newMetadata.name = newName
-        newOnChainName = newName
-      }
-
-      if (newSymbol != '') {
-        newMetadata.symbol = newSymbol
-        newOnChainSymbol = newSymbol
-
-      }
-
-      if (newDescription != '') {
-        newMetadata.description = newDescription
-      }
-
-      if (newRoyalties != '') {
-        newMetadata.seller_fee_basis_points = parseFloat(newRoyalties) * 100
-        newOnChainSellerFee = parseFloat(newRoyalties) * 100
-      }
-
-      if (newImageURI != '') {
-        newMetadata.image = newImageURI + '?ext=' + imageFormat
-        newFiles.push({
-          uri: newImageURI + '?ext=' + imageFormat,
-          type: "image/" + imageFormat
-        })
-      }
-      else {
-        const currentfiles = jsonMetadata!.properties?.files
-        if (currentfiles != undefined) {
-          for (let i = 0; i < currentfiles.length; i++) {
-            if (currentfiles[i]['type']?.includes('image/')) {
-              newFiles.push(currentfiles[i])
-            }
-          }
-        }
-      }
-
-      if (newAnimationURI != '') {
-        newMetadata['animation_url'] = newAnimationURI + '?ext=' + animationFormat
-        let animationType: string = ''
-
-        if (animationFormat == 'mp4' || animationFormat == 'mov') {
-          animationType = "video/"
-        }
-
-        else if (animationFormat == 'glb' || animationFormat == 'gltf') {
-          animationType = "model/"
-        }
-
-        newFiles.push({
-          uri: newAnimationURI + '?ext=' + animationFormat,
-          type: animationType + animationFormat
-        })
-      }
-      else {
-        const currentfiles = jsonMetadata!.properties?.files
-        if (currentfiles != undefined) {
-          for (let i = 0; i < currentfiles.length; i++) {
-            if (currentfiles[i]['type']?.includes('video/') || currentfiles[i]['type']?.includes('model/')) {
-              newFiles.push(currentfiles[i])
-            }
-          }
-        }
-      }
-
-      if (newExternalURL != '') {
-        newMetadata.external_url = newExternalURL
-      }
-
-      if (newFiles.length != 0) {
-        newMetadata.properties!.files = newFiles
-      }
-
-      // define the object which will contains the new attributes
-      const Attributes: any[] = []
-
-      // allow to filter the fields where information is missing
-      for (let i = 0; i < attributesList.length; i++) {
-        if (attributesList[i]['trait_type'] != '' && attributesList[i]['value'] != '') {
-          Attributes.push(attributesList[i])
-        }
-      }
-
-      if (Attributes.length != 0) {
-        newMetadata.attributes = Attributes
-      }
-
-      // upload the new NFT metadata and get the new uri
-      const { uri: newUri } = await metaplex
-        .nfts()
-        .uploadMetadata(newMetadata);
-
-      if (newUri) {
-        console.log(newUri)
-        newOnChainuri = newUri
-
-      }
-
-      // update the NFT metadata with the new uri
-      const updatedNft = await metaplex
-        .nfts()
-        .update({
-          nftOrSft: nft,
-          name: newOnChainName,
-          symbol: newOnChainSymbol,
-          uri: newOnChainuri,
-          sellerFeeBasisPoints: newOnChainSellerFee,
-        });
-
-      if (updatedNft) {
-        fetchMetadata()
-        setIsUpdating(false)
-        setSuccess(true)
-        console.log('success')
-      }
-    }
-    catch (error) {
-      const err = (error as any)?.message;
-      console.log(err)
-      setError(err)
-      setIsUpdating(false)
-    }
-  }
-
   const copyAddress = async (val: any) => {
     await navigator.clipboard.writeText(val);
   }
@@ -629,14 +319,14 @@ export const NftCard: FC<Props> = ({
   const addComment = (com: any) => {
     inputRef.current.value = ""
     const user: any = publicKey?.toBase58()
-    const time: any = new Date().getTime()/1000
+    const time: any = new Date().getTime() / 1000
     setComments(state => [...state, {
       wallet: user,
       timestamp: time,
       comment: com
     }])
   }
-  
+
   const inputRef = useRef<any>(null);
 
   return (
@@ -650,21 +340,20 @@ export const NftCard: FC<Props> = ({
               </div>
             </a>
             {!selectedMode ? (
-              <a onClick={toggleModal} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
-                <div>
+              <Link passHref href={`/token/${tokenMintAddress}`}>
+                <div className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
                   <h1 className="tracking-wider font-pixel bg-black bg-opacity-60 rounded p-3 text-xs border-2 border-opacity-20" >
                     {name ? (
                       <div>
                         <p className="font-pixel text-2xs lg:text-md text-center">{name}</p>
-                       
+
                       </div>
                     ) : (
                       <p>...no name...</p>
                     )}
                   </h1>
-
                 </div>
-              </a>
+              </Link>
             ) : (
               <div>
                 {!isSelected &&

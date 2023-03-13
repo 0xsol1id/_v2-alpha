@@ -1,11 +1,11 @@
 import { FC, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
-import { MainMenu } from "../mainmenu"
-import { randomWallets } from "../wallets"
-import { Footer } from '../footer';
+import { MainMenu } from "../../utils/mainmenu"
+import { randomWallets } from "../../utils/wallets"
+import { Footer } from '../../utils/footer';
 import Link from "next/link";
-import { divideAmount, isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
+import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import { ConnectWallet } from "components";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
 import { CommercialAlert } from "utils/CommercialAlert";

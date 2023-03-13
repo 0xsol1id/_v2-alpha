@@ -1,21 +1,11 @@
 import Link from 'next/link';
 import { FC, useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-
-import { MainMenu } from "../mainmenu"
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-
-import styled from "styled-components";
-import confetti from "canvas-confetti";
+import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
+import { getDomainKey, NameRegistryState } from '@bonfida/spl-name-service';
 import * as anchor from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import Countdown from "react-countdown";
-import { Snackbar, Paper, LinearProgress, Chip } from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
-import { toDate, AlertState, getAtaForMint } from './utils';
-import { MintButton } from './MintButton';
-import { MultiMintButton } from './MultiMintButton';
 import {
   CandyMachine,
   awaitTransactionSignatureConfirmation,
@@ -24,11 +14,21 @@ import {
   mintMultipleToken,
   CANDY_MACHINE_PROGRAM,
 } from "./candy-machine";
-import { randomWallets } from "../wallets"
-import { Footer } from '../footer';
-import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
-import { ConnectWallet, SelectAndConnectWalletButton } from "components";
-import { getDomainKey, NameRegistryState } from '@bonfida/spl-name-service';
+
+import styled from "styled-components";
+import confetti from "canvas-confetti";
+import Countdown from "react-countdown";
+import { Snackbar, Paper, LinearProgress, Chip } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
+
+import { ConnectWallet } from "components";
+import { MintButton } from './MintButton';
+import { MultiMintButton } from './MultiMintButton';
+import { randomWallets } from "../../utils/wallets"
+import { Footer } from '../../utils/footer';
+import { MainMenu } from "../../utils/mainmenu"
+import { toDate, AlertState, getAtaForMint } from './utils';
+
 
 const decimals = process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS ? +process.env.REACT_APP_SPL_TOKEN_TO_MINT_DECIMALS!.toString() : 9;
 const splTokenName = process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME ? process.env.REACT_APP_SPL_TOKEN_TO_MINT_NAME.toString() : "TOKEN";
