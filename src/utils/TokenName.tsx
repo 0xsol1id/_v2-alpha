@@ -57,8 +57,8 @@ export const TokenName = (props: { mint: string }) => {
       }
       {isNFT == true &&
         <div className='flex justify-between'>
-          <div><img className="font-pixel bg-gray-800 object-cover h-14 rounded-lg mr-5" src={uri} /></div>
-          <div className='font-pixel my-auto'>{name}</div>
+          <div><img className="font-trash uppercase bg-gray-800 object-cover h-14 rounded-lg mr-5" src={uri} /></div>
+          <div className='font-trash uppercase my-auto'>{name}</div>
         </div>
       }
     </div>

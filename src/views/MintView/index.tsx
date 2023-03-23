@@ -26,7 +26,7 @@ import { MintButton } from './MintButton';
 import { MultiMintButton } from './MultiMintButton';
 import { randomWallets } from "../../utils/wallets"
 import { Footer } from '../../utils/footer';
-import { MainMenu } from "../../utils/mainmenu"
+import { BuyButton } from "../../utils/buybutton"
 import { toDate, AlertState, getAtaForMint } from './utils';
 
 
@@ -499,11 +499,11 @@ export const MintView: FC<HomeProps> = (props) => {
   return (
     <div className="">
       <div className="">
-        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-gray-900">
-          <ul className="space-y-2 bg-gray-900 p-2 lg:hidden block sticky top-0 z-50 w-screen">
+        <div className="navbar sticky top-0 z-50 text-neutral-content flex justify-between bg-base-300">
+          <ul className="space-y-2 bg-base-300 p-2 lg:hidden block sticky top-0 z-50 w-screen">
             <div className="flex justify-between">
               <div className="flex">
-                <div className="font-pixel">
+                <div className="font-trash uppercase">
                   <button className="btn btn-primary ml-2" data-tip="Show a random wallet">
                     <Link href={`/showme?wallet=${randomWallet}`}>🤷‍♂️ </Link>
                   </button>
@@ -520,7 +520,7 @@ export const MintView: FC<HomeProps> = (props) => {
                     <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
                       <img src="./profil.png" className="w-6 h-6" />
                     </Link>
-                    <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
+                    <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
                   </button>
                 }
                 <ConnectWallet />
@@ -529,8 +529,8 @@ export const MintView: FC<HomeProps> = (props) => {
 
             <input
               type="text"
-              placeholder="Enter Wallet Address"
-              className="font-pixel input input-bordered h-8 w-full bg-base-200"
+              placeholder="WALLET / USER / DOMAIN / NFT"
+              className="font-trash uppercase input input-bordered h-8 w-full bg-base-200"
               value={value}
               onChange={(e) => { setValue(e.target.value) }}
             />
@@ -542,8 +542,8 @@ export const MintView: FC<HomeProps> = (props) => {
             </button>
             <input
               type="text"
-              placeholder="Enter Wallet Address"
-              className="font-pixel w-96 h-10 p-1 text-sm bg-base-200 text-center"
+              placeholder="WALLET / USER / DOMAIN / NFT"
+              className="font-trash uppercase w-96 h-10 p-1 text-sm bg-base-200 text-center"
               value={value}
               onChange={onChange}
             />
@@ -567,7 +567,7 @@ export const MintView: FC<HomeProps> = (props) => {
                   <Link href={`/showme?wallet=${publicKey?.toBase58()}`}>
                     <img src="./profil.png" className="w-6 h-6" />
                   </Link>
-                  <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
+                  <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
                 </button>
                 : null}
             </div>
@@ -579,7 +579,7 @@ export const MintView: FC<HomeProps> = (props) => {
             <div className="">
               <MintContainer>
                 <DesContainer>
-                  <div><img src="mint_banner1.png" alt="NFT To Mint" className='rounded-lg' /></div>
+                  <div><img src="/static/images/mint_banner1.png" alt="NFT To Mint" className='rounded-lg' /></div>
                   {!isActive && !isEnded && candyMachine?.state.goLiveDate && (!isWLOnly || whitelistTokenBalance > 0) &&
                     <Countdown
                       date={toDate(candyMachine?.state.goLiveDate)}
@@ -596,15 +596,15 @@ export const MintView: FC<HomeProps> = (props) => {
                       {wallet && isActive &&
                         <div>
                           <div className="justify-between hidden lg:flex">
-                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
-                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
-                            <p className="rounded-box mx-5 font-pixel text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                            <p className="rounded-box mx-5 font-trash uppercase text-xl p-3 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                            <p className="rounded-box mx-5 font-trash uppercase text-xl p-3 bg-base-100">BRICE: 0.01 $SOL</p>
+                            <p className="rounded-box mx-5 font-trash uppercase text-xl p-3 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
                           </div>
 
                           <div className="block lg:hidden">
-                            <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
-                            <p className="rounded-box mb-2 font-pixel text-md p-1 bg-base-100">BRICE: 0.01 $SOL</p>
-                            <p className="rounded-box font-pixel text-md p-1 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
+                            <p className="rounded-box mb-2 font-trash uppercase text-md p-1 bg-base-100">MINTED: {itemsRedeemed} / {itemsAvailable}</p>
+                            <p className="rounded-box mb-2 font-trash uppercase text-md p-1 bg-base-100">BRICE: 0.01 $SOL</p>
+                            <p className="rounded-box font-trash uppercase text-md p-1 bg-base-100">YOUR WALLET: {(balance || 0).toLocaleString()} SOL</p>
                           </div>
                         </div>
                       }

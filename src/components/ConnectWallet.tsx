@@ -1,8 +1,6 @@
 import { FC, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { WalletConnectIcon } from "components";
-
 
 export const ConnectWallet: FC = () => {
   const { setVisible } = useWalletModal();
@@ -22,8 +20,8 @@ export const ConnectWallet: FC = () => {
     try {
       if (!wallet) {
         setVisible(true)
-      } else {
-        if (!publicKey)
+      } else {        
+        if (!publicKey)        
           connect()
         else
           disconnect()
@@ -37,12 +35,12 @@ export const ConnectWallet: FC = () => {
     <div>
       {!wallet &&
         <div className="grid items-center">
-          <input type="checkbox" className="toggle tooltip tooltip-left font-pixel" data-tip="Connect Wallet" onClick={handleWalletClick} />
+          <input type="checkbox" className="toggle tooltip tooltip-left font-trash uppercase" data-tip="Connect Wallet" onClick={handleWalletClick} />
         </div>
       }
       {publicKey &&
         <div className="grid items-center">
-          <input type="checkbox" className="toggle toggle-secondary tooltip tooltip-left font-pixel" data-tip="Disconnect Wallet" onClick={handleWalletClick} checked />
+          <input type="checkbox" className="toggle toggle-secondary tooltip tooltip-left font-trash uppercase" data-tip="Disconnect Wallet" onClick={disconnect} checked />
         </div>
       }
     </div>

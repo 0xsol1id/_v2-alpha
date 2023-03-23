@@ -33,9 +33,9 @@ export const LegitOrScam: FC<Props> = ({
 
     return (
         <div>
-            {isVerified && <div className='text-[#16c60c] font-pixel sm:text-base text-left mr-3 tooltip tooltip-topü' data-tip="Legit">✅</div>}
-            {isScam && <div className='text-[#F03A17] font-pixel sm:text-base text-left mr-3 tooltip tooltip-top' data-tip="Scam">🚫</div>}
-            {!isVerified && !isScam && <div className='text-[#ff7f00] font-pixel sm:text-base text-left mr-3 tooltip tooltip-top' data-tip="DYOR"><strong>❓</strong></div>}
+            {isVerified && <div className='text-[#16c60c] font-trash uppercase sm:text-base text-left mr-3 tooltip tooltip-topü' data-tip="Legit">✅</div>}
+            {isScam && <div className='text-[#F03A17] font-trash uppercase sm:text-base text-left mr-3 tooltip tooltip-top' data-tip="Scam">🚫</div>}
+            {!isVerified && !isScam && <div className='text-[#ff7f00] font-trash uppercase sm:text-base text-left mr-3 tooltip tooltip-top' data-tip="DYOR"><strong>❓</strong></div>}
         </div>
     );
 };

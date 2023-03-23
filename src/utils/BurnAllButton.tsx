@@ -28,7 +28,7 @@ export const BurnAllButton: FC<Props> = ({
     return (
         <div>
             {!isburning &&
-                <button className="btn btn-primary uppercase w-full font-pixel" onClick={() => { if (publicKey) burnTokenAndCloseAccount(toBurn, publicKey, wallet, connection, setIsburning, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>BURN THE WHOLE WALLET</button>
+                <button className="btn bg-red-600 uppercase w-full font-trash uppercase text-xl" onClick={() => { if (publicKey) burnTokenAndCloseAccount(toBurn, publicKey, wallet, connection, setIsburning, setMessage, setRefresh, setCurrentTx, setTotalTx); else setVisible(true) }}>BURN THE WHOLE WALLET</button>
             }
 
             {isburning &&
@@ -41,11 +41,11 @@ export const BurnAllButton: FC<Props> = ({
             }
 
             {message != '' &&
-                <div className='font-pixel text-sm'>{message}</div>
+                <div className='font-trash uppercase text-sm'>{message}</div>
             }
 
             {isburning && currentTx != undefined && totalTx != undefined &&
-                <div className='font-pixel text-sm'>Please confirm Tx: {currentTx}/{totalTx}</div>
+                <div className='font-trash uppercase text-sm'>Please confirm Tx: {currentTx}/{totalTx}</div>
 
             }
         </div>

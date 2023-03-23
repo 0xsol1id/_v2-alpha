@@ -44,7 +44,7 @@ export const SelectAndConnectWalletButton: FC<Props> = ({
         disabled={connecting}
       >
         <img src="./profil.png" className="w-4 h-4" alt="tmp"/>        
-        <p className="font-pixel text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
+        <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}</p>
       </button> : null}
     </div>
   );

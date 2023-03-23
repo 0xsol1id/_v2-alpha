@@ -1,24 +1,17 @@
 import { FC, useState, useEffect, useCallback, SetStateAction, Dispatch, useRef } from "react";
 import useSWR from "swr";
-import proxy from './proxy.png'
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { fetcher } from "utils/fetcher";
-import { Metaplex, bundlrStorage, walletAdapterIdentity } from "@metaplex-foundation/js";
-import { PublicKey } from "@solana/web3.js";
 
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LegitOrScam } from './LegitOrScam';
-import { SelectSendButton } from './SelectSendButton';
-import { SingleBurnButton } from './SingleBurnButton';
+import proxy from './proxy.png'
 
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
 const rektiez: any = LoadRarityFile(3)
-
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
 
 import loadable from '@loadable/component';
 const ReactJson = loadable(() => import('react-json-view'));
@@ -85,6 +78,9 @@ type Props = {
   selectedMode: boolean;
   toBurnChange: any;
   toBurnDelete: any;
+  pfpMode: any;
+  setPfpMode: any;
+  toPfpImage: any;
 };
 
 export const NftCard: FC<Props> = ({
@@ -98,6 +94,9 @@ export const NftCard: FC<Props> = ({
   selectedMode,
   toBurnChange,
   toBurnDelete,
+  pfpMode,
+  setPfpMode,
+  toPfpImage
 }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -293,6 +292,12 @@ export const NftCard: FC<Props> = ({
     setIsSelected(val);
   };
 
+  const handlePfpChange = useCallback((image) => {
+    console.log(image)
+    toPfpImage(image)
+    setPfpMode()
+  }, [toPfpImage])
+
   const handleSelectChange = useCallback((nft, name, image) => {
     toBurnChange(nft, name, image)
   }, [toBurnChange])
@@ -308,53 +313,17 @@ export const NftCard: FC<Props> = ({
       handleIsSelectedChange(false)
   }, [toBurnChange])
 
-  const [comments, setComments] = useState([
-    {
-      wallet: "4ZVYJvxt9b6fpRTpMTHQnE3jHWEmLx8wjLYYMBKAgNc9",
-      timestamp: "1678181463",
-      comment: "This NFT sucks, pls burn it!"
-    },
-  ])
-
-  const addComment = (com: any) => {
-    inputRef.current.value = ""
-    const user: any = publicKey?.toBase58()
-    const time: any = new Date().getTime() / 1000
-    setComments(state => [...state, {
-      wallet: user,
-      timestamp: time,
-      comment: com
-    }])
-  }
-
-  const inputRef = useRef<any>(null);
-
   return (
     <div className="text-center">
       <figure className="animation-pulse-color">
         {!fallbackImage && !error ? (
-          <div className="relative ">
+          <div className="relative">
             <a href="#" className="relative">
               <div className="flex flex-wrap content-center w-full h-full">
                 <img src={image} className="mx-auto rounded" alt="" />
               </div>
             </a>
-            {!selectedMode ? (
-              <Link passHref href={`/token/${tokenMintAddress}`}>
-                <div className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
-                  <h1 className="tracking-wider font-pixel bg-black bg-opacity-60 rounded p-3 text-xs border-2 border-opacity-20" >
-                    {name ? (
-                      <div>
-                        <p className="font-pixel text-2xs lg:text-md text-center">{name}</p>
-
-                      </div>
-                    ) : (
-                      <p>...no name...</p>
-                    )}
-                  </h1>
-                </div>
-              </Link>
-            ) : (
+            {selectedMode ? (
               <div>
                 {!isSelected &&
                   <a onClick={() => { handleSelectChange(tokenMintAddress, name, image) }} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded tooltip" data-tip="Select to burn">
@@ -371,6 +340,32 @@ export const NftCard: FC<Props> = ({
                   </a>
                 }
               </div>
+            ) : (
+              (pfpMode ? (
+                <div>
+                    <a onClick={() => handlePfpChange(image)} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded tooltip" data-tip="Select to burn">
+                      {publicKey && isConnectedWallet &&
+                        <img src="/static/images/newPfp.png" className='bg-black bg-opacity-70 tracking-wider w-full h-full' alt="tmp" />
+                      }
+                    </a>
+                </div>
+              ) : (
+                <Link passHref href={`/token/${tokenMintAddress}`}>
+                  <div className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
+                    <h1 className="tracking-wider font-trash uppercase bg-black bg-opacity-60 rounded p-3 text-xs border-2 border-opacity-20" >
+                      {name ? (
+                        <div>
+                          <p className="font-trash uppercase text-2xs lg:text-md text-center">{name}</p>
+
+                        </div>
+                      ) : (
+                        <p>...no name...</p>
+                      )}
+                    </h1>
+                  </div>
+                </Link>
+              ))
+
             )}
           </div>
         ) : (
@@ -379,12 +374,12 @@ export const NftCard: FC<Props> = ({
             <div className="relative ">
               <a href="#" className="relative">
                 <div className="flex flex-wrap content-center">
-                  <img src={proxy.src} className="mx-auto rounded bg-gray-900" alt="" />
+                  <img src={proxy.src} className="mx-auto rounded bg-base-300" alt="" />
                 </div>
               </a>
               <a onClick={toggleModal} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
                 <div>
-                  <h1 className="tracking-wider font-pixel bg-black bg-opacity-40 rounded p-1 text-xs border-2 border-opacity-20" >
+                  <h1 className="tracking-wider font-trash uppercase bg-black bg-opacity-40 rounded p-1 text-xs border-2 border-opacity-20" >
                     {name ? (
                       <p>{name}</p>
                     ) : (

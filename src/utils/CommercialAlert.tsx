@@ -17,15 +17,15 @@ export const CommercialAlert: React.FC<Props> = ({ isDismissed }) => {
     return (
         <div>
             {!dismiss &&
-                <div className="bg-gray-900 border-2 border-primary rounded-lg shadow text-center p-2 items-center absolute bottom-1 right-1 z-50 lg:h-[270px]">
+                <div className="bg-base-300 border-2 border-primary rounded-lg shadow text-center p-2 items-center absolute bottom-1 right-1 z-50 lg:h-[270px]">
                     <div className="grid gap-2">
                         <div className="flex justify-between">
                             <div></div>
-                            <label className="font-pixel underline">MINT NOW!!!</label>
-                            <button className="btn btn-sm btn-secondary font-pixel" onClick={dismissAlert}>X</button>
+                            <label className="font-trash uppercase underline">MINT NOW!!!</label>
+                            <button className="btn btn-sm btn-secondary font-trash uppercase" onClick={dismissAlert}>X</button>
                         </div>
                         <img src="/static/images/mint_banner1.png" className="lg:h-[170px] rounded" />
-                        <button className="btn btn-sm btn-secondary font-pixel">
+                        <button className="btn btn-sm btn-secondary font-trash uppercase">
                             <Link href="/mint">Visit</Link>
                         </button>
                     </div>

@@ -19,6 +19,7 @@ module.exports = {
   }),
     fontFamily: {
       pixel: ['Pixel'],
+      trash: ['Trash'],
       impact: ['Impact'],
     },
     extend: {
@@ -52,9 +53,9 @@ module.exports = {
           "neutral": "#1b1d1d",
           "neutral-focus": "#20203B",
           "neutral-content": "#ffffff",
-          "base-100": "#111827",
+          "base-100": "#1e1d1d",
           "base-200": "#2d2d41",
-          "base-300": "#23232d",
+          "base-300": "#1e1d1d",
           "base-content": "#ffffff",
           "info": "#66c6ff",
           "success": "#87d039",

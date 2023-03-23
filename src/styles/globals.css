@@ -9,6 +9,11 @@
   }
 
   @font-face {
+    font-family: "Trash";
+    src: url("./trashtalk.ttf");
+  }
+
+  @font-face {
     font-family: "Impact";
     src: url("./Impact.ttf");
   }
@@ -39,11 +44,11 @@
   }
 
   .scrollbar::-webkit-scrollbar-track {
-    background: #111828;
+    background: #1e1d1d;
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
-    background: #7b3aec;
+    background: #d17d1f;
     border-radius: 6px;
     border: 3px solid #384152;
   }
