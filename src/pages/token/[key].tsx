@@ -1,4 +1,5 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from "react";
 
@@ -10,7 +11,11 @@ import { PublicKey } from "@solana/web3.js";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import ReactJson from 'react-json-view';
+
+const ReactJson = dynamic(
+  () => {
+    return import('react-json-view')
+  }, { ssr: false })
 
 import { BuyButton } from "../../utils/buybutton"
 import { randomWallets } from "../../utils/wallets"
@@ -627,7 +632,7 @@ const Token = () => {
   }
 
   useEffect(() => {
-    if(publicKey)
+    if (publicKey)
       GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
     GetOwner()
