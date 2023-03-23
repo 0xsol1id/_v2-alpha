@@ -195,7 +195,7 @@ export const HomeView: FC = ({ }) => {
                   </select>
                 </div>
                 {publicKey &&
-                  (notifMode ? (
+                  (!notifMode ? (
                     <div className="border-2 border-opacity-20 rounded-lg mt-1">
                       <button onClick={CheckNotifs} className="btn btn-border-2 w-full ">
                         <div className="mr-5 text-4xl">notifs</div>
