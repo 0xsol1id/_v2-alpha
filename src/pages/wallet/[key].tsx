@@ -1033,7 +1033,7 @@ const Wallet = () => {
                           <div className="grid bg-gray-900 text-sm h-18 text-center rounded-lg mb-1 border-2 border-gray-800 p-2">
                             <div className='flex justify-between'>
                               <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-trash tooltip tooltip-right w-48" data-tip="Show on ME">
-                                <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
+                                <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank" rel="noreferrer">
                                   <TokenName mint={num.tokenMint} />
                                 </a>
                               </button>
