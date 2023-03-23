@@ -31,6 +31,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 import { LoadRarityFile } from '../../utils/LoadRarityFiles'
 import { SideBar } from 'utils/sidebar';
 import { ReplyIcon } from '@heroicons/react/solid';
+import { UserIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -548,7 +549,7 @@ const Token = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
       setComments((state: any) => [...state, {
         pubKey: key,
         type: "nft",
@@ -677,7 +678,16 @@ const Token = () => {
             )
             }
           </div>
-          <div>
+          <div className="flex">
+            <div className="border-2 rounded-lg border-opacity-10">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                  <div className='w-full flex justify-between items-center'>
+                    <UserIcon className="w-8 h-8" />
+                  </div>
+                </Link>
+              </button>
+            </div>
             <ConnectWallet />
           </div>
         </div>
@@ -689,26 +699,10 @@ const Token = () => {
             <div className="p-2 text-center">
               <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} intervall={500} />
             </div>
-            {/* PROFILE */}
-            <div id="sidebar-profile" className="p-2">
-              <div className="border-2 rounded-lg border-opacity-10">
-                {publicKey ?
-                  <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                    <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                      <div className='w-full flex justify-between items-center'>
-                        <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
-                        <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
-                      </div>
-                    </Link>
-                  </button>
-                  : <div className="font-trash uppercase text-center">connect wallet</div>
-                }
-              </div>
-            </div>
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 border-2 border-opacity-20 h-[85vh]">
+          <div className="col-span-7 border-2 border-opacity-20 h-[80vh]">
             <div className="font-trash uppercase navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div className=''>
                 <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white' /></button>
@@ -743,7 +737,7 @@ const Token = () => {
               </TabList>
 
               <TabPanel>
-                <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[45rem]">
+                <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vhm]">
                   {comments.length > 0 ? (
                     (comments?.slice(0).reverse().map((num: any, index: any) => (
                       (num.type != "8" &&
@@ -825,8 +819,10 @@ const Token = () => {
                       </div>
                       <div className="flex justify-between">
                         <p>Owner:</p>
-                        <button className="hover:text-red-300" onClick={(e: any) => copyAddress(ownerAddress)}>
-                          {ownerAddress?.slice(0, 5) + "..." + ownerAddress?.slice(-5)}
+                        <button className="hover:text-red-300">
+                          <Link passHref href={`/wallet/${ownerAddress}`}>
+                            {ownerAddress?.slice(0, 5) + "..." + ownerAddress?.slice(-5)}
+                          </Link>
                         </button>
                       </div>
                       <br />

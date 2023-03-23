@@ -14,10 +14,8 @@ import { CommercialAlert } from "utils/CommercialAlert";
 import { QuestionMarkCircleIcon } from "@heroicons/react/solid";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en.json'
-TimeAgo.addDefaultLocale(en)
 import ReactTimeAgo from 'react-time-ago'
+import { UserIcon } from "@heroicons/react/solid";
 
 export const HomeView: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -113,7 +111,7 @@ export const HomeView: FC = ({ }) => {
           <div className="border-2 rounded-lg border-gray-700 w-5/12 text-center">
             <button className="hover:bg-gray-900 bg-base-300 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
               <Link passHref href={`/wallet/${randomWallet}`}>
-                <img src="/static/images/buttons/random.png" alt="" />
+                <UserIcon className="w-8 h-8" />
               </Link>
             </button>
             <input
@@ -140,7 +138,16 @@ export const HomeView: FC = ({ }) => {
             )
             }
           </div>
-          <div>
+          <div className="flex">
+            <div className="border-2 rounded-lg border-opacity-10">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                  <div className='w-full flex justify-between items-center'>
+                    <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
+                  </div>
+                </Link>
+              </button>
+            </div>
             <ConnectWallet />
           </div>
         </div>
@@ -152,38 +159,10 @@ export const HomeView: FC = ({ }) => {
             <div className="p-2 text-center">
               <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} intervall={500} />
             </div>
-
-            {/* PROFILE */}
-            <div id="sidebar" className="grid justify-items-end">
-              {publicKey ?
-                <div>
-                  <div className="border-2 rounded-lg border-opacity-10 mb-2 font-trash uppercase bg-primary">
-                    <button className="btn btn-ghost rounded-lg hover:bg-gray-800 w-full">
-                      <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                        <div className='text-center'>
-                          <div className="animate-pulse text-xl">new notifs</div>
-                        </div>
-                      </Link>
-                    </button>
-                  </div>
-                  <div className="border-2 rounded-lg border-opacity-10">
-                    <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                      <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                        <div className='w-full flex justify-between items-center'>
-                          <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
-                          <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
-                        </div>
-                      </Link>
-                    </button>
-                  </div>
-                </div> :
-                <div className="font-trash uppercase text-center">connect wallet</div>
-              }
-            </div>
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 scrollbar overflow-auto h-[85vh]" ref={scrollRef}>
+          <div className="col-span-7 scrollbar overflow-auto h-[80vh]" ref={scrollRef}>
             <div className="font-trash uppercase sticky top-0 z-40 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-10 rounded">
               <img src="/static/images/feedHeadline.png" alt="tmp" />
               <div className="flex items-center">

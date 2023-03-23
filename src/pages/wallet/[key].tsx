@@ -14,6 +14,7 @@ import {
 } from '@heroicons/react/solid'
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import ReactTimeAgo from 'react-time-ago'
 
 import { BuyButton } from "../../utils/buybutton"
 import { randomWallets } from "../../utils/wallets"
@@ -35,6 +36,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
 import { SideBar } from 'utils/sidebar';
+import { UserIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -66,6 +68,8 @@ function convertTimestamp(timestamp: any) {
   time = dd + '.' + mm + '.' + yyyy + ' / ' + h + ':' + min + ':' + sec + ' ' + ampm;
   return time;
 }
+
+
 
 const Wallet = () => {
   const router = useRouter()
@@ -124,14 +128,14 @@ const Wallet = () => {
     if (inputRef.current.value != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
     }
   }
   const addHiddenComment = (com: any) => {
     if (inputRef.current.value != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
     }
   }
 
@@ -588,7 +592,34 @@ const Wallet = () => {
             )
             }
           </div>
-          <div>
+          <div className="flex">
+            {isConnectedWallet &&
+              <div className='flex justify-between font-trash uppercase border-2 rounded-lg border-opacity-10 p-3 mr-2'>
+                <div className="flex justify-between">
+                  {selectedMode ? (
+                    <div className="flex justify-between items-center">
+                      <input type="checkbox" className="toggle" onClick={selectMode} />
+                      <p className="text-2xs text-center ml-2">BURN</p>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <input type="checkbox" className="toggle" onClick={selectMode} />
+                      <p className="text-2xs text-center ml-2">VIEW</p>
+                    </div>
+                  )
+                  }
+                </div>
+              </div>
+            }
+            <div className="border-2 rounded-lg border-opacity-10 mr-2">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                  <div className='w-full flex justify-between items-center'>
+                    <UserIcon className="w-8 h-8" />
+                  </div>
+                </Link>
+              </button>
+            </div>
             <ConnectWallet />
           </div>
         </div>
@@ -601,43 +632,11 @@ const Wallet = () => {
               <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} intervall={500} />
             </div>
 
-            {/* PROFILE */}
-            <div id="sidebar-profile" className="p-2">
-              {isConnectedWallet &&
-                <div className='flex justify-between font-trash uppercase border-2 rounded-lg border-opacity-10 p-1 mb-2'>
-                  <div className='text-xs'>Select Wallet Mode:</div>
-                  <div className="flex justify-between ml-2">
-                    {selectedMode ? (
-                      <div>
-                        <input type="checkbox" className="toggle" onClick={selectMode} />
-                        <p className="text-2xs text-center">BURN</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <input type="checkbox" className="toggle" onClick={selectMode} />
-                        <p className="text-2xs text-center">VIEW</p>
-                      </div>
-                    )
-                    }
-                  </div>
-                </div>
-              }
-              <div className="border-2 rounded-lg border-opacity-10">
-                {publicKey ?
-                  <button className="btn btn-ghost rounded-sm w-full">
-                    <div className='w-full flex justify-between items-center'>
-                      <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
-                      <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
-                    </div>
-                  </button>
-                  : <div className="font-trash uppercase text-center">connect wallet</div>
-                }
-              </div>
-            </div>
+
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 scrollbar overflow-auto h-[85vh] border-2 border-opacity-20" onScroll={handleScroll}>
+          <div className="col-span-7 scrollbar overflow-auto h-[80vh] border-2 border-opacity-20" onScroll={handleScroll}>
             <div className="font-trash uppercase navbar sticky top-0 z-10 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div>
                 <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white' /></button>
@@ -648,7 +647,15 @@ const Wallet = () => {
                 )}
                 <div className='grid'>
                   <div className="flex">
-                    {key}
+                    {key == publicKey?.toBase58() ? (
+                      <div className='flex'>
+                        {userAccountData.name}
+                      </div>
+                    ) : (
+                      <div>
+                        {walletUserAccountData.name}
+                      </div>
+                    )}
                     {key == publicKey?.toBase58() ? (
                       (userAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
                     ) : (
@@ -658,8 +665,7 @@ const Wallet = () => {
                   </div>
                   <div className='flex justify-between'>
                     <div className='flex'>
-                      <div className="flex text-sm "><p className="font-trash uppercase">NFTs:&nbsp;</p><p className="font-trash uppercase">{nfts.length}</p></div>
-                      <div className="flex text-sm ml-5 uppercase"><p className="font-trash uppercase">Score:&nbsp;</p><p className="font-trash uppercase">{score.toFixed(0)}</p></div>
+                      <div className='text-gray-500 mr-5'>{key}</div>
                     </div>
                     <div className="flex items-center">
                       <input
@@ -710,10 +716,11 @@ const Wallet = () => {
                     <Tab><h1 className="font-trash uppercase">HIDDEN COMMENTS</h1></Tab>
                   )
                   }
+                  <Tab><h1 className="font-trash uppercase">ME HISTORY</h1></Tab>
                 </TabList>
 
                 <TabPanel>
-                  <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[45rem]">
+                  <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vh]">
                     {comments.length > 0 ? (
                       (comments?.slice(0).reverse().map((num: any, index: any) => (
                         (num.type != "8" &&
@@ -1016,6 +1023,75 @@ const Wallet = () => {
                     </div>
                   )
                   }
+                </TabPanel>
+
+                <TabPanel>
+                  <div className="overflow-auto lg:h-[79.5vh] scrollbar p-1" onScroll={handleHistoryScroll}>
+                    {historyList?.map((num: any, index: any) => (
+                      <div key={index}>
+                        {num.type != "bid" ? (
+                          <div className="grid bg-gray-900 text-sm h-18 text-center rounded-lg mb-1 border-2 border-gray-800 p-2">
+                            <div className='flex justify-between'>
+                              <button className="flex bg-gray-900 justify-between hover:bg-gray-700 rounded-lg ml-1 font-trash tooltip tooltip-right w-48" data-tip="Show on ME">
+                                <a href={`https://magiceden.io/item-details/${num.tokenMint}`} target="_blank">
+                                  <TokenName mint={num.tokenMint} />
+                                </a>
+                              </button>
+
+                              {num.type == "buyNow" && num.buyer == publicKey?.toBase58() ? (
+                                <p className="font-trash text-center rounded bg-green-600 w-48 my-auto p-2">BOUGHT for {num.price.toFixed(2)}◎</p>
+                              ) : (
+                                num.type == "list" ? (
+                                  <p className="font-trash text-center rounded bg-yellow-400 w-48 my-auto p-2">LISTED for {num.price.toFixed(2)}◎</p>
+                                ) : (
+                                  num.type == "delist" ? (
+                                    <p className="font-trash text-center rounded bg-gray-500 w-48 my-auto p-2">DELISTED for {num.price.toFixed(2)}◎</p>
+                                  ) : (
+                                    num.type == "buyNow" && num.seller == publicKey?.toBase58() ? (
+                                      <p className="font-trash text-center rounded bg-red-600 w-48  my-auto p-2">SOLD for {num.price.toFixed(2)}◎</p>
+                                    ) : (
+                                      num.type == "cancelBid" ? (
+                                        <p className="font-trash text-center rounded bg-blue-600 w-48 my-auto p-2">CANCELED for {num.price.toFixed(2)}◎</p>
+                                      ) : (
+                                        <p className="rounded w-40h-8 my-auto">{num.type}</p>
+                                      )
+                                    )
+                                  )
+                                )
+                              )}
+                              <p className="font-trash text-xs my-auto ml-2">
+                                <ReactTimeAgo date={num.blockTime * 1000} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                              </p>
+                            </div>
+                            <div className='mt-2'>
+                              {num.type == "buyNow" && num.seller == publicKey?.toBase58() ? (
+                                <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
+                                  <button className="btn bg-gray-700 btn-sm text-xs">
+                                    <Link passHref href={`/wallet/${num.buyer}`}>
+                                      {num.buyer}
+                                    </Link>
+                                  </button>
+                                </div>
+                              ) : (
+                                null
+                              )}
+                              {num.type == "buyNow" && num.buyer == publicKey?.toBase58() ? (
+                                <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
+                                  <button className="btn bg-gray-700 btn-sm text-xs">
+                                    <Link passHref href={`/wallet/${num.seller}`}>
+                                      {num.seller}
+                                    </Link>
+                                  </button>
+                                </div>
+                              ) : (
+                                null
+                              )}
+                            </div>
+                          </div>
+                        ) : (null)}
+                      </div>
+                    ))}
+                  </div>
                 </TabPanel>
               </Tabs>
             }

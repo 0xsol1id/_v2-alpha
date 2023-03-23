@@ -27,8 +27,8 @@ export const Animation: FC<Props> = ({
     }, [frame]);
 
     return (
-        <div id="buybutton" className="">
-            <div className="hover:cursor-pointer tooltip tooltip-right" data-tip="BUY NFTs NOW">
+        <div id="ani" className="">
+            <div className="">
                 <img src={image} alt="ani" className="w-full" />
             </div>
         </div>

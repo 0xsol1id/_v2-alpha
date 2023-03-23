@@ -17,6 +17,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 
 import { ArrowCircleLeftIcon } from '@heroicons/react/solid';
 import { SideBar } from 'utils/sidebar';
+import { UserIcon } from '@heroicons/react/solid';
 
 function convertTimestamp(timestamp: any) {
   var d = new Date(timestamp * 1000),
@@ -74,9 +75,9 @@ const Discussion = () => {
       const user: any = publicKey?.toBase58()
       const n = "no name"
       if (discussion.type == 8)
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${com}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
       else
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${com}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
       setCourseOfDiscussion((state: any) => [...state, {
         pubKey: key,
         type: "discussion",
@@ -157,7 +158,7 @@ const Discussion = () => {
   }
 
   useEffect(() => {
-    if(publicKey)
+    if (publicKey)
       GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
     GetDiscussion(`https://fudility.xyz:3420/getdiscussion/${key}`)
@@ -199,7 +200,16 @@ const Discussion = () => {
             )
             }
           </div>
-          <div>
+          <div className="flex">
+            <div className="border-2 rounded-lg border-opacity-10">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                  <div className='w-full flex justify-between items-center'>
+                    <UserIcon className="w-8 h-8" />
+                  </div>
+                </Link>
+              </button>
+            </div>
             <ConnectWallet />
           </div>
         </div>
@@ -210,23 +220,6 @@ const Discussion = () => {
             <SideBar />
             <div className="p-2 text-center">
               <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} intervall={500} />
-            </div>
-
-            {/* PROFILE */}
-            <div id="sidebar-profile" className="p-2">
-              <div className="border-2 rounded-lg border-opacity-10">
-                {publicKey ?
-                  <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                    <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                      <div className='w-full flex justify-between items-center'>
-                        <img src="/static/images/profil.png" className="w-8 h-8" alt="tmp" />
-                        <p className="font-trash uppercase text-2xs">{(publicKey?.toBase58()).slice(0, 4)}...{(publicKey?.toBase58()).slice(-4)}</p>
-                      </div>
-                    </Link>
-                  </button>
-                  : <div className="font-trash uppercase text-center">connect wallet</div>
-                }
-              </div>
             </div>
           </div>
 
@@ -242,10 +235,6 @@ const Discussion = () => {
                       <h1 className='text-xs'>written by:
                         {discussion[0]?.writtenBy}
                       </h1>
-                    </div>
-                    <div className='flex justify-between'>
-                      <div className='flex'>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -273,7 +262,7 @@ const Discussion = () => {
                     ) : (
                       <div key={index} className='flex font-trash uppercase'>
                         <div className='w-1/2 '></div>
-                        <div id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 ml-5">
+                        <div id="Comments" className="bg-base-200 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 m-2">
                           <div className="flex justify-between">
                             <div className="flex">
                               <div className='border-2 rounded-lg border-opacity-10 mr-5'>
