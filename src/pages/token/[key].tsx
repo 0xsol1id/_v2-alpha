@@ -656,7 +656,7 @@ const Token = () => {
             {message == true ? (
               <div className="tooltip tooltip-right" data-tip="Load wallet">
                 <button className="hover:bg-primary bg-base-300 rounded-r-md h-10 w-12">
-                  <Link href={`/wallet/${value}`}>
+                  <Link passHref href={`/wallet/${value}`}>
                     <img src="/static/images/buttons/checkwallet.png" alt="" />
                   </Link>
                 </button>

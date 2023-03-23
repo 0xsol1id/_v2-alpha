@@ -184,7 +184,7 @@ const Discussion = () => {
             {message == true ? (
               <div className="tooltip tooltip-right" data-tip="Load wallet">
                 <button className="hover:bg-primary bg-base-300 rounded-r-md h-10 w-12">
-                  <Link href={`/wallet/${value}`}>
+                  <Link passHref href={`/wallet/${value}`}>
                     <img src="/static/images/buttons/checkwallet.png" alt="" />
                   </Link>
                 </button>
@@ -236,7 +236,7 @@ const Discussion = () => {
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
                   <div className='grid'>
-                    <h1 className='text-xs'>"{discussion[0]?.content}"</h1>
+                    <h1 className='text-xs'>&quot{discussion[0]?.content}&quot</h1>
                     <div className='flex justify-between'>
                       <h1 className='text-xs'>written by:
                         {discussion[0]?.writtenBy}
@@ -270,9 +270,9 @@ const Discussion = () => {
                         <h1 className="">{num.content}</h1>
                       </div>
                     ) : (
-                      <div className='flex font-trash uppercase'>
+                      <div key={index} className='flex font-trash uppercase'>
                         <div className='w-1/2 '></div>
-                        <div key={index} id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 ml-5">
+                        <div id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 ml-5">
                           <div className="flex justify-between">
                             <div className="flex">
                               <div className='border-2 rounded-lg border-opacity-10 mr-5'>
