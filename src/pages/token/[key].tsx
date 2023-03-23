@@ -722,7 +722,7 @@ const Token = () => {
               }
             </div>
             <div className="font-trash uppercase p-2 text-center">
-              <img src={details?.json.image} alt="tmp" className='h-[49rem]' />
+              <img src={details?.json.image} alt="tmp" className='h-[70vh]' />
             </div>
           </div>
 
@@ -737,7 +737,7 @@ const Token = () => {
               </TabList>
 
               <TabPanel>
-                <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vhm]">
+                <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vh]">
                   {comments.length > 0 ? (
                     (comments?.slice(0).reverse().map((num: any, index: any) => (
                       (num.type != "8" &&
