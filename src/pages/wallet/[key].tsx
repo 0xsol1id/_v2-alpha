@@ -90,6 +90,7 @@ const Wallet = () => {
   }
 
   const [value, setValue] = useState("")
+  const [commentValue, setCommentValue] = useState("")
   var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
 
   const onChange = async (e: any) => {
@@ -121,14 +122,14 @@ const Wallet = () => {
   const [hiddenComments, setHiddenComments] = useState<any>([])
   const addComment = (com: any) => {
     if (inputRef.current.value != "") {
-      setValue("")
+      setCommentValue("")
       const user: any = publicKey?.toBase58()
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
     }
   }
   const addHiddenComment = (com: any) => {
     if (inputRef.current.value != "") {
-      setValue("")
+      setCommentValue("")
       const user: any = publicKey?.toBase58()
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
     }
@@ -636,7 +637,7 @@ const Wallet = () => {
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 scrollbar overflow-auto h-[90vh] border-2 border-opacity-20" onScroll={handleScroll}>
+          <div className="col-span-7 scrollbar overflow-auto h-[85vh] border-2 border-opacity-20" onScroll={handleScroll}>
             <div className="font-trash uppercase navbar sticky top-0 z-10 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div>
                 <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white' /></button>
@@ -750,12 +751,12 @@ const Wallet = () => {
                       <input
                         ref={inputRef}
                         type="text"
-                        value={value}
-                        onChange={(e) => { setValue(e.target.value) }}
+                        value={commentValue}
+                        onChange={(e) => { setCommentValue(e.target.value) }}
                         placeholder="write comment"
-                        className="input w-full mr-5 input-bordered"
+                        className="input w-full mr-5 input-bordered text-3xl"
                         maxLength={150} />
-                      <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{value.length}/150</h1>
+                      <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
                       <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
                     </div>
                   ) : (
@@ -1000,12 +1001,12 @@ const Wallet = () => {
                           <input
                             ref={inputRef}
                             type="text"
-                            value={value}
+                            value={commentValue}
                             onChange={(e) => { setValue(e.target.value) }}
                             placeholder="write hidden comment"
                             className="input w-full mr-5 input-bordered"
                             maxLength={150} />
-                          <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{value.length}/150</h1>
+                          <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
                           <button onClick={() => addHiddenComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
                         </div>
                       ) : (

@@ -12,6 +12,7 @@ import { ConnectWallet } from "components";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
 import { CommercialAlert } from "utils/CommercialAlert";
 import { QuestionMarkCircleIcon } from "@heroicons/react/solid";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en.json'
@@ -70,6 +71,9 @@ export const HomeView: FC = ({ }) => {
       console.log(e)
     }
   }
+
+  const [userType, setUserType] = useState<any>(0)
+  const sortUserBy = ["ALL", "CLAIMED", "UNCLAIMED"]
 
   const [allUsers, setAllUsers] = useState<any>()
   async function GetAllUsers() {
@@ -179,7 +183,7 @@ export const HomeView: FC = ({ }) => {
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 scrollbar overflow-auto h-[90vh]" ref={scrollRef}>
+          <div className="col-span-7 scrollbar overflow-auto h-[85vh]" ref={scrollRef}>
             <div className="font-trash uppercase sticky top-0 z-40 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-10 rounded">
               <img src="/static/images/feedHeadline.png" alt="tmp" />
               <div className="flex items-center">
@@ -361,35 +365,112 @@ export const HomeView: FC = ({ }) => {
 
           {/* RIGHT BAR */}
           < div className="col-span-4 bg-base-300 p-2 font-trash uppercase" >
-            <div className="text-center">
+            <div className="text-center flex justify-between">
               <img src="/static/images/exploreHeadline.png" alt="explore" />
+
             </div>
-            <div className="overflow-auto h-[51rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-              {allUsers?.map((user: any, index: any) =>
-                <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
-                  <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
-                    <Link passHref href={`/wallet/${user.pubKey}`}>
-                      <div className="flex">
-                        {user.pfp != "none" ? (
-                          <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
-                        ) : (
-                          <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
-                        )
-                        }
-                        <div className="grid w-full">
-                          <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
-                          <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
-                          <div className="flex justify-between uppercase"><div>claimed:</div>
-                            <div>{user.claimed}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </button>
+            <Tabs>
+
+              <TabList>
+                <Tab><h1 className="font-trash uppercase">USER</h1></Tab>
+
+              </TabList>
+
+              <TabPanel>
+
+                <div className="flex items-center">
+                  <div className="text-xs mr-2">sort by</div>
+                  <select
+                    onChange={(e) => setUserType(e.target.selectedIndex)}
+                    className="select w-40 select-primary select-xs font-trash uppercase">
+                    {sortUserBy.map((id: any, index: any) => (
+                      <option key={index}>{id}</option>
+                    ))}
+                  </select>
                 </div>
-              )
-              }
-            </div>
+                <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                  {allUsers?.map((user: any, index: any) =>
+                  (userType == 0 ? (
+                    <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
+                      <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
+                        <Link passHref href={`/wallet/${user.pubKey}`}>
+                          <div className="flex">
+                            {user.pfp != "none" ? (
+                              <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
+                            ) : (
+                              <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
+                            )
+                            }
+                            <div className="grid w-full">
+                              <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
+                              <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
+                              <div className="flex justify-between uppercase"><div>claimed:</div>
+                                <div>{user.claimed}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </button>
+                    </div>
+                  ) : (
+                    (userType == 1 && user.claimed == "is claimed" ? (
+                      <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
+                        <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
+                          <Link passHref href={`/wallet/${user.pubKey}`}>
+                            <div className="flex">
+                              {user.pfp != "none" ? (
+                                <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
+                              ) : (
+                                <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
+                              )
+                              }
+                              <div className="grid w-full">
+                                <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
+                                <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
+                                <div className="flex justify-between uppercase"><div>claimed:</div>
+                                  <div>{user.claimed}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        </button>
+                      </div>
+                    ) : (
+                      (userType == 2 && user.claimed == "not yet" ? (
+                        <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
+                          <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
+                            <Link passHref href={`/wallet/${user.pubKey}`}>
+                              <div className="flex">
+                                {user.pfp != "none" ? (
+                                  <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
+                                ) : (
+                                  <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
+                                )
+                                }
+                                <div className="grid w-full">
+                                  <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
+                                  <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
+                                  <div className="flex justify-between uppercase"><div>claimed:</div>
+                                    <div>{user.claimed}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          </button>
+                        </div>
+                      ) : (
+                        null
+                      )
+                      )
+                    )
+                    )
+                  )
+                  )
+                  )
+                  }
+                </div>
+              </TabPanel>
+            </Tabs>
           </div >
         </div >
 

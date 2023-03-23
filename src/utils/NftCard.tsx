@@ -343,7 +343,7 @@ export const NftCard: FC<Props> = ({
             ) : (
               (pfpMode ? (
                 <div>
-                    <a onClick={() => handlePfpChange(image)} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded tooltip" data-tip="Select to burn">
+                    <a onClick={() => handlePfpChange(image)} className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
                       {publicKey && isConnectedWallet &&
                         <img src="/static/images/newPfp.png" className='bg-black bg-opacity-70 tracking-wider w-full h-full' alt="tmp" />
                       }

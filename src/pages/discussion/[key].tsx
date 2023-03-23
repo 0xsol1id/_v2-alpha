@@ -70,7 +70,7 @@ const Discussion = () => {
 
   const addDiscussion = (com: any) => {
     if (inputRef.current.value != "") {
-      setValue("")
+      setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = "no name"
       if (discussion.type == 8)
@@ -116,6 +116,7 @@ const Discussion = () => {
   }
 
   const [value, setValue] = useState("")
+  const [commentValue, setCommentValue] = useState("")
   var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
   const [message, setMessage] = useState(false)
   var valid = false
@@ -236,7 +237,7 @@ const Discussion = () => {
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
                   <div className='grid'>
-                    <h1 className='text-xs'>&quot{discussion[0]?.content}&quot</h1>
+                    <h1 className='text-xs'>{discussion[0]?.content}</h1>
                     <div className='flex justify-between'>
                       <h1 className='text-xs'>written by:
                         {discussion[0]?.writtenBy}
@@ -302,12 +303,12 @@ const Discussion = () => {
                 <input
                   ref={inputRef}
                   type="text"
-                  value={value}
-                  onChange={(e) => { setValue(e.target.value) }}
+                  value={commentValue}
+                  onChange={(e) => { setCommentValue(e.target.value) }}
                   placeholder="write comment"
-                  className="input w-full mr-5 input-bordered"
+                  className="input w-full mr-5 input-bordered text-3xl"
                   maxLength={150} />
-                <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{value.length}/150</h1>
+                <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
                 <button onClick={() => addDiscussion(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
               </div>
             ) : (

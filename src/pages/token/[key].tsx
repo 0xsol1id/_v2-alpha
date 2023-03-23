@@ -30,6 +30,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 
 import { LoadRarityFile } from '../../utils/LoadRarityFiles'
 import { SideBar } from 'utils/sidebar';
+import { ReplyIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -544,7 +545,7 @@ const Token = () => {
 
   const addComment = (com: any) => {
     if (inputRef.current.value != "") {
-      setValue("")
+      setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${com}/${user}/${userAccountData.name}`)
@@ -577,6 +578,7 @@ const Token = () => {
   }
 
   const [value, setValue] = useState("")
+  const [commentValue, setCommentValue] = useState("")
   var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
   const [message, setMessage] = useState(false)
   var valid = false
@@ -706,7 +708,7 @@ const Token = () => {
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 border-2 border-opacity-20">
+          <div className="col-span-7 border-2 border-opacity-20 h-[85vh]">
             <div className="font-trash uppercase navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div className=''>
                 <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white' /></button>
@@ -744,22 +746,31 @@ const Token = () => {
                 <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[45rem]">
                   {comments.length > 0 ? (
                     (comments?.slice(0).reverse().map((num: any, index: any) => (
-                      <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
-                        <div className="flex justify-between">
-                          <div className="flex">
-                            <div className='border-2 rounded-lg border-opacity-10 mr-5'>
-                              <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
-                                <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                  <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                                </Link>
-                              </button>
+                      (num.type != "8" &&
+                        <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                          <div className="flex justify-between">
+                            <div className="flex">
+                              <div className='border-2 rounded-lg border-opacity-10 mr-5'>
+                                <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
+                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                  </Link>
+                                </button>
+                              </div>
+                              <h1>said:</h1>
                             </div>
-                            <h1>said:</h1>
+                            <h1 className="text-right text-xs">{convertTimestamp(num.time)}</h1>
                           </div>
-                          <h1 className="text-right text-xs">{convertTimestamp(num.time)}</h1>
+                          <div className='flex justify-between'>
+                            <h1 className="">{num.content}</h1>
+                            <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                              <Link passHref href={`/discussion/${num._id}`}>
+                                <ReplyIcon className="w-6 h-6" />
+                              </Link>
+                            </button>
+                          </div>
                         </div>
-                        <h1 className="">{num.content}</h1>
-                      </div>
+                      )
                     )))) : (
                     <h1 className="text-center">Be the first who writes a comments on this</h1>
                   )
@@ -770,12 +781,12 @@ const Token = () => {
                     <input
                       ref={inputRef}
                       type="text"
-                      value={value}
-                      onChange={(e) => { setValue(e.target.value) }}
+                      value={commentValue}
+                      onChange={(e) => { setCommentValue(e.target.value) }}
                       placeholder="write comment"
-                      className="input w-full mr-5 input-bordered"
+                      className="input w-full mr-5 input-bordered text-3xl"
                       maxLength={150} />
-                    <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{value.length}/150</h1>
+                    <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
                     <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
                   </div>
                 ) : (
