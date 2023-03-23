@@ -550,6 +550,7 @@ const Token = () => {
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
       setComments((state: any) => [...state, {
         pubKey: key,
         type: "nft",
@@ -557,6 +558,14 @@ const Token = () => {
         writtenBy: user,
         time: Date.now()
       }])
+    }
+  }
+
+  async function SendNotif(uri: string) {
+    try {
+      const response = await fetch(uri)
+    } catch (e) {
+      console.log(e)
     }
   }
 

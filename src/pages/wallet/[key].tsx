@@ -129,6 +129,7 @@ const Wallet = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
     }
   }
   const addHiddenComment = (com: any) => {
@@ -136,6 +137,7 @@ const Wallet = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
     }
   }
 
@@ -164,6 +166,14 @@ const Wallet = () => {
       const response = await fetch(uri)
       const jsonData = await response.json()
       setHiddenComments(jsonData)
+    } catch (e) {
+      console.log(e)
+    }
+  }  
+
+  async function SendNotif(uri: string) {
+    try {
+      const response = await fetch(uri)
     } catch (e) {
       console.log(e)
     }

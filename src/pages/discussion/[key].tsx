@@ -77,7 +77,8 @@ const Discussion = () => {
       if (discussion.type == 8)
         SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
       else
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)        
+      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
       setCourseOfDiscussion((state: any) => [...state, {
         pubKey: key,
         type: "discussion",
@@ -85,6 +86,14 @@ const Discussion = () => {
         writtenBy: user,
         time: Date.now()
       }])
+    }
+  }
+
+  async function SendNotif(uri: string) {
+    try {
+      const response = await fetch(uri)
+    } catch (e) {
+      console.log(e)
     }
   }
 
