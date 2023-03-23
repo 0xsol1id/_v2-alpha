@@ -123,22 +123,22 @@ const Wallet = () => {
     if (inputRef.current.value != "") {
       setValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`http://localhost:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
     }
   }
   const addHiddenComment = (com: any) => {
     if (inputRef.current.value != "") {
       setValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`http://localhost:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${com}/${user}/${userAccountData.name}`)
     }
   }
 
   async function SendComment(uri: string) {
     try {
       const response = await fetch(uri)
-      GetComments(`http://localhost:3420/getcomments/${key}`)
-      GetHiddenComments(`http://localhost:3420/gethiddencomments/${key}`)
+      GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
+      GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
     } catch (e) {
       console.log(e)
     }
@@ -218,7 +218,7 @@ const Wallet = () => {
 
   const [pfpImage, setPfpImage] = useState<string>("none")
   const addToPfpImage = (newNFTImage: string) => {
-    ChangePfp(`http://localhost:3420/changepfp/${key}/${userAccountData.name}/${encodeURIComponent(newNFTImage)}`)
+    ChangePfp(`https://fudility.xyz:3420/changepfp/${key}/${userAccountData.name}/${encodeURIComponent(newNFTImage)}`)
     setPfpImage(newNFTImage)
   }
 
@@ -226,7 +226,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`http://localhost:3420/user/${key}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
         )
     } catch (e) {
       console.log(e)
@@ -454,7 +454,7 @@ const Wallet = () => {
   /*async function uploadCollage(image: any) {
     try {
       createCollage(NFTstoBurnImages, 500).then(async (imageBuffer: any) => {
-        const response = await fetch(`http://localhost:3420/upload/${imageBuffer}`)
+        const response = await fetch(`https://fudility.xyz:3420/upload/${imageBuffer}`)
       })
     } catch (e) {
       console.log(e)
@@ -465,7 +465,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`http://localhost:3420/user/${key}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
         )
     } catch (e) {
       console.log(e)
@@ -477,7 +477,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`http://localhost:3420/user/${key}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
         )
     } catch (e) {
       console.log(e)
@@ -495,11 +495,11 @@ const Wallet = () => {
     //Get User Account Data and Comments
     (async () => {
         if(publicKey)
-          GetUserAccount(`http://localhost:3420/user/${publicKey.toBase58()}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
-        GetWalletUserAccount(`http://localhost:3420/user/${key}`)
-        GetComments(`http://localhost:3420/getcomments/${key}`)
-        GetHiddenComments(`http://localhost:3420/gethiddencomments/${key}`)
+        GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+        GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
+        GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
      
     })();
 
@@ -824,7 +824,7 @@ const Wallet = () => {
                     <div className='flex justify-between font-trash uppercase'>
                       {walletUserAccountData.claimed == "not yet" &&
                         <div className="border-2 rounded-lg border-opacity-10 w-full text-center">
-                          <button onClick={() => ClaimWallet(`http://localhost:3420/claimwallet/${key}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
+                          <button onClick={() => ClaimWallet(`https://fudility.xyz:3420/claimwallet/${key}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
                             CLAIM WALLET NOW
                           </button>
                         </div>
@@ -844,7 +844,7 @@ const Wallet = () => {
                                 />
                               </div>
                               <div className="border-2 rounded-lg border-opacity-10 mt-2 text-center">
-                                <button onClick={() => ChangeUserName(`http://localhost:3420/changename/${key}/${newName}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
+                                <button onClick={() => ChangeUserName(`https://fudility.xyz:3420/changename/${key}/${newName}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
                                   CHANGE USER NAME
                                 </button>
                               </div>

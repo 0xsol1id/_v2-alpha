@@ -74,9 +74,9 @@ const Discussion = () => {
       const user: any = publicKey?.toBase58()
       const n = "no name"
       if (discussion.type == 8)
-        SendDiscussion(`http://localhost:3420/senddiscussion/${key}/9/${n}/${com}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${com}/${user}/${userAccountData.name}`)
       else
-        SendDiscussion(`http://localhost:3420/senddiscussion/${key}/5/${n}/${com}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${com}/${user}/${userAccountData.name}`)
       setCourseOfDiscussion((state: any) => [...state, {
         pubKey: key,
         type: "discussion",
@@ -157,10 +157,10 @@ const Discussion = () => {
 
   useEffect(() => {
     if(publicKey)
-      GetUserAccount(`http://localhost:3420/user/${publicKey.toBase58()}`)
-      
-    GetDiscussion(`http://localhost:3420/getdiscussion/${key}`)
-    GetCourseOfDiscussion(`http://localhost:3420/getcourseofdiscussion/${key}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+
+    GetDiscussion(`https://fudility.xyz:3420/getdiscussion/${key}`)
+    GetCourseOfDiscussion(`https://fudility.xyz:3420/getcourseofdiscussion/${key}`)
   }, []);
 
   return (

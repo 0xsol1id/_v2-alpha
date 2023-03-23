@@ -542,7 +542,7 @@ const Token = () => {
       setValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
-      SendComment(`http://localhost:3420/sendcomment/${key}/4/${n}/${com}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${com}/${user}/${userAccountData.name}`)
       setComments((state: any) => [...state, {
         pubKey: key,
         type: "nft",
@@ -628,10 +628,10 @@ const Token = () => {
 
   useEffect(() => {
     if(publicKey)
-      GetUserAccount(`http://localhost:3420/user/${publicKey.toBase58()}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
     GetOwner()
-    GetComments(`http://localhost:3420/getcomments/${key}`)
+    GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
     getMetadata()
   }, []);
 

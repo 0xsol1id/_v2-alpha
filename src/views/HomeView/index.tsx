@@ -74,7 +74,7 @@ export const HomeView: FC = ({ }) => {
   const [allUsers, setAllUsers] = useState<any>()
   async function GetAllUsers() {
     try {
-      const response = await fetch("http://localhost:3420/getalluser")
+      const response = await fetch("https://fudility.xyz:3420/getalluser")
       const jsonData = await response.json()
       setAllUsers(jsonData)
     } catch (e) {
@@ -95,9 +95,9 @@ export const HomeView: FC = ({ }) => {
 
   useEffect(() => {
     if (publicKey)
-      GetUserAccount(`http://localhost:3420/user/${publicKey.toBase58()}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
-    GetFeed(`http://localhost:3420/getfeed`)
+    GetFeed(`https://fudility.xyz:3420/getfeed`)
     GetAllUsers()
   }, [])
 
@@ -192,7 +192,7 @@ export const HomeView: FC = ({ }) => {
                   ))}
                 </select>
               </div>
-              <button onClick={() => GetFeed(`http://localhost:3420/getfeed`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+              <button onClick={() => GetFeed(`https://fudility.xyz:3420/getfeed`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
                 <img src="/static/images/buttons/refresh.png" alt="tmp" />
               </button>
             </div>
