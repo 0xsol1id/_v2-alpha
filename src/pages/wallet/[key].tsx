@@ -465,7 +465,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
         )
     } catch (e) {
       console.log(e)
@@ -477,7 +477,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
+          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
         )
     } catch (e) {
       console.log(e)
@@ -494,13 +494,13 @@ const Wallet = () => {
   useEffect(() => {
     //Get User Account Data and Comments
     (async () => {
-        if(publicKey)
-          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      if (publicKey)
+        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
 
-        GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
-        GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
-        GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
-     
+      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+      GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
+      GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
+
     })();
 
     //DOMAIN
@@ -648,7 +648,12 @@ const Wallet = () => {
                 <div className='grid'>
                   <div className="flex">
                     {key}
-                    {walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />)}
+                    {key == publicKey?.toBase58() ? (
+                      (userAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
+                    ) : (
+                      (walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
+                    )
+                    }
                   </div>
                   <div className='flex justify-between'>
                     <div className='flex'>
@@ -822,14 +827,14 @@ const Wallet = () => {
                 <TabPanel>
                   {isConnectedWallet ? (
                     <div className='flex justify-between font-trash uppercase'>
-                      {walletUserAccountData.claimed == "not yet" &&
+                      {userAccountData.claimed == "not yet" &&
                         <div className="border-2 rounded-lg border-opacity-10 w-full text-center">
                           <button onClick={() => ClaimWallet(`https://fudility.xyz:3420/claimwallet/${key}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
                             CLAIM WALLET NOW
                           </button>
                         </div>
                       }
-                      {walletUserAccountData.claimed != "not yet" &&
+                      {userAccountData.claimed != "not yet" &&
                         <div className='w-full'>
                           <div className='flex justify-between w-full gap-2'>
                             <div className="border-2 rounded-lg border-opacity-10 text-center p-2 flex flex-col justify-between">
@@ -876,7 +881,7 @@ const Wallet = () => {
                           </div>
                           <div className="mt-2 border-2 rounded-lg border-opacity-10 w-full p-2">
                             <div className='text-center font-trash uppercase'>HIDDEN COMMENTS</div>
-                            <div className='overflow-auto h-[38.3rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
+                            <div className='overflow-auto h-[37rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
                               {hiddenComments?.slice(0).reverse().map((num: any, index: any) => (
                                 (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
                                   <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">

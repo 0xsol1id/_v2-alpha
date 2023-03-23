@@ -203,7 +203,7 @@ export const HomeView: FC = ({ }) => {
                     <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
                       <button className="border-2 border-yellow-300 rounded-lg w-full mb-2 hover:border-primary hover:bg-gray-800 p-2">
                         <div className="flex">
-                          <div className=""></div>
+                          <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
                           <div className="grid w-full">
                             <div className="block mb-5">
                               <div className="flex">
@@ -337,8 +337,8 @@ export const HomeView: FC = ({ }) => {
                                           </div>
                                         </div>
                                         <div className="flex items-center">
-                                        User changed PFP into
-                                        <img src={num.content} alt="" className="w-20 h-20 ml-5" />
+                                          User changed PFP into
+                                          <img src={num.content} alt="" className="w-20 h-20 ml-5" />
                                         </div>
                                       </div>
                                     </div>
