@@ -1075,7 +1075,7 @@ const Wallet = () => {
                             </div>
                             <div className='mt-2'>
                               {num.type == "buyNow" && num.seller == key ? (
-                                <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
+                                <div className="font-trash flex justify-between rounded items-center"><p className='mr-2 uppercase '>Bought by </p>
                                   <button className="btn bg-gray-700 btn-sm text-xs">
                                     <Link passHref href={`/wallet/${num.buyer}`}>
                                       {num.buyer}
@@ -1086,7 +1086,7 @@ const Wallet = () => {
                                 null
                               )}
                               {num.type == "buyNow" && num.buyer == key ? (
-                                <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
+                                <div className="font-trash flex justify-between rounded items-center"><p className='mr-2 uppercase '>Bought from </p>
                                   <button className="btn bg-gray-700 btn-sm text-xs">
                                     <Link passHref href={`/wallet/${num.seller}`}>
                                       {num.seller}
