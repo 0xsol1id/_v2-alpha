@@ -1048,7 +1048,7 @@ const Wallet = () => {
                                 </a>
                               </button>
 
-                              {num.type == "buyNow" && num.buyer == publicKey?.toBase58() ? (
+                              {num.type == "buyNow" && num.buyer == key ? (
                                 <p className="font-trash text-center rounded bg-green-600 w-48 my-auto p-2">BOUGHT for {num.price.toFixed(2)}◎</p>
                               ) : (
                                 num.type == "list" ? (
@@ -1057,7 +1057,7 @@ const Wallet = () => {
                                   num.type == "delist" ? (
                                     <p className="font-trash text-center rounded bg-gray-500 w-48 my-auto p-2">DELISTED for {num.price.toFixed(2)}◎</p>
                                   ) : (
-                                    num.type == "buyNow" && num.seller == publicKey?.toBase58() ? (
+                                    num.type == "buyNow" && num.seller == key ? (
                                       <p className="font-trash text-center rounded bg-red-600 w-48  my-auto p-2">SOLD for {num.price.toFixed(2)}◎</p>
                                     ) : (
                                       num.type == "cancelBid" ? (
@@ -1074,7 +1074,7 @@ const Wallet = () => {
                               </p>
                             </div>
                             <div className='mt-2'>
-                              {num.type == "buyNow" && num.seller == publicKey?.toBase58() ? (
+                              {num.type == "buyNow" && num.seller == key ? (
                                 <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
                                   <button className="btn bg-gray-700 btn-sm text-xs">
                                     <Link passHref href={`/wallet/${num.buyer}`}>
@@ -1085,7 +1085,7 @@ const Wallet = () => {
                               ) : (
                                 null
                               )}
-                              {num.type == "buyNow" && num.buyer == publicKey?.toBase58() ? (
+                              {num.type == "buyNow" && num.buyer == key ? (
                                 <div className="font-trash flex justify-between text-xs rounded items-center"><p className='mr-2 uppercase '>Bought by: </p>
                                   <button className="btn bg-gray-700 btn-sm text-xs">
                                     <Link passHref href={`/wallet/${num.seller}`}>

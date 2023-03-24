@@ -339,10 +339,10 @@ export const HomeView: FC = ({ }) => {
                                       <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                                     </div>
                                   </div>
-                                  <div className="uppercase text-left mb-2 flex">Wrote into discussion for
+                                  <div className="uppercase text-left mb-2 flex hover:text-red-500 hover:cursor-pointer">Wrote into discussion for '
                                     <Link key={index} passHref href={`/discussion/${num.pubKey}`}>
-                                      {num.pubKey}
-                                    </Link>
+                                      <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
+                                    </Link>'
                                     :</div>
                                   <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
                                 </div>
@@ -507,10 +507,10 @@ export const HomeView: FC = ({ }) => {
                                         <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                                       </div>
                                     </div>
-                                    <div className="uppercase text-left mb-2 flex">Wrote into discussion for
+                                    <div className="uppercase text-left mb-2 flex">Wrote into discussion for '
                                       <Link key={index} passHref href={`/discussion/${num.pubKey}`}>
-                                        {num.pubKey}
-                                      </Link>
+                                        <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
+                                      </Link>'
                                       :</div>
                                     <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
                                   </div>
