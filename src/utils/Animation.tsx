@@ -1,36 +1,29 @@
 import { FC, useEffect, useState } from "react";
 
 type Props = {
-    images: string[]
-    maxFrame: number
-    intervall: number
-  };
+  images: string[];
+  maxFrame: number;
+  interval: number;
+};
 
-export const Animation: FC<Props> = ({
-    images,
-    maxFrame,
-    intervall
-  }) => {
-    const [frame, setFrame] = useState(1);
-    const [image, setImage] = useState<string>("/static/images/" + images[0])
+export const Animation: FC<Props> = ({ images, maxFrame, interval }) => {
+  const [frame, setFrame] = useState(1);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const tmp = frame
-            if (tmp == maxFrame)
-                setFrame(1)
-            else                
-                setFrame(tmp + 1)
-            setImage("/static/images/" + images[frame-1])
-        }, intervall);
-        return () => clearTimeout(timer);
-    }, [frame]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFrame((frame % maxFrame) + 1);
+    }, interval);
 
-    return (
-        <div id="ani" className="">
-            <div className="">
-                <img src={image} alt="ani" className="w-full" />
-            </div>
-        </div>
-    );
-}; 
+    return () => clearTimeout(timer);
+  }, [frame, maxFrame, interval]);
+
+  const image = `/static/images/${images[frame - 1]}`;
+
+  return (
+    <div id="ani">
+      <div>
+        <img src={image} alt="ani" className="w-full" />
+      </div>
+    </div>
+  );
+};

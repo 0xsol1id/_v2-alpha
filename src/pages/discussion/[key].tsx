@@ -228,7 +228,7 @@ const Discussion = () => {
           <div className="col-span-1 bg-base-300 flex flex-col justify-between">
             <SideBar />
             <div className="p-2 text-center">
-              <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} intervall={500} />
+              <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} interval={500} />
             </div>
           </div>
 
