@@ -589,12 +589,14 @@ export const HomeView: FC = ({ }) => {
               <TabList>
                 <Tab><h1 className="font-trash uppercase">ANNOUNCMENTS</h1></Tab>
                 <Tab><h1 className="font-trash uppercase">USER</h1></Tab>
+                <Tab><h1 className="font-trash uppercase">COLLECTIONS</h1></Tab>
+                <Tab><h1 className="font-trash uppercase">GROUPS</h1></Tab>
               </TabList>
 
               <TabPanel>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
-                    WELCOME!!! THIS IS AN ANNOUNCMENT!!! PNSQRT!!!
+                    WELCOME!!! THIS IS AN ANNOUNCMENT FROM YOUR BELOVED CREATORS OF THIS PLATTFORM: PNSQRT!!!
                   </div>
                 </div>
               </TabPanel>
@@ -611,7 +613,7 @@ export const HomeView: FC = ({ }) => {
                   </select>
                 </div>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-                  {allUsers?.map((user: any, index: any) =>
+                  {allUsers?.sort((a: any, b: any) => { return b.score - a.score }).map((user: any, index: any) =>
                   (userType == 0 ? (
                     <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
                       <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
@@ -690,6 +692,22 @@ export const HomeView: FC = ({ }) => {
                   )
                   )
                   }
+                </div>
+              </TabPanel>
+              
+              <TabPanel>
+                <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                  <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
+                    WELCOME!!! THIS IS A COLLECTION PROFILE!!! PNSQRT!!!
+                  </div>
+                </div>
+              </TabPanel>
+              
+              <TabPanel>
+                <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                  <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
+                    WELCOME!!! THIS IS A GROUP!!! PNSQRT!!!
+                  </div>
                 </div>
               </TabPanel>
             </Tabs>

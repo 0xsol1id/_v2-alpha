@@ -37,6 +37,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 import { LoadRarityFile } from 'utils/LoadRarityFiles'
 import { SideBar } from 'utils/sidebar';
 import { UserIcon } from '@heroicons/react/solid';
+import { HeartIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -169,7 +170,7 @@ const Wallet = () => {
     } catch (e) {
       console.log(e)
     }
-  }  
+  }
 
   async function SendNotif(uri: string) {
     try {
@@ -672,6 +673,7 @@ const Wallet = () => {
                       (walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
                     )
                     }
+                    <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
                   </div>
                   <div className='flex justify-between'>
                     <div className='flex'>
