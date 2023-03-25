@@ -199,6 +199,7 @@ const Wallet = () => {
       const response = await fetch(uri)
       setLikeState("isLiked")
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }
@@ -209,6 +210,7 @@ const Wallet = () => {
       const response = await fetch(uri)
       setLikeState("notLiked")
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }
@@ -706,21 +708,19 @@ const Wallet = () => {
                       (walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
                     )
                     }
-                    {key != publicKey?.toBase58() &&
-                      (publicKey && likeState != "isLiked" ? (
-                        <div className='flex'>
-                          <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
-                            <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
-                          </a>
-                        </div>
-                      ) : (
-                        <div className='flex'>
-                          <a onClick={() => DisLike(`https://fudility.xyz:3420/dislike/${publicKey?.toBase58()}/${key}`)}>
-                            <HeartIcon className="h-6 w-6 ml-12 text-red-500 hover:text-gray-500 hover:cursor-pointer" />
-                          </a>
-                        </div>
-                      )
-                      )
+                    {publicKey && likeState != "isLiked" ? (
+                      <div className='flex'>
+                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                          <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
+                        </a>
+                      </div>
+                    ) : (
+                      <div className='flex'>
+                        <a onClick={() => DisLike(`https://fudility.xyz:3420/dislike/${publicKey?.toBase58()}/${key}`)}>
+                          <HeartIcon className="h-6 w-6 ml-12 text-red-500 hover:text-gray-500 hover:cursor-pointer" />
+                        </a>
+                      </div>
+                    )
                     }
                     {key == publicKey?.toBase58() ? (
                       <div className='ml-5'>Likes: {userAccountData.likes}</div>
@@ -793,30 +793,30 @@ const Wallet = () => {
                           <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
                             <div className='grid grid-cols-10'>
                               <div className='col-span-1'>
-                            <img src={num.writtenByPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
-                            </div>
-                            <div className='col-span-9'>
-                            <div className="flex justify-between">
-                              <div className="flex mb-2 text-xs text-gray-500">
-                                <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
-                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                                  </Link>
+                                <img src={num.writtenByPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
+                              </div>
+                              <div className='col-span-9'>
+                                <div className="flex justify-between">
+                                  <div className="flex mb-2 text-xs text-gray-500">
+                                    <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
+                                      <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                        <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                      </Link>
+                                    </div>
+                                  </div>
+                                  <div className="text-right text-xs ml-10">
+                                    <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                                  </div>
+                                </div>
+                                <div className='flex justify-between'>
+                                  <h1 className="">{num.content}</h1>
+                                  <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                                    <Link passHref href={`/discussion/${num._id}`}>
+                                      <ReplyIcon className="w-6 h-6" />
+                                    </Link>
+                                  </button>
                                 </div>
                               </div>
-                              <div className="text-right text-xs ml-10">
-                                <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                              </div>
-                            </div>
-                            <div className='flex justify-between'>
-                              <h1 className="">{num.content}</h1>
-                              <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
-                                <Link passHref href={`/discussion/${num._id}`}>
-                                  <ReplyIcon className="w-6 h-6" />
-                                </Link>
-                              </button>
-                            </div>
-                            </div>
                             </div>
                           </div>
                         )
