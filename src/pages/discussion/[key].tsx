@@ -77,9 +77,9 @@ const Discussion = () => {
       const user: any = publicKey?.toBase58()
       const n = "no name"
       if (discussion.type == 8)
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       else
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
       setCourseOfDiscussion((state: any) => [...state, {
         pubKey: key,
@@ -241,11 +241,13 @@ const Discussion = () => {
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
                   <div className='grid'>
-                    <h1 className='text-xs'>{discussion[0]?.content}</h1>
-                    <div className='flex justify-between'>
-                      <h1 className='text-xs'>written by:
-                        {discussion[0]?.writtenBy}
-                      </h1>
+                    <h1 className='text-lg'>{discussion[0]?.content}</h1>
+                    <div className='flex justify-between text-gray-500'>
+                        <div className="font-trash uppercase w-full ">
+                          <Link passHref href={`/wallet/${discussion[0]?.writtenBy}`}>
+                            <div className='flex text-xs'><h1 className='mr-2'>written by:</h1><div className='hover:text-red-500 hover:cursor-pointer'>{discussion[0]?.writtenBy}</div></div>
+                          </Link>
+                        </div>
                     </div>
                   </div>
                 </div>

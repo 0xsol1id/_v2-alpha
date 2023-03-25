@@ -199,7 +199,8 @@ const Wallet = () => {
       const response = await fetch(uri)
       setLikeState("isLiked")
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+      if (key == publicKey?.toBase58())
+        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }
@@ -210,7 +211,8 @@ const Wallet = () => {
       const response = await fetch(uri)
       setLikeState("notLiked")
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+      if (key == publicKey?.toBase58())
+        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }

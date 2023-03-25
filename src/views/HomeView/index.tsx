@@ -16,6 +16,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import ReactTimeAgo from 'react-time-ago'
 import { UserIcon } from "@heroicons/react/solid";
+import { ReplyIcon } from "@heroicons/react/solid";
 
 export const HomeView: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -445,7 +446,7 @@ export const HomeView: FC = ({ }) => {
                         (num.eventType == 3 ? (
                           <div className="border-2 border-red-500 rounded-lg w-full mb-2 p-2">
                             <div className="flex">
-                          <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
+                              <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                               <div className="grid w-full">
                                 <div className="block mb-5">
                                   <div className="flex">
@@ -462,7 +463,14 @@ export const HomeView: FC = ({ }) => {
                                     <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
                                   </Link>'
                                   <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                                    <div className="flex">
+                                      <div className="uppercase text-left border-2 border-opacity-10 rounded p-2 w-full">{num.content}</div>
+                                      <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                                        <Link passHref href={`/discussion/${num.contentId}`}>
+                                          <ReplyIcon className="w-6 h-6" />
+                                        </Link>
+                                      </button>
+                                    </div>
                               </div>
                             </div>
                           </div>
@@ -495,7 +503,7 @@ export const HomeView: FC = ({ }) => {
                             (num.eventType == 5 ? (
                               <div className="border-2 border-blue-500 rounded-lg w-full mb-2 p-2">
                                 <div className="flex">
-                                  <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
+                                  <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                                   <div className="grid w-full">
                                     <div className="block mb-5">
                                       <div className="flex">
@@ -512,7 +520,14 @@ export const HomeView: FC = ({ }) => {
                                         <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
                                       </Link>'
                                       :</div>
-                                    <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                                    <div className="flex">
+                                      <div className="uppercase text-left border-2 border-opacity-10 rounded p-2 w-full">{num.content}</div>
+                                      <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                                        <Link passHref href={`/discussion/${num.pubKey}`}>
+                                          <ReplyIcon className="w-6 h-6" />
+                                        </Link>
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
