@@ -180,6 +180,30 @@ const Wallet = () => {
     }
   }
 
+  const [likeState, setLikeState] = useState<any>()
+  async function GetLike(uri: string) {
+    try {
+      const response = await fetch(uri)
+      const jsonData = await response.json()
+      console.log(jsonData)
+      if (jsonData[0].user == publicKey?.toBase58())
+        setLikeState("isLiked")
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async function SendLike(uri: string) {
+    try {
+      const response = await fetch(uri)
+      const jsonData = await response.json()
+      console.log(response)
+      setLikeState("isLiked")
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const inputRef = useRef<any>(null);
 
   const [isBurnAllOpen, setIsBurnAllOpen] = useState(false);
@@ -510,8 +534,10 @@ const Wallet = () => {
   useEffect(() => {
     //Get User Account Data and Comments
     (async () => {
-      if (publicKey)
+      if (publicKey) {
+        GetLike(`https://fudility.xyz:3420/getlike/${publicKey.toBase58()}/${key}`)
         GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      }
 
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
       GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
@@ -673,7 +699,16 @@ const Wallet = () => {
                       (walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
                     )
                     }
-                    <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
+                    {publicKey && likeState != "isLiked" ? (
+                      <div className='flex'>
+                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                          <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
+                        </a>
+                      </div>
+                    ) : (
+                      <HeartIcon className="h-6 w-6 ml-12 text-red-500 " />
+                    )
+                    }
                   </div>
                   <div className='flex justify-between'>
                     <div className='flex'>

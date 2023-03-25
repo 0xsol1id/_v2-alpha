@@ -32,6 +32,7 @@ import { LoadRarityFile } from '../../utils/LoadRarityFiles'
 import { SideBar } from 'utils/sidebar';
 import { ReplyIcon } from '@heroicons/react/solid';
 import { UserIcon } from '@heroicons/react/solid';
+import { HeartIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -642,10 +643,34 @@ const Token = () => {
       console.log(e)
     }
   }
+  
+  const [likeState, setLikeState] = useState<any>()
+  async function GetLike(uri: string) {
+    try {
+      const response = await fetch(uri)
+      const jsonData = await response.json()
+      if (jsonData[0].user == publicKey?.toBase58())
+        setLikeState("isLiked")
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async function SendLike(uri: string) {
+    try {
+      const response = await fetch(uri)
+      setLikeState("isLiked")
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   useEffect(() => {
     if (publicKey)
+    {      
+      GetLike(`https://fudility.xyz:3420/getlike/${publicKey.toBase58()}/${key}`)
       GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+    }
 
     GetOwner()
     GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
@@ -720,9 +745,17 @@ const Token = () => {
                   <div className='flex justify-between'>
                     <h1 className='text-xs'>{key}</h1>
                   </div>
-                  <div className='flex justify-between'>
-                    <div className='flex'>
-                    </div>
+                  <div className='flex justify-between'>                    
+                  {publicKey && likeState != "isLiked" ? (
+                      <div className='flex'>
+                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                          <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
+                        </a>
+                      </div>
+                    ) : (
+                      <HeartIcon className="h-6 w-6 ml-12 text-red-500 " />
+                    )
+                    }
                   </div>
                 </div>
               </div>
