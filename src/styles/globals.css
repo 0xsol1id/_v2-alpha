@@ -57,3 +57,18 @@
     background: #df6f25;
   }
 }
+
+.emoji-mart-category-label span {
+  background-color: #f5f5f5 !important;
+  color: #222 !important;
+  }
+  .emoji-mart-dark .emoji-mart-search input {
+  color: #222 !important;
+  border-color: #c8c5c2 !important;
+  background-color: #eeece9 !important;
+  
+  }
+  .emoji-mart-dark {
+  color: #222 !important;
+  
+  }

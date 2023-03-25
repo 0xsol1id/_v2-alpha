@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from "react";
+import InputEmoji from "react-input-emoji";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Metaplex, bundlrStorage, walletAdapterIdentity } from "@metaplex-foundation/js";
@@ -11,6 +12,7 @@ import { PublicKey } from "@solana/web3.js";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import ReactTimeAgo from 'react-time-ago'
 
 const ReactJson = dynamic(
   () => {
@@ -546,7 +548,7 @@ const Token = () => {
   const [comments, setComments] = useState<any>([])
 
   const addComment = (com: any) => {
-    if (inputRef.current.value != "") {
+    if (commentValue != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
@@ -643,7 +645,7 @@ const Token = () => {
       console.log(e)
     }
   }
-  
+
   const [likeState, setLikeState] = useState<any>()
   async function GetLike(uri: string) {
     try {
@@ -666,8 +668,7 @@ const Token = () => {
   }
 
   useEffect(() => {
-    if (publicKey)
-    {      
+    if (publicKey) {
       GetLike(`https://fudility.xyz:3420/getlike/${publicKey.toBase58()}/${key}`)
       GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
     }
@@ -745,8 +746,8 @@ const Token = () => {
                   <div className='flex justify-between'>
                     <h1 className='text-xs'>{key}</h1>
                   </div>
-                  <div className='flex justify-between'>                    
-                  {publicKey && likeState != "isLiked" ? (
+                  <div className='flex justify-between'>
+                    {publicKey && likeState != "isLiked" ? (
                       <div className='flex'>
                         <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
                           <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
@@ -786,16 +787,14 @@ const Token = () => {
                         <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
                           <div className="flex justify-between">
                             <div className="flex">
-                              <div className='border-2 rounded-lg border-opacity-10 mr-5'>
-                                <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
-                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                                  </Link>
-                                </button>
+                              <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
+                                <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                  <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                </Link>
                               </div>
-                              <h1>said:</h1>
+                              <h1 className='ml-2'>said:</h1>
                             </div>
-                            <h1 className="text-right text-xs">{convertTimestamp(num.time)}</h1>
+                            <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                           </div>
                           <div className='flex justify-between'>
                             <h1 className="">{num.content}</h1>
@@ -813,17 +812,19 @@ const Token = () => {
                   }
                 </div>
                 {publicKey ? (
-                  <div className="bg-base-300 w-full font-trash uppercase flex justify-between mt-5">
-                    <input
-                      ref={inputRef}
+                  <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-10 p-1 rounded-lg">
+                    <InputEmoji
                       type="text"
                       value={commentValue}
-                      onChange={(e) => { setCommentValue(e.target.value) }}
-                      placeholder="write comment"
-                      className="input w-full mr-5 input-bordered text-3xl"
-                      maxLength={150} />
-                    <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
-                    <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
+                      onChange={setCommentValue}
+                      placeholder="Write a Comment"
+                      maxLength={150}
+                      onEnter={() => addComment(commentValue)}
+                      borderColor="#EAEAEA"
+                      borderRadius={5}
+                    />
+                    <h1 className='grid items-center mr-3 text-xs'>{commentValue.length}/150</h1>
+                    <button onClick={() => addComment(commentValue)} className="btn btn-secondary mr-2">Send</button>
                   </div>
                 ) : (
                   <h1 className="bg-base-300 w-full font-trash uppercase p-2 flex justify-between mt-5 border-2 border-opacity-20 text-center rounded-lg">connect your wallet to write comments</h1>

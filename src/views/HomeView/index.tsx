@@ -237,7 +237,7 @@ export const HomeView: FC = ({ }) => {
                   (num.eventType == 1 ? (
                     <div className="border-2 border-yellow-300 rounded-lg w-full mb-2 p-2">
                       <div className="flex">
-                        <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
+                        <img src={num.pfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                         <div className="grid w-full">
                           <div className="block mb-5">
                             <div className="flex">
@@ -405,7 +405,7 @@ export const HomeView: FC = ({ }) => {
                     (num.eventType == 1 ? (
                       <div className="border-2 border-yellow-300 rounded-lg w-full mb-2 p-2">
                         <div className="flex">
-                          <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
+                          <img src={num.pfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                           <div className="grid w-full">
                             <div className="block mb-5">
                               <div className="flex">
@@ -445,7 +445,7 @@ export const HomeView: FC = ({ }) => {
                         (num.eventType == 3 ? (
                           <div className="border-2 border-red-500 rounded-lg w-full mb-2 p-2">
                             <div className="flex">
-                              <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
+                          <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                               <div className="grid w-full">
                                 <div className="block mb-5">
                                   <div className="flex">
@@ -631,6 +631,9 @@ export const HomeView: FC = ({ }) => {
                               <div className="flex justify-between uppercase"><div>claimed:</div>
                                 <div>{user.claimed}</div>
                               </div>
+                              <div className="flex justify-between uppercase"><div>LIKES:</div>
+                                <div>{user.likes}</div>
+                              </div>
                             </div>
                           </div>
                         </Link>
@@ -694,7 +697,7 @@ export const HomeView: FC = ({ }) => {
                   }
                 </div>
               </TabPanel>
-              
+
               <TabPanel>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
@@ -702,7 +705,7 @@ export const HomeView: FC = ({ }) => {
                   </div>
                 </div>
               </TabPanel>
-              
+
               <TabPanel>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">

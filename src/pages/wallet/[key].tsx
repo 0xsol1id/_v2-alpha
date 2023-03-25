@@ -15,6 +15,7 @@ import {
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import ReactTimeAgo from 'react-time-ago'
+import InputEmoji from "react-input-emoji";
 
 import { BuyButton } from "../../utils/buybutton"
 import { randomWallets } from "../../utils/wallets"
@@ -126,18 +127,18 @@ const Wallet = () => {
   const [comments, setComments] = useState<any>([])
   const [hiddenComments, setHiddenComments] = useState<any>([])
   const addComment = (com: any) => {
-    if (inputRef.current.value != "") {
+    if (commentValue != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
     }
   }
   const addHiddenComment = (com: any) => {
-    if (inputRef.current.value != "") {
+    if (commentValue != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
     }
   }
@@ -196,9 +197,18 @@ const Wallet = () => {
   async function SendLike(uri: string) {
     try {
       const response = await fetch(uri)
-      const jsonData = await response.json()
-      console.log(response)
       setLikeState("isLiked")
+      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async function DisLike(uri: string) {
+    try {
+      const response = await fetch(uri)
+      setLikeState("notLiked")
+      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
     } catch (e) {
       console.log(e)
     }
@@ -532,17 +542,14 @@ const Wallet = () => {
   }, [publicKey])
 
   useEffect(() => {
-    //Get User Account Data and Comments
+    //Get User Account Data and Comments everytime the site reloads
     (async () => {
-      if (publicKey) {
-        GetLike(`https://fudility.xyz:3420/getlike/${publicKey.toBase58()}/${key}`)
-        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
-      }
+      GetLike(`https://fudility.xyz:3420/getlike/${publicKey?.toBase58()}/${key}`)
+      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
 
       GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
       GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
       GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
-
     })();
 
     //DOMAIN
@@ -588,7 +595,7 @@ const Wallet = () => {
       setIsConnectedWallet(true)
     else
       setIsConnectedWallet(false)
-  }, [wallet])
+  }, [key])
 
   useEffect(() => {
     setHistoryList(history.slice(0, historyNumber))
@@ -680,10 +687,10 @@ const Wallet = () => {
                 {pfpImage == "none" ? (
                   <QuestionMarkCircleIcon className="w-12 h-12" />
                 ) : (
-                  <img src={pfpImage} alt="" className='w-12 h-12 rounded-full border-2 mr-2' />
+                  <img src={pfpImage} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
                 )}
-                <div className='grid'>
-                  <div className="flex">
+                <div className=''>
+                  <div className="flex justify between">
                     {key == publicKey?.toBase58() ? (
                       <div className='flex'>
                         {userAccountData.name}
@@ -699,14 +706,26 @@ const Wallet = () => {
                       (walletUserAccountData.claimed == "not yet" ? (<QuestionMarkCircleIcon className="h-6 w-6 text-red-500" />) : (<CheckCircleIcon className="h-6 w-6 text-green-500" />))
                     )
                     }
-                    {publicKey && likeState != "isLiked" ? (
-                      <div className='flex'>
-                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
-                          <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
-                        </a>
-                      </div>
+                    {key != publicKey?.toBase58() &&
+                      (publicKey && likeState != "isLiked" ? (
+                        <div className='flex'>
+                          <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                            <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
+                          </a>
+                        </div>
+                      ) : (
+                        <div className='flex'>
+                          <a onClick={() => DisLike(`https://fudility.xyz:3420/dislike/${publicKey?.toBase58()}/${key}`)}>
+                            <HeartIcon className="h-6 w-6 ml-12 text-red-500 hover:text-gray-500 hover:cursor-pointer" />
+                          </a>
+                        </div>
+                      )
+                      )
+                    }
+                    {key == publicKey?.toBase58() ? (
+                      <div className='ml-5'>Likes: {userAccountData.likes}</div>
                     ) : (
-                      <HeartIcon className="h-6 w-6 ml-12 text-red-500 " />
+                      <div className='ml-5'>Likes: {walletUserAccountData.likes}</div>
                     )
                     }
                   </div>
@@ -760,7 +779,7 @@ const Wallet = () => {
                   {isConnectedWallet ? (
                     <Tab><h1 className="font-trash uppercase">DASHBOARD</h1></Tab>
                   ) : (
-                    <Tab><h1 className="font-trash uppercase">HIDDEN COMMENTS</h1></Tab>
+                    <Tab><h1 className="font-trash uppercase">DM</h1></Tab>
                   )
                   }
                   <Tab><h1 className="font-trash uppercase">ME HISTORY</h1></Tab>
@@ -772,18 +791,22 @@ const Wallet = () => {
                       (comments?.slice(0).reverse().map((num: any, index: any) => (
                         (num.type != "8" &&
                           <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                            <div className='grid grid-cols-10'>
+                              <div className='col-span-1'>
+                            <img src={num.writtenByPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
+                            </div>
+                            <div className='col-span-9'>
                             <div className="flex justify-between">
-                              <div className="flex">
-                                <div className='border-2 rounded-lg border-opacity-10 mr-5'>
-                                  <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
-                                    <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                      <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                                    </Link>
-                                  </button>
+                              <div className="flex mb-2 text-xs text-gray-500">
+                                <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
+                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                  </Link>
                                 </div>
-                                <h1>said:</h1>
                               </div>
-                              <h1 className="text-right text-xs">{convertTimestamp(num.time)}</h1>
+                              <div className="text-right text-xs ml-10">
+                                <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                              </div>
                             </div>
                             <div className='flex justify-between'>
                               <h1 className="">{num.content}</h1>
@@ -793,6 +816,8 @@ const Wallet = () => {
                                 </Link>
                               </button>
                             </div>
+                            </div>
+                            </div>
                           </div>
                         )
                       )))) : (
@@ -801,17 +826,19 @@ const Wallet = () => {
                     }
                   </div>
                   {publicKey ? (
-                    <div className="bg-base-300 w-full font-trash uppercase flex justify-between mt-5">
-                      <input
-                        ref={inputRef}
+                    <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-10 p-1 rounded-lg">
+                      <InputEmoji
                         type="text"
                         value={commentValue}
-                        onChange={(e) => { setCommentValue(e.target.value) }}
-                        placeholder="write comment"
-                        className="input w-full mr-5 input-bordered text-3xl"
-                        maxLength={150} />
-                      <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
-                      <button onClick={() => addComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
+                        onChange={setCommentValue}
+                        placeholder="Write a Comment"
+                        maxLength={150}
+                        onEnter={() => addComment(commentValue)}
+                        borderColor="#EAEAEA"
+                        borderRadius={5}
+                      />
+                      <h1 className='grid items-center mr-3 text-xs'>{commentValue.length}/150</h1>
+                      <button onClick={() => addComment(commentValue)} className="btn btn-secondary mr-2">Send</button>
                     </div>
                   ) : (
                     <h1 className="bg-base-300 w-full font-trash uppercase p-2 flex justify-between mt-5 border-2 border-opacity-20 text-center rounded-lg">connect your wallet to write comments</h1>
@@ -935,8 +962,7 @@ const Wallet = () => {
                             </div>
                           </div>
                           <div className="mt-2 border-2 rounded-lg border-opacity-10 w-full p-2">
-                            <div className='text-center font-trash uppercase'>HIDDEN COMMENTS</div>
-                            <div className='overflow-auto h-[37rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
+                            <div className='overflow-auto h-[60vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
                               {hiddenComments?.slice(0).reverse().map((num: any, index: any) => (
                                 (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
                                   <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
@@ -971,7 +997,7 @@ const Wallet = () => {
                               {comments.length > 0 ? (
                                 (comments?.slice(0).reverse().map((num: any, index: any) => (
                                   (num.type == 8 && num.pubKey == publicKey?.toBase58() &&
-                                    <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                                    <div key={index} id="Comments" className="">
                                       <div className="flex justify-between">
                                         <div className="flex">
                                           <div className='border-2 rounded-lg border-opacity-10 mr-5'>
@@ -999,7 +1025,7 @@ const Wallet = () => {
                                     </div>
                                   )
                                 )))) : (
-                                <h1 className="text-center">No hidden comments yet</h1>
+                                <h1 className="text-center">No DM yet</h1>
                               )
                               }
                             </div>
@@ -1008,9 +1034,8 @@ const Wallet = () => {
                       }
                     </div>
                   ) : (
-                    <div className="mt-2 border-2 rounded-lg border-opacity-10 w-full p-2">
-                      <div className='text-center font-trash uppercase'>HIDDEN COMMENTS</div>
-                      <div className='overflow-auto h-[44rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
+                    <div className="">
+                      <div className='overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
                         {comments.length > 0 ? (
                           (comments?.slice(0).reverse().map((num: any, index: any) => (
                             (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
@@ -1057,8 +1082,8 @@ const Wallet = () => {
                             type="text"
                             value={commentValue}
                             onChange={(e) => { setValue(e.target.value) }}
-                            placeholder="write hidden comment"
-                            className="input w-full mr-5 input-bordered"
+                            placeholder="write DM"
+                            className="input w-full mr-5 input-bordered text-3xl"
                             maxLength={150} />
                           <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
                           <button onClick={() => addHiddenComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
@@ -1149,7 +1174,7 @@ const Wallet = () => {
                     Burn The Whole Wallet At Once
                   </button>
                 </div>
-                <ul className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                <ul className="overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   {NFTstoBurnNames.map((num: any, index: any) => (
                     <li key={index} className="bg-gray-700 rounded-lg font-trash uppercase p-2 mb-1 flex justify-between items-center break">
                       <img src={NFTstoBurnImages[index]} className="h-16" alt="tmp" />
