@@ -72,6 +72,7 @@ function randomInt(low: number, high: number) {
 }
 
 const Token = () => {
+  const fudility = process.env.NEXT_PUBLIC_FUDILITY_BACKEND!
   const router = useRouter()
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -109,7 +110,7 @@ const Token = () => {
       setUpdateAuthority(nft.updateAuthorityAddress.toBase58())
       setTokenMintAddress(nft.address.toBase58())
       setImage(nft.json?.image)
-      GetCollectionName(`https://fudility.xyz:3420/collectionname/${nft.address.toBase58()}`)
+      GetCollectionName(fudility + `collectionname/${nft.address.toBase58()}`)
       setBurnThis([nft.address.toBase58()])
 
       if (nft.updateAuthorityAddress.toBase58() == "EshFf23GMA55yKPCQm76KrhSyfp7RuAsjDDpHE7wTeDM") {
@@ -165,8 +166,8 @@ const Token = () => {
   const [collectionName, setcollectionName] = useState("-")
   const handleChangecollectionName = (val: string) => {
     if (collectionName != null) {
-      CheckFloor(`https://fudility.xyz:3420/checkfloor/${val}`)
-      GetpriceHistory(`https://fudility.xyz:3420/pricehistory/${val}`)
+      CheckFloor(fudility + `checkfloor/${val}`)
+      GetpriceHistory(fudility + `pricehistory/${val}`)
     }
     else
       handleChangeFloor("NaN")
@@ -552,8 +553,8 @@ const Token = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
-      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
+      SendComment(fudility + `sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendNotif(fudility + `sendnotif/${key}/1`)
       setComments((state: any) => [...state, {
         pubKey: key,
         type: "nft",
@@ -669,12 +670,12 @@ const Token = () => {
 
   useEffect(() => {
     if (publicKey) {
-      GetLike(`https://fudility.xyz:3420/getlike/${publicKey.toBase58()}/${key}`)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      GetLike(fudility + `getlike/${publicKey.toBase58()}/${key}`)
+      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
     }
 
     GetOwner()
-    GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
+    GetComments(fudility + `getcomments/${key}`)
     getMetadata()
   }, []);
 
@@ -714,7 +715,7 @@ const Token = () => {
             }
           </div>
           <div className="flex">
-            <div className="border-2 rounded-lg border-opacity-10">
+            <div className="border-2 rounded-lg border-opacity-20">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                   <div className='w-full flex justify-between items-center'>
@@ -749,7 +750,7 @@ const Token = () => {
                   <div className='flex justify-between'>
                     {publicKey && likeState != "isLiked" ? (
                       <div className='flex'>
-                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                        <a onClick={() => SendLike(fudility + `sendlike/${publicKey.toBase58()}/${key}`)}>
                           <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
                         </a>
                       </div>
@@ -784,7 +785,7 @@ const Token = () => {
                   {comments.length > 0 ? (
                     (comments?.slice(0).reverse().map((num: any, index: any) => (
                       (num.type != "8" &&
-                        <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                        <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
                           <div className="flex justify-between">
                             <div className="flex">
                               <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
@@ -812,7 +813,7 @@ const Token = () => {
                   }
                 </div>
                 {publicKey ? (
-                  <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-10 p-1 rounded-lg">
+                  <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-20 p-1 rounded-lg">
                     <InputEmoji
                       type="text"
                       value={commentValue}

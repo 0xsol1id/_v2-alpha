@@ -95,7 +95,7 @@ export default function Custom404() {
           <div id="sidebar" className="grid justify-items-end">
             {publicKey ?
               <div>
-                <div className="border-2 rounded-lg border-opacity-10 mb-2 font-trash uppercase bg-primary">
+                <div className="border-2 rounded-lg border-opacity-20 mb-2 font-trash uppercase bg-primary">
                   <button className="btn btn-ghost rounded-lg hover:bg-gray-800 w-full">
                     <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                       <div className='text-center'>
@@ -104,7 +104,7 @@ export default function Custom404() {
                     </Link>
                   </button>
                 </div>
-                <div className="border-2 rounded-lg border-opacity-10">
+                <div className="border-2 rounded-lg border-opacity-20">
                   <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                     <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                       <div className='w-full flex justify-between items-center'>
@@ -121,7 +121,7 @@ export default function Custom404() {
         </div>
 
         {/* CONTENT */}
-        <div className="col-span-7">
+        <div className="col-span-7 p-5 font-trash text-4xl">
          404 - page not found
         </div >
 

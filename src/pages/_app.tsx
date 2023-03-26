@@ -8,6 +8,10 @@ import "../styles/globals.css";
 import "../styles/App.css"; 
 import '../styles/tabs.css';
 
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+TimeAgo.addDefaultLocale(en)
+
 // set custom RPC server endpoint for the final website
 // const endpoint = "https://explorer-api.devnet.solana.com";
 // const endpoint = "http://127.0.0.1:8899";

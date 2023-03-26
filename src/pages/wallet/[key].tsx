@@ -74,6 +74,7 @@ function convertTimestamp(timestamp: any) {
 
 
 const Wallet = () => {
+  const fudility = process.env.NEXT_PUBLIC_FUDILITY_BACKEND!
   const router = useRouter()
   const { key } = router.query
   const wallet: string | string[] = key !== undefined ? key : '';
@@ -130,24 +131,24 @@ const Wallet = () => {
     if (commentValue != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
-      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
+      SendComment(fudility + `sendcomment/${key}/3/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
+      SendNotif(fudility + `sendnotif/${key}/1`)
     }
   }
   const addHiddenComment = (com: any) => {
     if (commentValue != "") {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
-      SendComment(`https://fudility.xyz:3420/sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
-      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
+      SendComment(fudility + `sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
+      SendNotif(fudility + `sendnotif/${key}/1`)
     }
   }
 
   async function SendComment(uri: string) {
     try {
       const response = await fetch(uri)
-      GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
-      GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
+      GetComments(fudility + `getcomments/${key}`)
+      GetHiddenComments(fudility + `gethiddencomments/${key}`)
     } catch (e) {
       console.log(e)
     }
@@ -181,7 +182,7 @@ const Wallet = () => {
     }
   }
 
-  const [likeState, setLikeState] = useState<any>()
+  const [likeState, setLikeState] = useState<string>("notLiked")
   async function GetLike(uri: string) {
     try {
       const response = await fetch(uri)
@@ -198,9 +199,9 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
       setLikeState("isLiked")
-      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+      GetWalletUserAccount(fudility + `user/${key}`)
       if (key == publicKey?.toBase58())
-        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+        GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }
@@ -210,9 +211,9 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
       setLikeState("notLiked")
-      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
+      GetWalletUserAccount(fudility + `user/${key}`)
       if (key == publicKey?.toBase58())
-        GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+        GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
     } catch (e) {
       console.log(e)
     }
@@ -272,7 +273,7 @@ const Wallet = () => {
 
   const [pfpImage, setPfpImage] = useState<string>("none")
   const addToPfpImage = (newNFTImage: string) => {
-    ChangePfp(`https://fudility.xyz:3420/changepfp/${key}/${userAccountData.name}/${encodeURIComponent(newNFTImage)}`)
+    ChangePfp(fudility + `changepfp/${key}/${userAccountData.name}/${encodeURIComponent(newNFTImage)}`)
     setPfpImage(newNFTImage)
   }
 
@@ -280,7 +281,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`https://fudility.xyz:3420/user/${key}`)
+          GetUserAccount(fudility + `user/${key}`)
         )
     } catch (e) {
       console.log(e)
@@ -360,7 +361,7 @@ const Wallet = () => {
     if (!nfts?.length) {
       return (
         <div className="font-trash uppercase text-center text-2xl pt-16">
-          No NFTs found in this wallet
+          No NFTs found in this wallet, BOZO
         </div>
       );
     }
@@ -406,9 +407,6 @@ const Wallet = () => {
       </div>
     );
   };
-
-
-
 
   var gen1Count: number = 0
   var gen2Count: number = 0
@@ -505,21 +503,11 @@ const Wallet = () => {
     }
   }
 
-  /*async function uploadCollage(image: any) {
-    try {
-      createCollage(NFTstoBurnImages, 500).then(async (imageBuffer: any) => {
-        const response = await fetch(`https://fudility.xyz:3420/upload/${imageBuffer}`)
-      })
-    } catch (e) {
-      console.log(e)
-    }
-  }*/
-
   async function ClaimWallet(uri: string) {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+          GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
         )
     } catch (e) {
       console.log(e)
@@ -531,7 +519,7 @@ const Wallet = () => {
     try {
       const response = await fetch(uri)
         .then((res) =>
-          GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+          GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
         )
     } catch (e) {
       console.log(e)
@@ -539,21 +527,15 @@ const Wallet = () => {
   }
 
   useEffect(() => {
-    if (key == publicKey?.toBase58())
-      setIsConnectedWallet(true)
-    else
-      setIsConnectedWallet(false)
-  }, [publicKey])
-
-  useEffect(() => {
     //Get User Account Data and Comments everytime the site reloads
     (async () => {
-      GetLike(`https://fudility.xyz:3420/getlike/${publicKey?.toBase58()}/${key}`)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey?.toBase58()}`)
+      //setLikeState("notLiked")
+      GetLike(fudility + `getlike/${publicKey?.toBase58()}/${key}`)
+      GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
 
-      GetWalletUserAccount(`https://fudility.xyz:3420/user/${key}`)
-      GetComments(`https://fudility.xyz:3420/getcomments/${key}`)
-      GetHiddenComments(`https://fudility.xyz:3420/gethiddencomments/${key}`)
+      GetWalletUserAccount(fudility + `user/${key}`)
+      GetComments(fudility + `getcomments/${key}`)
+      GetHiddenComments(fudility + `gethiddencomments/${key}`)
     })();
 
     //DOMAIN
@@ -589,7 +571,7 @@ const Wallet = () => {
 
     //ME HISTORY
     setHistoryList([])
-    GetHistory(`https://fudility.xyz:3420/history/${key}`)
+    GetHistory(fudility + `history/${key}`)
     //getTransactions(walletPublicKey, 5)
 
     setPostNumber(35);
@@ -599,7 +581,20 @@ const Wallet = () => {
       setIsConnectedWallet(true)
     else
       setIsConnectedWallet(false)
-  }, [key])
+  }, [wallet])
+
+
+  useEffect(() => {
+    (async () => {
+      //setLikeState("notLiked")
+      GetLike(fudility + `getlike/${publicKey?.toBase58()}/${key}`)
+      GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
+
+      GetWalletUserAccount(fudility + `user/${key}`)
+      GetComments(fudility + `getcomments/${key}`)
+      GetHiddenComments(fudility + `gethiddencomments/${key}`)
+    })();
+  }, [userAccountData.likes])
 
   useEffect(() => {
     setHistoryList(history.slice(0, historyNumber))
@@ -642,7 +637,7 @@ const Wallet = () => {
           </div>
           <div className="flex">
             {isConnectedWallet &&
-              <div className='flex justify-between font-trash uppercase border-2 rounded-lg border-opacity-10 p-3 mr-2'>
+              <div className='flex justify-between font-trash uppercase border-2 rounded-lg border-opacity-20 p-3 mr-2'>
                 <div className="flex justify-between">
                   {selectedMode ? (
                     <div className="flex justify-between items-center">
@@ -659,7 +654,7 @@ const Wallet = () => {
                 </div>
               </div>
             }
-            <div className="border-2 rounded-lg border-opacity-10 mr-2">
+            <div className="border-2 rounded-lg border-opacity-20 mr-2">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                   <div className='w-full flex justify-between items-center'>
@@ -712,13 +707,13 @@ const Wallet = () => {
                     }
                     {publicKey && likeState != "isLiked" ? (
                       <div className='flex'>
-                        <a onClick={() => SendLike(`https://fudility.xyz:3420/sendlike/${publicKey.toBase58()}/${key}`)}>
+                        <a onClick={() => SendLike(fudility + `sendlike/${publicKey.toBase58()}/${key}`)}>
                           <HeartIcon className="h-6 w-6 text-gray-500 ml-12 hover:text-red-500 hover:cursor-pointer" />
                         </a>
                       </div>
                     ) : (
                       <div className='flex'>
-                        <a onClick={() => DisLike(`https://fudility.xyz:3420/dislike/${publicKey?.toBase58()}/${key}`)}>
+                        <a onClick={() => DisLike(fudility + `dislike/${publicKey?.toBase58()}/${key}`)}>
                           <HeartIcon className="h-6 w-6 ml-12 text-red-500 hover:text-gray-500 hover:cursor-pointer" />
                         </a>
                       </div>
@@ -792,7 +787,7 @@ const Wallet = () => {
                     {comments.length > 0 ? (
                       (comments?.slice(0).reverse().map((num: any, index: any) => (
                         (num.type != "8" &&
-                          <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                          <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
                             <div className='grid grid-cols-10'>
                               <div className='col-span-1'>
                                 <img src={num.writtenByPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
@@ -828,7 +823,7 @@ const Wallet = () => {
                     }
                   </div>
                   {publicKey ? (
-                    <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-10 p-1 rounded-lg">
+                    <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-20 p-1 rounded-lg">
                       <InputEmoji
                         type="text"
                         value={commentValue}
@@ -853,67 +848,38 @@ const Wallet = () => {
                 </TabPanel>
 
                 <TabPanel>
-                  {score <= 0 ? (
-                    <div className=''> {/* ---blur-sm---       wen junkScore is lower equal zero*/}
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Public Key:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData?.pubKey}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Claimed:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.claimed}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Name:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.name}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Score:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.score}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Created at:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.time}</p></div>
-                      <br />
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Domain:&nbsp;</p><p className="font-trash uppercase">{domain}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase mr-2">SOL:&nbsp;</p><p className="font-trash uppercase">{balance}◎</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Total NFTs:&nbsp;</p><p className="font-trash uppercase">{nfts.length}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Collections:&nbsp;</p><p className="font-trash uppercase">{collections.length}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">NFT Value:&nbsp;</p><p className="font-trash uppercase">tba</p></div>
-                      <br />
-                      <p className="font-trash uppercase underline">$TRUK CLAIMING</p>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN1:&nbsp;</p><p className="font-trash uppercase">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN2:&nbsp;</p><p className="font-trash uppercase">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">$olana Money Bu$ine$$:&nbsp;</p><p className="font-trash uppercase">{smbCount}/{smbScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Faces of $MB:&nbsp;</p><p className="font-trash uppercase">{facesCount}/{facesScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Lil Rektiez:&nbsp;</p><p className="font-trash uppercase">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">HarrddyJunks:&nbsp;</p><p className="font-trash uppercase">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
-                      <br />
-                      <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">Wallet Score:&nbsp;</p><p className="font-trash uppercase">{score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">$TRUK/Day:&nbsp;</p><p className="font-trash uppercase">{trukClaim.toFixed(2)}</p></div>
-                    </div>
-                  ) : (
-                    <div className=''>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Public Key:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData?.pubKey}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Claimed:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.claimed}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Name:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.name}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Score:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.score}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Created at:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.time}</p></div>
-                      <br />
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Domain:&nbsp;</p><p className="font-trash uppercase">{domain}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase mr-2">SOL:&nbsp;</p><p className="font-trash uppercase">{balance}◎</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Total NFTs:&nbsp;</p><p className="font-trash uppercase">{nfts.length}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Collections:&nbsp;</p><p className="font-trash uppercase">{collections.length}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">NFT Value:&nbsp;</p><p className="font-trash uppercase">tba</p></div>
-                      <br />
-                      <p className="font-trash uppercase underline">$TRUK CLAIMING</p>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN1:&nbsp;</p><p className="font-trash uppercase">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN2:&nbsp;</p><p className="font-trash uppercase">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">$olana Money Bu$ine$$:&nbsp;</p><p className="font-trash uppercase">{smbCount}/{smbScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Faces of $MB:&nbsp;</p><p className="font-trash uppercase">{facesCount}/{facesScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Lil Rektiez:&nbsp;</p><p className="font-trash uppercase">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">HarrddyJunks:&nbsp;</p><p className="font-trash uppercase">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
-                      <br />
-                      <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">Wallet Score:&nbsp;</p><p className="font-trash uppercase">{score.toFixed(0)}</p></div>
-                      <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">$TRUK/Day:&nbsp;</p><p className="font-trash uppercase">{trukClaim.toFixed(2)}</p></div>
-                    </div>
-                  )
-
-                  }
+                  <div className={score <= 0 ? 'blur-sm' : ''}> {/* ---blur-sm---       wen junkScore is lower equal zero*/}
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Public Key:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData?.pubKey}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Claimed:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.claimed}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Name:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.name}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Score:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.score}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Created at:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.time}</p></div>
+                    <br />
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Domain:&nbsp;</p><p className="font-trash uppercase">{domain}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase mr-2">SOL:&nbsp;</p><p className="font-trash uppercase">{balance}◎</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Total NFTs:&nbsp;</p><p className="font-trash uppercase">{nfts.length}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Collections:&nbsp;</p><p className="font-trash uppercase">{collections.length}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">NFT Value:&nbsp;</p><p className="font-trash uppercase">tba</p></div>
+                    <br />
+                    <p className="font-trash uppercase underline">$TRUK CLAIMING</p>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN1:&nbsp;</p><p className="font-trash uppercase">{gen1Count}/{gen1Score.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">SolJunks GEN2:&nbsp;</p><p className="font-trash uppercase">{gen2Count}/{gen2Score.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">$olana Money Bu$ine$$:&nbsp;</p><p className="font-trash uppercase">{smbCount}/{smbScore.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Faces of $MB:&nbsp;</p><p className="font-trash uppercase">{facesCount}/{facesScore.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Lil Rektiez:&nbsp;</p><p className="font-trash uppercase">{rektiezCount}/{rektiezScore.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">HarrddyJunks:&nbsp;</p><p className="font-trash uppercase">{harrddyJunksCount}/{harrddyJunksScore.toFixed(0)}</p></div>
+                    <br />
+                    <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">Wallet Score:&nbsp;</p><p className="font-trash uppercase">{score.toFixed(0)}</p></div>
+                    <div className="flex justify-between text-sm mx-2 uppercase"><p className="font-trash uppercase">$TRUK/Day:&nbsp;</p><p className="font-trash uppercase">{trukClaim.toFixed(2)}</p></div>
+                  </div>
                 </TabPanel>
 
                 <TabPanel>
                   {isConnectedWallet ? (
                     <div className='flex justify-between font-trash uppercase'>
                       {userAccountData.claimed == "not yet" &&
-                        <div className="border-2 rounded-lg border-opacity-10 w-full text-center">
-                          <button onClick={() => ClaimWallet(`https://fudility.xyz:3420/claimwallet/${key}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
+                        <div className="border-2 rounded-lg border-opacity-20 w-full text-center">
+                          <button onClick={() => ClaimWallet(fudility + `claimwallet/${key}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
                             CLAIM WALLET NOW
                           </button>
                         </div>
@@ -921,7 +887,7 @@ const Wallet = () => {
                       {userAccountData.claimed != "not yet" &&
                         <div className='w-full'>
                           <div className='flex justify-between w-full gap-2'>
-                            <div className="border-2 rounded-lg border-opacity-10 text-center p-2 flex flex-col justify-between">
+                            <div className="border-2 rounded-lg border-opacity-20 text-center p-2 flex flex-col justify-between">
                               <div className="">
                                 <input
                                   type="input"
@@ -932,19 +898,19 @@ const Wallet = () => {
                                   onChange={(e) => setNewName(e.target.value)}
                                 />
                               </div>
-                              <div className="border-2 rounded-lg border-opacity-10 mt-2 text-center">
-                                <button onClick={() => ChangeUserName(`https://fudility.xyz:3420/changename/${key}/${newName}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
+                              <div className="border-2 rounded-lg border-opacity-20 mt-2 text-center">
+                                <button onClick={() => ChangeUserName(fudility + `changename/${key}/${newName}/${userAccountData.name}`)} className="btn btn-ghost hover:bg-gray-800 w-full">
                                   CHANGE USER NAME
                                 </button>
                               </div>
                             </div>
-                            <div className="border-2 rounded-lg border-opacity-10 items-center text-center p-2 w-full">
+                            <div className="border-2 rounded-lg border-opacity-20 items-center text-center p-2 w-full">
                               {pfpImage == "none" ? (
                                 <QuestionMarkCircleIcon className="w-24 h-24" />
                               ) : (
                                 <img src={pfpImage} alt="" className='w-24 h-24 rounded-full border-2' />
                               )}
-                              <div className="border-2 rounded-lg border-opacity-10 text-center">
+                              <div className="border-2 rounded-lg border-opacity-20 text-center">
                                 <button onClick={() => PfpMode()} className="btn btn-ghost hover:bg-gray-800">
                                   {!pfpMode ? (
                                     <div>CHANGE PFP FROM WALLET</div>
@@ -954,27 +920,27 @@ const Wallet = () => {
                                 </button>
                               </div>
                             </div>
-                            <div className="border-2 rounded-lg border-opacity-10 items-center text-center p-2 w-full">
+                            <div className="border-2 rounded-lg border-opacity-20 items-center text-center p-2 w-full">
                               <img src="/static/images/rude1.jpg" alt="" className='w-24 h-24 mask mask-hexagon-2 border-2' />
-                              <div className="border-2 rounded-lg border-opacity-10 text-center">
+                              <div className="border-2 rounded-lg border-opacity-20 text-center">
                                 <button onClick={toggleModal} className="btn btn-ghost hover:bg-gray-800">
                                   MINT BADGE
                                 </button>
                               </div>
                             </div>
                           </div>
-                          <div className="mt-2 border-2 rounded-lg border-opacity-10 w-full p-2">
+                          <div className="mt-2 border-2 rounded-lg border-opacity-20 w-full p-2">
                             <div className='overflow-auto h-[60vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
                               {hiddenComments?.slice(0).reverse().map((num: any, index: any) => (
                                 (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
-                                  <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                                  <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
                                     <div className="flex justify-between">
                                       <div className="flex">
-                                        <div className='border-2 rounded-lg border-opacity-10 mr-5'>
+                                        <div className='border-2 rounded-lg border-opacity-20 mr-5'>
                                           YOU
                                         </div>
                                         <h1>said to</h1>
-                                        <div className='ml-5 border-2 rounded-lg border-opacity-10 mr-5'>
+                                        <div className='ml-5 border-2 rounded-lg border-opacity-20 mr-5'>
                                           <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
                                             <Link passHref href={`/wallet/${num.pubKey}`}>
                                               <div>{num.pubKey.slice(0, 4)}...{num.pubKey.slice(-4)}</div>
@@ -1002,7 +968,7 @@ const Wallet = () => {
                                     <div key={index} id="Comments" className="">
                                       <div className="flex justify-between">
                                         <div className="flex">
-                                          <div className='border-2 rounded-lg border-opacity-10 mr-5'>
+                                          <div className='border-2 rounded-lg border-opacity-20 mr-5'>
                                             <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
                                               <Link passHref href={`/wallet/${num.writtenBy}`}>
                                                 <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
@@ -1010,7 +976,7 @@ const Wallet = () => {
                                             </button>
                                           </div>
                                           <h1>said to</h1>
-                                          <div className='ml-5 border-2 rounded-lg border-opacity-10 mr-5'>
+                                          <div className='ml-5 border-2 rounded-lg border-opacity-20 mr-5'>
                                             YOU
                                           </div>
                                         </div>
@@ -1041,10 +1007,10 @@ const Wallet = () => {
                         {comments.length > 0 ? (
                           (comments?.slice(0).reverse().map((num: any, index: any) => (
                             (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
-                              <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-10">
+                              <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
                                 <div className="flex justify-between">
                                   <div className="flex">
-                                    <div className='border-2 rounded-lg border-opacity-10 mr-5'>
+                                    <div className='border-2 rounded-lg border-opacity-20 mr-5'>
                                       <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
                                         <Link passHref href={`/wallet/${num.writtenBy}`}>
                                           <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
@@ -1052,7 +1018,7 @@ const Wallet = () => {
                                       </button>
                                     </div>
                                     <h1>said to</h1>
-                                    <div className='border-2 rounded-lg border-opacity-10 mr-5'>
+                                    <div className='border-2 rounded-lg border-opacity-20 mr-5'>
                                       <button className="btn btn-ghost font-trash uppercase w-full hover:bg-gray-800 btn-xs">
                                         <Link passHref href={`/wallet/${num.pubKey}`}>
                                           <div>{num.pubKey.slice(0, 4)}...{num.pubKey.slice(-4)}</div>

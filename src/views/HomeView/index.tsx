@@ -19,6 +19,7 @@ import { UserIcon } from "@heroicons/react/solid";
 import { ReplyIcon } from "@heroicons/react/solid";
 
 export const HomeView: FC = ({ }) => {
+  const fudility = process.env.NEXT_PUBLIC_FUDILITY_BACKEND!
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
@@ -62,8 +63,8 @@ export const HomeView: FC = ({ }) => {
     console.log(notifMode)
     setNotifMode(!notifMode)
     if (publicKey && userAccountData.notif == 1) {
-      SendNotif(`https://fudility.xyz:3420/sendnotif/${publicKey.toBase58()}/0`)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      SendNotif(fudility + `sendnotif/${publicKey.toBase58()}/0`)
+      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
     }
   };
 
@@ -116,9 +117,9 @@ export const HomeView: FC = ({ }) => {
 
   useEffect(() => {
     if (publicKey)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
 
-    GetFeed(`https://fudility.xyz:3420/getfeed`)
+    GetFeed(fudility + `getfeed`)
     GetAllUsers()
   }, [])
 
@@ -158,7 +159,7 @@ export const HomeView: FC = ({ }) => {
             }
           </div>
           <div className="flex">
-            <div className="border-2 rounded-lg border-opacity-10 mr-2">
+            <div className="border-2 rounded-lg border-opacity-20 mr-2">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                   <div className='w-full flex justify-between items-center'>
@@ -182,7 +183,7 @@ export const HomeView: FC = ({ }) => {
 
           {/* CONTENT */}
           <div className="col-span-7 scrollbar overflow-auto h-[80vh]" ref={scrollRef}>
-            <div className="font-trash uppercase sticky top-0 z-40 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-10 rounded">
+            <div className="font-trash uppercase sticky top-0 z-40 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-20 rounded">
               <img src="/static/images/feedHeadline.png" alt="tmp" />
               <div className="">
                 <div className="flex items-center">
@@ -228,7 +229,7 @@ export const HomeView: FC = ({ }) => {
 
                 }
               </div>
-              <button onClick={() => GetFeed(`https://fudility.xyz:3420/getfeed`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+              <button onClick={() => GetFeed(fudility + `getfeed`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
                 <img src="/static/images/buttons/refresh.png" alt="tmp" />
               </button>
             </div>
@@ -295,7 +296,7 @@ export const HomeView: FC = ({ }) => {
                                   <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
                                 </Link>'
                                 <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                              <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                              <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
                             </div>
                           </div>
                         </div>
@@ -320,7 +321,7 @@ export const HomeView: FC = ({ }) => {
                                     <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
                                   </Link>'
                                   <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                                <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
                               </div>
                             </div>
                           </div>
@@ -345,7 +346,7 @@ export const HomeView: FC = ({ }) => {
                                       <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
                                     </Link>'
                                     :</div>
-                                  <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
                                 </div>
                               </div>
                             </div>
@@ -463,14 +464,14 @@ export const HomeView: FC = ({ }) => {
                                     <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
                                   </Link>'
                                   <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                    <div className="flex">
-                                      <div className="uppercase text-left border-2 border-opacity-10 rounded p-2 w-full">{num.content}</div>
-                                      <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
-                                        <Link passHref href={`/discussion/${num.contentId}`}>
-                                          <ReplyIcon className="w-6 h-6" />
-                                        </Link>
-                                      </button>
-                                    </div>
+                                <div className="flex">
+                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2 w-full">{num.content}</div>
+                                  <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                                    <Link passHref href={`/discussion/${num.contentId}`}>
+                                      <ReplyIcon className="w-6 h-6" />
+                                    </Link>
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -495,7 +496,7 @@ export const HomeView: FC = ({ }) => {
                                       <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
                                     </Link>'
                                     <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                  <div className="uppercase text-left border-2 border-opacity-10 rounded p-2">{num.content}</div>
+                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
                                 </div>
                               </div>
                             </div>
@@ -521,7 +522,7 @@ export const HomeView: FC = ({ }) => {
                                       </Link>'
                                       :</div>
                                     <div className="flex">
-                                      <div className="uppercase text-left border-2 border-opacity-10 rounded p-2 w-full">{num.content}</div>
+                                      <div className="uppercase text-left border-2 border-opacity-20 rounded p-2 w-full">{num.content}</div>
                                       <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
                                         <Link passHref href={`/discussion/${num.pubKey}`}>
                                           <ReplyIcon className="w-6 h-6" />
@@ -602,19 +603,12 @@ export const HomeView: FC = ({ }) => {
             <Tabs>
 
               <TabList>
-                <Tab><h1 className="font-trash uppercase">ANNOUNCMENTS</h1></Tab>
                 <Tab><h1 className="font-trash uppercase">USER</h1></Tab>
                 <Tab><h1 className="font-trash uppercase">COLLECTIONS</h1></Tab>
                 <Tab><h1 className="font-trash uppercase">GROUPS</h1></Tab>
+                <Tab><h1 className="font-trash uppercase">ANNOUNCMENTS</h1></Tab>
               </TabList>
 
-              <TabPanel>
-                <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-                  <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
-                    WELCOME!!! THIS IS AN ANNOUNCMENT FROM YOUR BELOVED CREATORS OF THIS PLATTFORM: PNSQRT!!!
-                  </div>
-                </div>
-              </TabPanel>
 
               <TabPanel>
                 <div className="flex items-center">
@@ -628,94 +622,57 @@ export const HomeView: FC = ({ }) => {
                   </select>
                 </div>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-                  {allUsers?.sort((a: any, b: any) => { return b.score - a.score }).map((user: any, index: any) =>
-                  (userType == 0 ? (
-                    <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
-                      <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
-                        <Link passHref href={`/wallet/${user.pubKey}`}>
-                          <div className="flex">
-                            {user.pfp != "none" ? (
-                              <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
-                            ) : (
-                              <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
-                            )
-                            }
-                            <div className="grid w-full">
-                              <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
-                              <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
-                              <div className="flex justify-between uppercase"><div>claimed:</div>
-                                <div>{user.claimed}</div>
-                              </div>
-                              <div className="flex justify-between uppercase"><div>LIKES:</div>
-                                <div>{user.likes}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </button>
-                    </div>
-                  ) : (
-                    (userType == 1 && user.claimed == "is claimed" ? (
-                      <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
+                  {allUsers
+                    ?.filter((user: any) => {
+                      if (userType === 0) {
+                        return true;
+                      } else if (userType === 1) {
+                        return user.claimed === "is claimed";
+                      } else if (userType === 2) {
+                        return user.claimed === "not yet";
+                      }
+                      return false;
+                    })
+                    .sort((a: any, b: any) => b.score - a.score)
+                    .map((user: any, index: any) => (
+                      <div key={index} className="border-2 rounded-lg border-opacity-20 w-full mb-2 hover:border-primary">
                         <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
                           <Link passHref href={`/wallet/${user.pubKey}`}>
                             <div className="flex">
-                              {user.pfp != "none" ? (
-                                <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
+                              {user.pfp !== "none" ? (
+                                <img src={user.pfp} alt="tmp" className='w-28 h-28 rounded-full border-2 mr-2' />
                               ) : (
-                                <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
-                              )
-                              }
+                                <QuestionMarkCircleIcon className="ml-3 w-28 h-28 mr-5" />
+                              )}
                               <div className="grid w-full">
-                                <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
-                                <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
-                                <div className="flex justify-between uppercase"><div>claimed:</div>
+                                <div className="flex justify-between uppercase">
+                                  <div>User Name:</div>
+                                  <div>{user.name}</div>
+                                </div>
+                                <div className="flex justify-between">
+                                  <div className="uppercase">Public Key:</div>
+                                  <div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div>
+                                </div>
+                                <div className="flex justify-between uppercase">
+                                  <div>claimed:</div>
                                   <div>{user.claimed}</div>
+                                </div>
+                                <div className="flex justify-between uppercase">
+                                  <div>LIKES:</div>
+                                  <div>{user.likes}</div>
                                 </div>
                               </div>
                             </div>
                           </Link>
                         </button>
                       </div>
-                    ) : (
-                      (userType == 2 && user.claimed == "not yet" ? (
-                        <div key={index} className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary">
-                          <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">
-                            <Link passHref href={`/wallet/${user.pubKey}`}>
-                              <div className="flex">
-                                {user.pfp != "none" ? (
-                                  <img src={user.pfp} alt="tmp" className="w-20 h-20 mr-5" />
-                                ) : (
-                                  <QuestionMarkCircleIcon className="ml-3 w-20 h-20 mr-5" />
-                                )
-                                }
-                                <div className="grid w-full">
-                                  <div className="flex justify-between uppercase"><div>User Name:</div><div>{user.name}</div></div>
-                                  <div className="flex justify-between"><div className=" uppercase">Public Key:</div><div>{user.pubKey.slice(0, 6)}...{user.pubKey.slice(-6)}</div></div>
-                                  <div className="flex justify-between uppercase"><div>claimed:</div>
-                                    <div>{user.claimed}</div>
-                                  </div>
-                                </div>
-                              </div>
-                            </Link>
-                          </button>
-                        </div>
-                      ) : (
-                        null
-                      )
-                      )
-                    )
-                    )
-                  )
-                  )
-                  )
-                  }
+                    ))}
                 </div>
               </TabPanel>
 
               <TabPanel>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-                  <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
+                  <div className="border-2 rounded-lg border-opacity-20 w-full mb-2 hover:border-primary p-2">
                     WELCOME!!! THIS IS A COLLECTION PROFILE!!! PNSQRT!!!
                   </div>
                 </div>
@@ -723,8 +680,16 @@ export const HomeView: FC = ({ }) => {
 
               <TabPanel>
                 <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
-                  <div className="border-2 rounded-lg border-opacity-10 w-full mb-2 hover:border-primary p-2">
+                  <div className="border-2 rounded-lg border-opacity-20 w-full mb-2 hover:border-primary p-2">
                     WELCOME!!! THIS IS A GROUP!!! PNSQRT!!!
+                  </div>
+                </div>
+              </TabPanel>
+
+              <TabPanel>
+                <div className="overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                  <div className="border-2 rounded-lg border-opacity-20 w-full mb-2 hover:border-primary p-2">
+                    WELCOME!!! THIS IS AN ANNOUNCMENT FROM YOUR BELOVED CREATORS OF THIS PLATTFORM: PNSQRT!!!
                   </div>
                 </div>
               </TabPanel>

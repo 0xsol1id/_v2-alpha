@@ -7,6 +7,9 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getDomainKey, NameRegistryState, performReverseLookup } from "@bonfida/spl-name-service";
 import { isValidPublicKeyAddress } from "@metaplex-foundation/js-next";
 import ReactTimeAgo from 'react-time-ago'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+TimeAgo.addLocale(en)
 
 import { BuyButton } from "../../utils/buybutton"
 import { randomWallets } from "../../utils/wallets"
@@ -52,6 +55,7 @@ function randomInt(low: number, high: number) {
 }
 
 const Discussion = () => {
+  const fudility = process.env.NEXT_PUBLIC_FUDILITY_BACKEND!
   const router = useRouter()
   const { connection } = useConnection();
   const { publicKey } = useWallet();
@@ -77,10 +81,10 @@ const Discussion = () => {
       const user: any = publicKey?.toBase58()
       const n = "no name"
       if (discussion.type == 8)
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
+        SendDiscussion(fudility + `senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       else
-        SendDiscussion(`https://fudility.xyz:3420/senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
-      SendNotif(`https://fudility.xyz:3420/sendnotif/${key}/1`)
+        SendDiscussion(fudility + `senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
+      SendNotif(fudility + `sendnotif/${key}/1`)
       setCourseOfDiscussion((state: any) => [...state, {
         pubKey: key,
         type: "discussion",
@@ -111,6 +115,7 @@ const Discussion = () => {
     try {
       const response = await fetch(uri)
       const jsonData = await response.json()
+      console.log(jsonData)
       setDiscussion(jsonData)
     } catch (e) {
       console.log(e)
@@ -155,8 +160,6 @@ const Discussion = () => {
     }
   };
 
-  const [ownerAddress, setOwnerAddress] = useState<any>()
-
   const [userAccountData, setUserAccountData] = useState<any>({})
   async function GetUserAccount(uri: string) {
     try {
@@ -170,11 +173,11 @@ const Discussion = () => {
 
   useEffect(() => {
     if (publicKey)
-      GetUserAccount(`https://fudility.xyz:3420/user/${publicKey.toBase58()}`)
+      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
 
-    GetDiscussion(`https://fudility.xyz:3420/getdiscussion/${key}`)
-    GetCourseOfDiscussion(`https://fudility.xyz:3420/getcourseofdiscussion/${key}`)
-  }, []);
+    GetDiscussion(fudility + `getdiscussion/${key}`)
+    GetCourseOfDiscussion(fudility + `getcourseofdiscussion/${key}`)
+  }, [userAccountData.likes]);
 
   return (
     <div className="min-h-full">
@@ -212,7 +215,7 @@ const Discussion = () => {
             }
           </div>
           <div className="flex">
-            <div className="border-2 rounded-lg border-opacity-10">
+            <div className="border-2 rounded-lg border-opacity-20">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
                   <div className='w-full flex justify-between items-center'>
@@ -237,26 +240,36 @@ const Discussion = () => {
           {/* CONTENT */}
           <div className="col-span-11 mr-5">
             <div className="scrollbar overflow-auto h-[75vh] border-2 border-opacity-20 ">
-              <div className="font-trash uppercase navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
+              <div className="font-trash navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
-                  <div className='grid'>
-                    <h1 className='text-lg'>{discussion[0]?.content}</h1>
-                    <div className='flex justify-between text-gray-500'>
-                        <div className="font-trash uppercase w-full ">
-                          <Link passHref href={`/wallet/${discussion[0]?.writtenBy}`}>
-                            <div className='flex text-xs'><h1 className='mr-2'>written by:</h1><div className='hover:text-red-500 hover:cursor-pointer'>{discussion[0]?.writtenBy}</div></div>
-                          </Link>
-                        </div>
-                    </div>
-                  </div>
+                  <div>DISCUSSION #{key}</div>
                 </div>
               </div>
+
               <div className='block justify-items-end'>
+
+                {discussion.length > 0 &&
+                  <div id="Comments" className="p-2 border-b-2 border-opacity-20 font-trash uppercase bg-gray-900 bg-opacity-10">
+                    <div className="flex justify-between">
+                      <div className="flex">
+                        <div className="font-trash uppercase hover:text-red-500 hover:cursor-pointer">
+                          <Link passHref href={`/wallet/${discussion[0]?.writtenBy}`}>
+                            <div>{discussion[0]?.writtenBy.slice(0, 4)}...{discussion[0]?.writtenBy.slice(-4)}</div>
+                          </Link>
+                        </div>
+                        <h1 className='ml-2'>said:</h1>
+                      </div>
+                      <ReactTimeAgo date={discussion[0]?.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                    </div>
+                    <h1 className="">{discussion[0]?.content}</h1>
+                  </div>
+                }
+
                 {courseOfDiscussion.length > 0 ? (
                   (courseOfDiscussion?.slice(0).map((num: any, index: any) => (
                     (num.writtenBy != publicKey?.toBase58() ? (
-                      <div key={index} id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 m-2 font-trash uppercase">
+                      <div key={index} id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-20 w-1/2 m-2 font-trash uppercase">
                         <div className="flex justify-between">
                           <div className="flex">
                             <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
@@ -273,7 +286,7 @@ const Discussion = () => {
                     ) : (
                       <div key={index} className='flex font-trash uppercase'>
                         <div className='w-1/2 '></div>
-                        <div id="Comments" className="bg-base-200 rounded-lg p-2 mb-2 border-2 border-opacity-10 w-1/2 m-2">
+                        <div id="Comments" className="bg-base-200 rounded-lg p-2 mb-2 border-2 border-opacity-20 w-1/2 m-2">
                           <div className="flex justify-between">
                             <div className="flex">
                               <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
@@ -297,7 +310,7 @@ const Discussion = () => {
               </div>
             </div>
             {publicKey ? (
-              <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-10 p-1 rounded-lg">
+              <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-20 p-1 rounded-lg">
                 <InputEmoji
                   type="text"
                   value={commentValue}
