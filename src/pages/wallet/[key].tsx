@@ -1164,36 +1164,10 @@ const Wallet = () => {
           </div>
         </div>
 
-        {/*<CommercialAlert isDismissed={false} />
-        <div className="hero my-auto lg:hidden block">
-          <div className="text-center hero-content items-center">
-            <div className="border-2 rounded-lg border-gray-700 bg-gray-700">
-              <button className="btn btn-primary mb-3 font-trash uppercase w-full">
-                <Link href={`/showme?wallet=${randomWallet}`}>Load random wallet</Link>
-              </button>
-              <input
-                type="text"
-                placeholder="WALLET / USER / DOMAIN / NFT"
-                className="font-trash uppercase w-96 h-10 p-1 text-sm bg-base-200 text-center"
-                value={value}
-                onChange={onChange}
-              />
-              {message == true ? (
-                <button className="btn btn-primary mb-3 font-trash uppercase w-full">
-                  <Link href={`/showme?wallet=${value}`}>Load Wallet</Link>
-                </button>
-              ) : (
-                <button className="bg-gray-700 mt-3 font-trash uppercase">not a valid wallet</button>
-              )
-              }
-            </div>
-
-          </div>
-        </div>
-        <div className="hidden lg:hero">
-          <video className='hero-content' autoPlay muted loop><source src={'./landing.mp4'} type='video/mp4' /></video>
-            </div>*/}
+        <CommercialAlert isDismissed={false} />
         <Footer />
+
+        
         <Modal
           isOpen={isBurnAllOpen}
           onRequestClose={toggleBurnAllModal}
