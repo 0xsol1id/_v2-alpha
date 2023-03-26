@@ -3,6 +3,8 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react"
 import { Metaplex, bundlrStorage, walletAdapterIdentity } from "@metaplex-foundation/js"
 import { PublicKey } from "@solana/web3.js"
 import html2canvas from 'html2canvas'
+import { ChevronDoubleLeftIcon } from "@heroicons/react/solid"
+import { ChevronDoubleRightIcon } from "@heroicons/react/solid"
 
 export const BadgeCreator: FC = ({ }) => {
   const { publicKey } = useWallet();
@@ -78,7 +80,7 @@ export const BadgeCreator: FC = ({ }) => {
   const rcbody8 = '/static/images/rudecans_layer/body/sol.png';
   const rcbody9 = '/static/images/rudecans_layer/body/yellow.png';
   const rcbodies = [rcbody1, rcbody2, rcbody3, rcbody4, rcbody5, rcbody6, rcbody7, rcbody8, rcbody9]
-  const [selectedRudeCansBody, setselectedRudeCansBody] = useState(rcbodies[8])
+  const [selectedRudeCansBody, setselectedRudeCansBody] = useState(rcbodies[7])
   const nextRudeCansBody = async () => {
     const currentIndex = rcbodies.indexOf(selectedRudeCansBody);
     const nextRudeCansIndex = (currentIndex + 1) % rcbodies.length;
@@ -90,7 +92,7 @@ export const BadgeCreator: FC = ({ }) => {
     if (nextRudeCansIndex < 0)
       setselectedRudeCansBody(rcbodies[rcbodies.length - 1])
     else
-      setselectedRudeCansBG(rcbodies[nextRudeCansIndex])
+      setselectedRudeCansBody(rcbodies[nextRudeCansIndex])
   }
 
   const rcmouth1 = '/static/images/rudecans_layer/mouth/fake.png';
@@ -301,58 +303,58 @@ export const BadgeCreator: FC = ({ }) => {
           <div className='mt-4'>
 
             <div className="p-2">
-              <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansBG()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Background</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansBG()}>⏩</button>
+              <div className="row-span-1 grid grid-cols-5 text-center mb-2 ">
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansBG()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Background</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 ml-2" onClick={() => nextRudeCansBG()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansBody()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Body</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansBody()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansBody()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Body</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansBody()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansMouth()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Mouth</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansMouth()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansMouth()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Mouth</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansMouth()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansFists()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Fists</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansFists()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansFists()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Fists</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansFists()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansEyes()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Eyes</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansEyes()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansEyes()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Eyes</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansEyes()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansProberty()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Proberty</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansProberty()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansProberty()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Proberty</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansProberty()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansDaylight()}>⏪</button>
-                <h1 className="font-trash uppercase col-span-3">Change Daylight</h1>
-                <button className="font-trash uppercase btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansDaylight()}>⏩</button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansDaylight()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <h1 className="font-pixel col-span-3">Change Daylight</h1>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansDaylight()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
               </div>
             </div>
 
             <div className="p-2">
               <div className="mt-4 text-center">
                 {sending == false &&
-                  <button className="font-trash uppercase btn btn-primary btn-lg text-3xl w-full mb-2"
+                  <button className="font-pixel btn btn-primary btn-lg text-3xl w-full mb-2"
                     onClick={CreateAndSendNFT}>Mint now
                   </button>}
 
                 {sending &&
-                  <button className="font-trash uppercase btn btn-primary btn-lg text-3xl w-full mb-2">
+                  <button className="font-pixel btn btn-primary btn-lg text-3xl w-full mb-2">
                     <svg role="status" className="inline mr-3 w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
                       <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
@@ -364,50 +366,52 @@ export const BadgeCreator: FC = ({ }) => {
                 }
 
                 {sending &&
-                  <div className="font-trash uppercase text-xs mt-[5%] w-full">
+                  <div className="font-pixel text-xs mt-[5%] w-full">
                     There will come up 4 TX to approve
                   </div>}
 
                 {isSent &&
-                  <div className="font-trash uppercase text-xl mt-[5%] w-full">
+                  <div className="font-pixel text-xl mt-[5%] w-full">
                     ✅ Successfully minted!
                   </div>}
               </div>
             </div>
-          </div>         
+          </div>
         </div>
       </div>
-       {/* MEME CANVAS - START */}
-       <div className={`w-[400px] h-[400px] container text-center border-1 border-black`} id="canvas">
-            <div className="relative">
-              {/* BG */}
-              <img src={selectedRudeCansBG} alt='' />
-              {/* Layer 1 */}
-              <span className="absolute top-0 left-0 ">
-                <img src={selectedRudeCansBody} alt='' />
-              </span>
-              {/* Layer 2 */}
-              <span className="absolute top-0 left-0">
-                <img src={selectedRudeCansMouth} alt='' />
-              </span>
-              {/* Layer 3 */}
-              <span className="absolute top-0 left-0">
-                <img src={selectedRudeCansFists} alt='' />
-              </span>
-              {/* Layer 4 */}
-              <span className="absolute top-0 left-0">
-                <img src={selectedRudeCansEye} alt='' />
-              </span>
-              {/* Layer 5 */}
-              <span className="absolute top-0 left-0">
-                <img src={selectedRudeCansProberty} alt='' />
-              </span>
-              {/* Layer 6 */}
-              <span className="absolute top-0 left-0">
-                <img src={selectedRudeCansDaylight} alt='' />
-              </span>
-            </div>
-          </div>
+      {/* MEME CANVAS - START */}
+      <div className={`w-[400px] h-[400px] container text-center border-1 border-black`} id="canvas">
+        <div className="relative">
+          {/* BG */}
+          <span className="absolute top-0 left-0 ">
+            <img src={selectedRudeCansBG} alt='' />
+          </span>
+          {/* Layer 1 */}
+          <span className="absolute top-0 left-0 ">
+            <img src={selectedRudeCansBody} alt='' />
+          </span>
+          {/* Layer 2 */}
+          <span className="absolute top-0 left-0">
+            <img src={selectedRudeCansMouth} alt='' />
+          </span>
+          {/* Layer 3 */}
+          <span className="absolute top-0 left-0">
+            <img src={selectedRudeCansFists} alt='' />
+          </span>
+          {/* Layer 4 */}
+          <span className="absolute top-0 left-0">
+            <img src={selectedRudeCansEye} alt='' />
+          </span>
+          {/* Layer 5 */}
+          <span className="absolute top-0 left-0">
+            <img src={selectedRudeCansProberty} alt='' />
+          </span>
+          {/* Layer 6 */}
+          <span className="absolute top-0 left-0">
+            <img src={selectedRudeCansDaylight} alt='' />
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

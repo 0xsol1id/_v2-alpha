@@ -243,7 +243,17 @@ const Discussion = () => {
               <div className="font-trash navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
-                  <div>DISCUSSION #{key}</div>
+
+                      {discussion[0].type == "3" ? (
+                        <div className='flex'>WALLET DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                      ) : (
+                        (discussion[0].type == "4" ? (
+                          <div className='flex'>NFT DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                        ) : (
+                          <div className='flex'>DM DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                        )
+                        )
+                      )}
                 </div>
               </div>
 
@@ -253,12 +263,12 @@ const Discussion = () => {
                   <div id="Comments" className="p-2 border-b-2 border-opacity-20 font-trash uppercase bg-gray-900 bg-opacity-10">
                     <div className="flex justify-between">
                       <div className="flex">
-                        <div className="font-trash uppercase hover:text-red-500 hover:cursor-pointer">
+                        <div className='mr-2 text-gray-500'>Author: </div>
+                        <div className="font-trash uppercase hover:text-red-500 hover:cursor-pointer text-gray-500">
                           <Link passHref href={`/wallet/${discussion[0]?.writtenBy}`}>
                             <div>{discussion[0]?.writtenBy.slice(0, 4)}...{discussion[0]?.writtenBy.slice(-4)}</div>
                           </Link>
                         </div>
-                        <h1 className='ml-2'>said:</h1>
                       </div>
                       <ReactTimeAgo date={discussion[0]?.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                     </div>
@@ -270,35 +280,39 @@ const Discussion = () => {
                   (courseOfDiscussion?.slice(0).map((num: any, index: any) => (
                     (num.writtenBy != publicKey?.toBase58() ? (
                       <div key={index} id="Comments" className="bg-base-300 rounded-lg p-2 mb-2 border-2 border-opacity-20 w-1/2 m-2 font-trash uppercase">
-                        <div className="flex justify-between">
-                          <div className="flex">
-                            <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
-                              <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                              </Link>
-                            </div>
-                            <h1 className='ml-2'>said:</h1>
-                          </div>
-                          <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                        </div>
-                        <h1 className="">{num.content}</h1>
-                      </div>
-                    ) : (
-                      <div key={index} className='flex font-trash uppercase'>
-                        <div className='w-1/2 '></div>
-                        <div id="Comments" className="bg-base-200 rounded-lg p-2 mb-2 border-2 border-opacity-20 w-1/2 m-2">
-                          <div className="flex justify-between">
-                            <div className="flex">
+                        <div className='flex'>
+                          <img src={num.writtenByPfp} alt="tmp" className='rounded-full border-2 w-16 h-16 mr-5' />
+                          <div className="w-full">
+                            <div className="flex justify-between text-xs text-gray-500">
                               <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
                                 <Link passHref href={`/wallet/${num.writtenBy}`}>
                                   <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
                                 </Link>
                               </div>
-                              <h1 className='ml-2'>said:</h1>
+                              <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                             </div>
-                            <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                            <h1 className="">{num.content}</h1>
                           </div>
-                          <h1 className="">{num.content}</h1>
+                        </div>
+                      </div>
+                    ) : (
+                      <div key={index} className='flex font-trash uppercase'>
+                        <div className='w-1/2 '></div>
+                        <div id="Comments" className="bg-base-200 rounded-lg p-2 mb-2 border-2 border-opacity-20 w-1/2 m-2">
+                          <div className='flex'>
+                            <img src={num.writtenByPfp} alt="tmp" className='rounded-full border-2 w-16 h-16 mr-5' />
+                            <div className="w-full">
+                              <div className="flex justify-between text-xs text-gray-500">
+                                <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
+                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                  </Link>
+                                </div>
+                                <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                              </div>
+                              <h1 className="">{num.content}</h1>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))

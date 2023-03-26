@@ -11,13 +11,13 @@ export const CommercialAlert: React.FC<Props> = ({ isDismissed }) => {
         setDismiss(true);
         setTimeout(() => {
             setDismiss(false);
-        }, 180000);
+        }, 300000);
       }
 
     return (
         <div>
             {!dismiss &&
-                <div className="bg-base-300 border-2 border-primary rounded-lg shadow text-center p-2 items-center absolute bottom-1 right-1 z-50 lg:h-[270px]">
+                <div className="bg-base-300 border-2 border-primary rounded-lg shadow text-center p-2 items-center absolute bottom-1 right-1 z-10 lg:h-[270px]">
                     <div className="grid gap-2">
                         <div className="flex justify-between">
                             <div></div>

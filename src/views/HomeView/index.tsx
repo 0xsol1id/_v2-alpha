@@ -17,6 +17,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import ReactTimeAgo from 'react-time-ago'
 import { UserIcon } from "@heroicons/react/solid";
 import { ReplyIcon } from "@heroicons/react/solid";
+import { FeedObject } from "utils/FeedObject";
+import { BellIcon } from "@heroicons/react/solid";
 
 export const HomeView: FC = ({ }) => {
   const fudility = process.env.NEXT_PUBLIC_FUDILITY_BACKEND!
@@ -91,7 +93,14 @@ export const HomeView: FC = ({ }) => {
   }
 
   const [userType, setUserType] = useState<any>(0)
+  const [sortType, setSortType] = useState<any>("")
   const sortUserBy = ["ALL", "CLAIMED", "UNCLAIMED"]
+  const sortTypes = [
+    { value: "scoreDesc", label: "Trending ↓" },
+    { value: "scoreAsc", label: "Trending ↑" },
+    { value: "timeDesc", label: "Member Since ↓" },
+    { value: "timeAsc", label: "Member Since ↑" },
+  ];
 
   const [allUsers, setAllUsers] = useState<any>()
   async function GetAllUsers() {
@@ -126,7 +135,7 @@ export const HomeView: FC = ({ }) => {
   return (
     <div className="min-h-full">
       <div className="">
-        <div className="navbar sticky top-0 z-40 text-neutral-content flex justify-between bg-base-300">
+        <div className="navbar sticky top-0 z-0 text-neutral-content flex justify-between bg-base-300">
           <BuyButton />
           <div className="border-2 rounded-lg border-gray-700 w-5/12 text-center">
             <button className="hover:bg-gray-900 bg-base-300 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
@@ -159,6 +168,21 @@ export const HomeView: FC = ({ }) => {
             }
           </div>
           <div className="flex">
+            <div className="border-2 border-opacity-20 rounded-lg mr-2">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/notfications`}>
+                  {userAccountData.notif == 1 ? (
+                    <span className="flex">
+                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
+                    </span>
+                  ) : (
+                    <div className=""><BellIcon className="w-8 h-8" /></div>
+                  )
+                  }
+                </Link>
+              </button>
+            </div>
             <div className="border-2 rounded-lg border-opacity-20 mr-2">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
@@ -182,8 +206,8 @@ export const HomeView: FC = ({ }) => {
           </div>
 
           {/* CONTENT */}
-          <div className="col-span-7 scrollbar overflow-auto h-[80vh]" ref={scrollRef}>
-            <div className="font-trash uppercase sticky top-0 z-40 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-20 rounded">
+          <div className="col-span-7 scrollbar overflow-auto h-[82.5vh]" ref={scrollRef}>
+            <div className="font-trash uppercase sticky top-0 z-0 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-20 rounded">
               <img src="/static/images/feedHeadline.png" alt="tmp" />
               <div className="">
                 <div className="flex items-center">
@@ -196,38 +220,6 @@ export const HomeView: FC = ({ }) => {
                     ))}
                   </select>
                 </div>
-                {publicKey &&
-                  (!notifMode ? (
-                    <div className="border-2 border-opacity-20 rounded-lg mt-1">
-                      <button onClick={CheckNotifs} className="btn btn-border-2 w-full ">
-                        <div className="mr-5 text-4xl">notifs</div>
-                        <div>
-                          {userAccountData.notif == 1 &&
-                            <span className="flex h-4 w-4">
-                              <span className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                            </span>
-                          }
-                        </div>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-opacity-20 rounded-lg mt-1">
-                      <button onClick={CheckNotifs} className="btn btn-border-2 w-full bg-gray-400">
-                        <div className="mr-5 text-4xl text-red-500">notifs</div>
-                        <div>
-                          {userAccountData.notif == 1 &&
-                            <span className="flex h-4 w-4">
-                              <span className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                            </span>
-                          }
-                        </div>
-                      </button>
-                    </div>
-                  ))
-
-                }
               </div>
               <button onClick={() => GetFeed(fudility + `getfeed`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
                 <img src="/static/images/buttons/refresh.png" alt="tmp" />
@@ -236,354 +228,10 @@ export const HomeView: FC = ({ }) => {
             <div className="font-trash uppercase p-2">
               {feed?.sort((a: any, b: any) => { return b.time - a.time }).map((num: any, index: any) => (
                 (notifMode && num.pubKey == publicKey?.toBase58() ? (
-                  (num.eventType == 1 ? (
-                    <div className="border-2 border-yellow-300 rounded-lg w-full mb-2 p-2">
-                      <div className="flex">
-                        <img src={num.pfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
-                        <div className="grid w-full">
-                          <div className="block mb-5">
-                            <div className="flex">
-                              <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                              </Link>
-                              <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                              <div className="text-gray-500 mr-2 ml-2">·</div>
-                              <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                            </div>
-                          </div>
-                          <div className="uppercase text-left">New user account created - Welcome to the trash!</div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    (num.eventType == 2 ? (
-                      <div className="border-2 border-green-500 rounded-lg w-full mb-2 p-2">
-                        <div className="flex">
-                          <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                          <div className="grid w-full">
-                            <div className="block mb-5">
-                              <div className="flex">
-                                <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                  <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                </Link>
-                                <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                <div className="text-gray-500 mr-2 ml-2">·</div>
-                                <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                              </div>
-                            </div>
-                            <div className="uppercase text-left">User claimed account</div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      (num.eventType == 3 ? (
-                        <div className="border-2 border-red-500 rounded-lg w-full mb-2 p-2">
-                          <div className="flex">
-                            <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                            <div className="grid w-full">
-                              <div className="block mb-5">
-                                <div className="flex">
-                                  <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                    <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                  </Link>
-                                  <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                  <div className="text-gray-500 mr-2 ml-2">·</div>
-                                  <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                </div>
-                              </div>
-                              <div className="uppercase text-left mb-2 flex">Commented wallet '
-                                <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                  <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                </Link>'
-                                <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                              <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        (num.eventType == 4 ? (
-                          <div className="border-2 border-purple-500 rounded-lg w-full mb-2 p-2">
-                            <div className="flex">
-                              <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                              <div className="grid w-full">
-                                <div className="block mb-5">
-                                  <div className="flex">
-                                    <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                      <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                    </Link>
-                                    <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                    <div className="text-gray-500 mr-2 ml-2">·</div>
-                                    <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                  </div>
-                                </div>
-                                <div className="uppercase text-left mb-2 flex">Commented the NFT '
-                                  <Link key={index} passHref href={`/token/${num.pubKey}`}>
-                                    <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                  </Link>'
-                                  <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          (num.eventType == 5 ? (
-                            <div className="border-2 border-blue-500 rounded-lg w-full mb-2 p-2">
-                              <div className="flex">
-                                <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                <div className="grid w-full">
-                                  <div className="block mb-5">
-                                    <div className="flex">
-                                      <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                        <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                      </Link>
-                                      <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                      <div className="text-gray-500 mr-2 ml-2">·</div>
-                                      <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                    </div>
-                                  </div>
-                                  <div className="uppercase text-left mb-2 flex hover:text-red-500 hover:cursor-pointer">Wrote into discussion for '
-                                    <Link key={index} passHref href={`/discussion/${num.pubKey}`}>
-                                      <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
-                                    </Link>'
-                                    :</div>
-                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            (num.eventType == 6 ? (
-                              <div className="border-2  border-indigo-500 rounded-lg w-full mb-2 p-2">
-                                <div className="flex">
-                                  <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                  <div className="grid w-full">
-                                    <div className="block mb-5">
-                                      <div className="flex">
-                                        <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                          <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                        </Link>
-                                        <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                        <div className="text-gray-500 mr-2 ml-2">·</div>
-                                        <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                      </div>
-                                    </div>
-                                    <div className="text-left uppercase flex">User changed Name from <div className="text-yellow-300 ml-2 mr-2">{num.authorName}</div> to <div className="text-yellow-300 ml-2 mr-2">{num.name}</div></div>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              (num.eventType == 7 ? (
-                                <div className="border-2 border-pink-500 rounded-lg w-full mb-2 p-2">
-                                  <div className="flex">
-                                    <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                    <div className="grid w-full">
-                                      <div className="block mb-5">
-                                        <div className="flex">
-                                          <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                            <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                          </Link>
-                                          <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                          <div className="text-gray-500 mr-2 ml-2">·</div>
-                                          <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center">
-                                        USER CHANGED PFP INTO
-                                        <img src={num.content} alt="" className="w-20 h-20 ml-5" />
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                null
-                              ))
-                            ))
-                          ))
-                        ))
-                      ))
-                    ))
-                  ))
+                  <FeedObject num={num} index={index} />
                 ) : (
                   (!notifMode && (eventType <= 0 || num.eventType == eventType) ? (
-                    (num.eventType == 1 ? (
-                      <div className="border-2 border-yellow-300 rounded-lg w-full mb-2 p-2">
-                        <div className="flex">
-                          <img src={num.pfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
-                          <div className="grid w-full">
-                            <div className="block mb-5">
-                              <div className="flex">
-                                <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                  <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                </Link>
-                                <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                <div className="text-gray-500 mr-2 ml-2">·</div>
-                                <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                              </div>
-                            </div>
-                            <div className="uppercase text-left">New user account created - Welcome to the trash!</div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      (num.eventType == 2 ? (
-                        <div className="border-2 border-green-500 rounded-lg w-full mb-2 p-2">
-                          <div className="flex">
-                            <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                            <div className="grid w-full">
-                              <div className="block mb-5">
-                                <div className="flex">
-                                  <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                    <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                  </Link>
-                                  <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                  <div className="text-gray-500 mr-2 ml-2">·</div>
-                                  <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                </div>
-                              </div>
-                              <div className="uppercase text-left">User claimed account</div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        (num.eventType == 3 ? (
-                          <div className="border-2 border-red-500 rounded-lg w-full mb-2 p-2">
-                            <div className="flex">
-                              <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
-                              <div className="grid w-full">
-                                <div className="block mb-5">
-                                  <div className="flex">
-                                    <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                      <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                    </Link>
-                                    <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                    <div className="text-gray-500 mr-2 ml-2">·</div>
-                                    <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                  </div>
-                                </div>
-                                <div className="uppercase text-left mb-2 flex">Commented wallet '
-                                  <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                    <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                  </Link>'
-                                  <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                <div className="flex">
-                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2 w-full">{num.content}</div>
-                                  <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
-                                    <Link passHref href={`/discussion/${num.contentId}`}>
-                                      <ReplyIcon className="w-6 h-6" />
-                                    </Link>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          (num.eventType == 4 ? (
-                            <div className="border-2 border-purple-500 rounded-lg w-full mb-2 p-2">
-                              <div className="flex">
-                                <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                <div className="grid w-full">
-                                  <div className="block mb-5">
-                                    <div className="flex">
-                                      <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                        <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                      </Link>
-                                      <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                      <div className="text-gray-500 mr-2 ml-2">·</div>
-                                      <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                    </div>
-                                  </div>
-                                  <div className="uppercase text-left mb-2 flex">Commented the NFT '
-                                    <Link key={index} passHref href={`/token/${num.pubKey}`}>
-                                      <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                    </Link>'
-                                    <div className="text-gray-500 ml-2">({num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)})</div>:</div>
-                                  <div className="uppercase text-left border-2 border-opacity-20 rounded p-2">{num.content}</div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            (num.eventType == 5 ? (
-                              <div className="border-2 border-blue-500 rounded-lg w-full mb-2 p-2">
-                                <div className="flex">
-                                  <img src={num.authorPfp} alt="tmp" className='w-12 h-12 rounded-full border-2 mr-2' />
-                                  <div className="grid w-full">
-                                    <div className="block mb-5">
-                                      <div className="flex">
-                                        <Link key={index} passHref href={`/wallet/${num.authorPubKey}`}>
-                                          <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.authorName}</div>
-                                        </Link>
-                                        <div className="text-gray-500">{num.authorPubKey.slice(0, 6)}...{num.authorPubKey.slice(-6)}</div>
-                                        <div className="text-gray-500 mr-2 ml-2">·</div>
-                                        <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                      </div>
-                                    </div>
-                                    <div className="uppercase text-left mb-2 flex">Wrote into discussion for '
-                                      <Link key={index} passHref href={`/discussion/${num.pubKey}`}>
-                                        <div className="text-yellow-300 hover:text-red-500 hover:cursor-pointer">{num.pubKey}</div>
-                                      </Link>'
-                                      :</div>
-                                    <div className="flex">
-                                      <div className="uppercase text-left border-2 border-opacity-20 rounded p-2 w-full">{num.content}</div>
-                                      <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
-                                        <Link passHref href={`/discussion/${num.pubKey}`}>
-                                          <ReplyIcon className="w-6 h-6" />
-                                        </Link>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              (num.eventType == 6 ? (
-                                <div className="border-2  border-indigo-500 rounded-lg w-full mb-2 p-2">
-                                  <div className="flex">
-                                    <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                    <div className="grid w-full">
-                                      <div className="block mb-5">
-                                        <div className="flex">
-                                          <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                            <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                          </Link>
-                                          <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                          <div className="text-gray-500 mr-2 ml-2">·</div>
-                                          <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                        </div>
-                                      </div>
-                                      <div className="text-left uppercase flex">User changed Name from <div className="text-yellow-300 ml-2 mr-2">{num.authorName}</div> to <div className="text-yellow-300 ml-2 mr-2">{num.name}</div></div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                (num.eventType == 7 ? (
-                                  <div className="border-2 border-pink-500 rounded-lg w-full mb-2 p-2">
-                                    <div className="flex">
-                                      <div className=""><QuestionMarkCircleIcon className="w-6 h-6 mr-2" /></div>
-                                      <div className="grid w-full">
-                                        <div className="block mb-5">
-                                          <div className="flex">
-                                            <Link key={index} passHref href={`/wallet/${num.pubKey}`}>
-                                              <div className="uppercase mr-5 text-xl hover:text-red-500 hover:cursor-pointer">{num.name}</div>
-                                            </Link>
-                                            <div className="text-gray-500">{num.pubKey.slice(0, 6)}...{num.pubKey.slice(-6)}</div>
-                                            <div className="text-gray-500 mr-2 ml-2">·</div>
-                                            <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
-                                          </div>
-                                        </div>
-                                        <div className="flex items-center">
-                                          USER CHANGED PFP INTO
-                                          <img src={num.content} alt="" className="w-20 h-20 ml-5" />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  null
-                                ))
-                              ))
-                            ))
-                          ))
-                        ))
-                      ))
-                    ))
+                    <FeedObject num={num} index={index} />
                   ) : (
                     null
                   )
@@ -609,19 +257,32 @@ export const HomeView: FC = ({ }) => {
                 <Tab><h1 className="font-trash uppercase">ANNOUNCMENTS</h1></Tab>
               </TabList>
 
-
               <TabPanel>
-                <div className="flex items-center">
-                  <div className="text-xs mr-2">sort by</div>
-                  <select
-                    onChange={(e) => setUserType(e.target.selectedIndex)}
-                    className="select w-40 select-primary select-xs font-trash uppercase">
-                    {sortUserBy.map((id: any, index: any) => (
-                      <option key={index}>{id}</option>
-                    ))}
-                  </select>
+                <div className="flex justify-between">
+                  <div className="flex">
+                    <div className="text-xs mr-2">filter by</div>
+                    <select
+                      onChange={(e) => setUserType(e.target.selectedIndex)}
+                      className="select w-40 select-primary select-xs font-trash uppercase">
+                      {sortUserBy.map((id: any, index: any) => (
+                        <option key={index}>{id}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex">
+                    <div className="text-xs mr-2">sort by</div>
+                    <select
+                      onChange={(e) => setSortType(e.target.value)}
+                      className="select w-40 select-primary select-xs font-trash uppercase ml-2">
+                      {sortTypes.map((type: any) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="overflow-auto h-[46rem] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
+                <div className="overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800">
                   {allUsers
                     ?.filter((user: any) => {
                       if (userType === 0) {
@@ -633,7 +294,18 @@ export const HomeView: FC = ({ }) => {
                       }
                       return false;
                     })
-                    .sort((a: any, b: any) => b.score - a.score)
+                    .sort((a: any, b: any) => {
+                      if (sortType === "scoreAsc") {
+                        return a.score - b.score;
+                      } else if (sortType === "scoreDesc") {
+                        return b.score - a.score;
+                      } else if (sortType === "timeAsc") {
+                        return b.time - a.time;
+                      } else if (sortType === "timeDesc") {
+                        return a.time - b.time;
+                      }
+                      return 0;
+                    })
                     .map((user: any, index: any) => (
                       <div key={index} className="border-2 rounded-lg border-opacity-20 w-full mb-2 hover:border-primary">
                         <button className="font-trash w-full hover:bg-gray-800 p-2 rounded-lg">

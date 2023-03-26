@@ -553,7 +553,7 @@ const Token = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = details.json.name != "" ? details.json.name.replace(/ /g, "_").replace("#", "") : "no name"
-      SendComment(fudility + `sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}`)
+      SendComment(fudility + `sendcomment/${key}/4/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(details.json.image)}`)
       SendNotif(fudility + `sendnotif/${key}/1`)
       setComments((state: any) => [...state, {
         pubKey: key,
@@ -682,7 +682,7 @@ const Token = () => {
   return (
     <div className="min-h-full">
       <div className="">
-        <div className="navbar sticky top-0 z-40 text-neutral-content flex justify-between bg-base-300">
+        <div className="navbar sticky top-0 z-0 text-neutral-content flex justify-between bg-base-300">
           <BuyButton />
           <div className="border-2 rounded-lg border-gray-700 w-5/12 text-center">
             <button className="hover:bg-gray-900 bg-base-300 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
@@ -739,7 +739,7 @@ const Token = () => {
 
           {/* CONTENT */}
           <div className="col-span-7 border-2 border-opacity-20 h-[80vh]">
-            <div className="font-trash uppercase navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
+            <div className="font-trash uppercase navbar sticky top-0 z-0 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
               <div className=''>
                 <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white' /></button>
                 <div className='grid ml-2'>

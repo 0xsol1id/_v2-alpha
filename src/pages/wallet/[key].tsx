@@ -370,42 +370,54 @@ const Wallet = () => {
 
     const [nftList, setNftList] = useState(nfts.slice(0, postNumber))
 
+    const lgCols: any = {
+      2: "grid-cols-2",
+      3: "lg:grid-cols-3",
+      4: "lg:grid-cols-4",
+      5: "lg:grid-cols-5",
+      6: "lg:grid-cols-6",
+      7: "lg:grid-cols-7",
+      8: "lg:grid-cols-8",
+      9: "lg:grid-cols-9",
+      10: "lg:grid-cols-10",
+      11: "lg:grid-cols-11",
+      12: "lg:grid-cols-12"
+    };
+    const columns = lgCols[columnsSize] || lgCols[2];
+    const nftListToShow = selectedCollection === "Show all collections" ? nftList : nfts.filter((nft) => nft.updateAuthority === selectedCollection);
+
     return (
-      <div className={`${columnsSize == 12 ? "lg:grid-cols-12" :
-        columnsSize == 11 ? "lg:grid-cols-11" :
-          columnsSize == 10 ? "lg:grid-cols-10" :
-            columnsSize == 9 ? "lg:grid-cols-9" :
-              columnsSize == 8 ? "lg:grid-cols-8" :
-                columnsSize == 7 ? "lg:grid-cols-7" :
-                  columnsSize == 6 ? "lg:grid-cols-6" :
-                    columnsSize == 5 ? "lg:grid-cols-5" :
-                      columnsSize == 4 ? "lg:grid-cols-4" :
-                        columnsSize == 3 ? "lg:grid-cols-3" : "grid-cols-2"} grid-cols-2 grid gap-1`}>
+      <div className={`${columns} grid gap-1`}>
         <div className='relative'>
-          <img src="/static/images/commercial_block1.png" alt="tmp" className="hover:border-primary hover:cursor-pointer rounded bg-base-300 border-2 flex flex-wrap content-center" />
+          <img src="/static/images/commercial_block1.png" alt="tmp" className="rounded-3xl hover:border-primary hover:cursor-pointer bg-base-300 border-2 flex flex-wrap content-center" />
           <Link passHref href="/mint">
-            <div className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded">
+            <div className="hover:cursor-pointer absolute inset-0 text-center flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-opacity-90 duration-300 hover:border-2 border-primary rounded-3xl">
               <h1 className="tracking-wider font-trash uppercase bg-black bg-opacity-60 rounded p-3 border-2 border-opacity-20" >
                 THIS IS NO NFT, IT`S A COMMERCIAL!!! CLICK TO MINT SOLJUNKS GEN2 NOW
               </h1>
             </div>
           </Link>
         </div>
-        {selectedCollection == "Show all collections" ? (
-          (nftList?.map((nft: any, index: any) => (
-            <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} setPfpMode={PfpMode} pfpMode={pfpMode} toPfpImage={addToPfpImage} />
-          )
-          ))
-        ) : (
-          (nfts?.map((nft: any, index: any) => (
-            (nft.updateAuthority == selectedCollection &&
-              <NftCard isConnectedWallet={isConnectedWallet} key={index} details={nft} onSelect={() => { }} toBurn={NFTstoBurn} toBurnChange={addNFTtoBurn} toBurnDelete={delNFTtoBurn} toSend={NFTstoSend} selectedMode={selectedMode} setRefresh={setRefresh} setPfpMode={PfpMode} pfpMode={pfpMode} toPfpImage={addToPfpImage} />
-            )
-          )
-          ))
-        )
-        }
-        <Link passHref href="/mint"><img src="/static/images/commercial_block1.png" alt="tmp" className="hover:border-primary hover:cursor-pointer rounded bg-base-300 border-2 flex flex-wrap content-center" /></Link>
+        {nftListToShow.map((nft, index) => (
+          <NftCard
+            isConnectedWallet={isConnectedWallet}
+            key={index}
+            details={nft}
+            onSelect={() => { }}
+            toBurn={NFTstoBurn}
+            toBurnChange={addNFTtoBurn}
+            toBurnDelete={delNFTtoBurn}
+            toSend={NFTstoSend}
+            selectedMode={selectedMode}
+            setRefresh={setRefresh}
+            setPfpMode={PfpMode}
+            pfpMode={pfpMode}
+            toPfpImage={addToPfpImage}
+          />
+        ))}
+        <Link passHref href="/mint">
+          <img src="/static/images/commercial_block1.png" alt="tmp" className="hover:border-primary hover:cursor-pointer rounded bg-base-300 border-2 flex flex-wrap content-center" />
+        </Link>
       </div>
     );
   };
@@ -605,7 +617,7 @@ const Wallet = () => {
   return (
     <div className="min-h-full">
       <div className="">
-        <div className="navbar sticky top-0 z-40 text-neutral-content flex justify-between bg-base-300">
+        <div className="navbar sticky top-0 z-0 text-neutral-content flex justify-between bg-base-300">
           <BuyButton />
           <div className="border-2 rounded-lg border-gray-700 w-5/12 text-center">
             <button className="hover:bg-gray-900 bg-base-300 rounded-l-md tooltip tooltip-left h-10 w-12" data-tip="Show a random wallet">
@@ -676,8 +688,6 @@ const Wallet = () => {
             <div className="p-2 text-center">
               <Animation images={["trashcan.png", "trashcan2.png"]} maxFrame={2} interval={500} />
             </div>
-
-
           </div>
 
           {/* CONTENT */}
@@ -850,7 +860,7 @@ const Wallet = () => {
                 </TabPanel>
 
                 <TabPanel>
-                  <div className={score <= 0 ? 'blur-sm' : ''}> {/* ---blur-sm---       wen junkScore is lower equal zero*/}
+                  <div className={score <= 0 ? '' : ''}> {/* ---blur-sm---       wen junkScore is lower equal zero*/}
                     <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Public Key:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData?.pubKey}</p></div>
                     <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Claimed:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.claimed}</p></div>
                     <div className="flex justify-between text-sm mx-2"><p className="font-trash uppercase">Name:&nbsp;</p><p className="font-trash uppercase">{walletUserAccountData.name}</p></div>
