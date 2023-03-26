@@ -80,7 +80,7 @@ const Discussion = () => {
       setCommentValue("")
       const user: any = publicKey?.toBase58()
       const n = "no name"
-      if (discussion.type == 8)
+      if (discussion[0].type == 8)
         SendDiscussion(fudility + `senddiscussion/${key}/9/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       else
         SendDiscussion(fudility + `senddiscussion/${key}/5/${n}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)

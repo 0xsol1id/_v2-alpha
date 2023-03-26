@@ -98,6 +98,7 @@ const Wallet = () => {
 
   const [value, setValue] = useState("")
   const [commentValue, setCommentValue] = useState("")
+  const [hiddenCommentValue, setHiddenCommentValue] = useState("")
   var randomWallet = randomWallets[randomInt(0, randomWallets.length)].Wallet //start with a random wallet from the list
 
   const onChange = async (e: any) => {
@@ -136,8 +137,8 @@ const Wallet = () => {
     }
   }
   const addHiddenComment = (com: any) => {
-    if (commentValue != "") {
-      setCommentValue("")
+    if (hiddenCommentValue != "") {
+      setHiddenCommentValue("")
       const user: any = publicKey?.toBase58()
       SendComment(fudility + `sendcomment/${key}/8/${walletUserAccountData.name}/${encodeURIComponent(com)}/${user}/${userAccountData.name}/${encodeURIComponent(userAccountData.pfp)}`)
       SendNotif(fudility + `sendnotif/${key}/1`)
@@ -220,6 +221,7 @@ const Wallet = () => {
   }
 
   const inputRef = useRef<any>(null);
+  const inputRefHiddenComment = useRef<any>(null);
 
   const [isBurnAllOpen, setIsBurnAllOpen] = useState(false);
   function toggleBurnAllModal() {
@@ -1003,7 +1005,7 @@ const Wallet = () => {
                     </div>
                   ) : (
                     <div className="">
-                      <div className='overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800'>
+                      <div className='overflow-auto h-[70vh] scrollbar border-2 rounded mt-1 mb-1 p-1 border-gray-800 font-trash uppercase'>
                         {comments.length > 0 ? (
                           (comments?.slice(0).reverse().map((num: any, index: any) => (
                             (num.type == 8 && num.writtenBy == publicKey?.toBase58() &&
@@ -1039,22 +1041,24 @@ const Wallet = () => {
                               </div>
                             )
                           )))) : (
-                          <h1 className="text-center">No hidden comments yet</h1>
+                          <h1 className="text-center font-trash uppercase">You have no conversations with this wallet</h1>
                         )
                         }
                       </div>
                       {publicKey ? (
-                        <div className="bg-base-300 w-full font-trash uppercase flex justify-between mt-5">
-                          <input
-                            ref={inputRef}
+                        <div className="bg-base-300 w-full font-trash uppercase flex justify-between mt-5 border-2 border-opacity-20 p-2 rounded-lg">
+                          <InputEmoji
                             type="text"
-                            value={commentValue}
-                            onChange={(e) => { setValue(e.target.value) }}
-                            placeholder="write DM"
-                            className="input w-full mr-5 input-bordered text-3xl"
-                            maxLength={150} />
-                          <h1 className='grid items-center mr-3 border-2 border-opacity-20 p-1 rounded-xl text-xs'>{commentValue.length}/150</h1>
-                          <button onClick={() => addHiddenComment(inputRef.current?.value)} className="btn btn-secondary mr-2">Send</button>
+                            value={hiddenCommentValue}
+                            onChange={setHiddenCommentValue}
+                            placeholder="Write a Comment"
+                            maxLength={150}
+                            onEnter={() => addHiddenComment(hiddenCommentValue)}
+                            borderColor="#EAEAEA"
+                            borderRadius={5}
+                          />
+                          <h1 className='grid items-center mr-3 text-xs'>{hiddenCommentValue.length}/150</h1>
+                          <button onClick={() => addHiddenComment(hiddenCommentValue)} className="btn btn-secondary mr-2">Send</button>
                         </div>
                       ) : (
                         <h1 className="bg-base-300 w-full font-trash uppercase p-2 flex justify-between mt-5 border-2 border-opacity-20 text-center rounded-lg">connect your wallet to write comments</h1>
@@ -1167,7 +1171,7 @@ const Wallet = () => {
         <CommercialAlert isDismissed={false} />
         <Footer />
 
-        
+
         <Modal
           isOpen={isBurnAllOpen}
           onRequestClose={toggleBurnAllModal}
