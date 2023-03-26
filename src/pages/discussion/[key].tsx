@@ -259,10 +259,22 @@ const Discussion = () => {
               <div className="font-trash navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
-                    <div className='flex'>DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+
+                      {discussion[0]?.type == "3" ? (
+                        <div className='flex'>WALLET DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                      ) : (
+                        (discussion[0]?.type == "4" ? (
+                          <div className='flex'>NFT DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                        ) : (
+                          <div className='flex'>DM DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                        )
+                        )
+                      )}
                 </div>
               </div>
+
               <div className='block justify-items-end'>
+
                 {discussion.length > 0 &&
                   <div id="Comments" className="p-2 border-b-2 border-opacity-20 font-trash uppercase bg-gray-900 bg-opacity-10">
                     <div className="flex justify-between">
