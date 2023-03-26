@@ -23,6 +23,7 @@ import { CommercialAlert } from "utils/CommercialAlert";
 import { ArrowCircleLeftIcon } from '@heroicons/react/solid';
 import { SideBar } from 'utils/sidebar';
 import { UserIcon } from '@heroicons/react/solid';
+import { BellIcon } from '@heroicons/react/solid';
 
 function convertTimestamp(timestamp: any) {
   var d = new Date(timestamp * 1000),
@@ -215,6 +216,21 @@ const Discussion = () => {
             }
           </div>
           <div className="flex">
+            <div className="border-2 border-opacity-20 rounded-lg mr-2">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/notfications`}>
+                  {userAccountData.notif == 1 ? (
+                    <span className="flex">
+                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
+                    </span>
+                  ) : (
+                    <div className=""><BellIcon className="w-8 h-8" /></div>
+                  )
+                  }
+                </Link>
+              </button>
+            </div>
             <div className="border-2 rounded-lg border-opacity-20">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
@@ -243,22 +259,10 @@ const Discussion = () => {
               <div className="font-trash navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
                 <div className=''>
                   <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
-
-                      {discussion[0].type == "3" ? (
-                        <div className='flex'>WALLET DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
-                      ) : (
-                        (discussion[0].type == "4" ? (
-                          <div className='flex'>NFT DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
-                        ) : (
-                          <div className='flex'>DM DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
-                        )
-                        )
-                      )}
+                    <div className='flex'>DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
                 </div>
               </div>
-
               <div className='block justify-items-end'>
-
                 {discussion.length > 0 &&
                   <div id="Comments" className="p-2 border-b-2 border-opacity-20 font-trash uppercase bg-gray-900 bg-opacity-10">
                     <div className="flex justify-between">

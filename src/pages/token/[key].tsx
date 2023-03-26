@@ -35,6 +35,7 @@ import { SideBar } from 'utils/sidebar';
 import { ReplyIcon } from '@heroicons/react/solid';
 import { UserIcon } from '@heroicons/react/solid';
 import { HeartIcon } from '@heroicons/react/solid';
+import { BellIcon } from '@heroicons/react/solid';
 const junks: any = LoadRarityFile(0)
 const smb: any = LoadRarityFile(1)
 const faces: any = LoadRarityFile(2)
@@ -715,6 +716,21 @@ const Token = () => {
             }
           </div>
           <div className="flex">
+            <div className="border-2 border-opacity-20 rounded-lg mr-2">
+              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
+                <Link passHref href={`/notfications`}>
+                  {userAccountData.notif == 1 ? (
+                    <span className="flex">
+                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
+                    </span>
+                  ) : (
+                    <div className=""><BellIcon className="w-8 h-8" /></div>
+                  )
+                  }
+                </Link>
+              </button>
+            </div>
             <div className="border-2 rounded-lg border-opacity-20">
               <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
                 <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
