@@ -823,7 +823,7 @@ const Wallet = () => {
 
                 <TabPanel>
                   <div>
-                    <button onClick={() => GetComments(fudility + `getcomments/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+                    <button onClick={() => GetComments(fudility + `getcomments/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Comments">
                       <img src="/static/images/buttons/refresh.png" alt="tmp" />
                     </button>
                     <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vh]">

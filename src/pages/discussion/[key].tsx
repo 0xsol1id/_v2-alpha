@@ -283,7 +283,7 @@ const Discussion = () => {
                       )
                     )}
                   </div>
-                    <button onClick={() => GetCourseOfDiscussion(fudility + `getcourseofdiscussion/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+                    <button onClick={() => GetCourseOfDiscussion(fudility + `getcourseofdiscussion/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Discussion">
                       <img src="/static/images/buttons/refresh.png" alt="tmp" />
                     </button>
                 </div>
