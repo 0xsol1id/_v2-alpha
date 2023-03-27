@@ -215,32 +215,44 @@ const Discussion = () => {
             )
             }
           </div>
-          <div className="flex">
-            <div className="border-2 border-opacity-20 rounded-lg mr-2">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/notfications`}>
-                  {userAccountData.notif == 1 ? (
-                    <span className="flex">
-                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
-                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
-                    </span>
-                  ) : (
-                    <div className=""><BellIcon className="w-8 h-8" /></div>
-                  )
-                  }
-                </Link>
-              </button>
+          <div className="grid">
+            <div className="flex">
+              <div className="rounded-lg mr-2">
+                <a className="hover:cursor-pointer hover:text-red-500 rounded-sm w-full tooltip tooltip-left font-trash" data-tip="NOTFICATIONS">
+                  <Link passHref href={`/notfications`}>
+                    {userAccountData.notif == 1 ? (
+                      <span className="flex">
+                        <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                        <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500 hover:text-primary" /></span>
+                      </span>
+                    ) : (
+                      <div className=""><BellIcon className="w-8 h-8 hover:text-primary" /></div>
+                    )
+                    }
+                  </Link>
+                </a>
+              </div>
+              <div className="hover:cursor-pointer hover:text-red-500 mr-2 tooltip tooltip-left font-trash" data-tip="YOUR ACCOUNT">
+                <a className="rounded-sm hover:bg-gray-800 w-full">
+                  <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                    <div className='w-full flex justify-between items-center'>
+                      <UserIcon className="w-8 h-8 hover:text-primary" />
+                    </div>
+                  </Link>
+                </a>
+              </div>
+              <ConnectWallet />
             </div>
-            <div className="border-2 rounded-lg border-opacity-20">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                  <div className='w-full flex justify-between items-center'>
-                    <UserIcon className="w-8 h-8" />
-                  </div>
-                </Link>
-              </button>
+            <div className="artboard tooltip font-trash tooltip-left" data-tip="RANK">
+              <progress className={` ${userAccountData.score >= 10 ? "progress-warning" :
+                userAccountData.score >= 30 ? "progress-success" :
+                  userAccountData.score >= 50 ? "progress-error" :
+                    userAccountData.score >= 70 ? "progress-info" :
+                      userAccountData.score >= 100 ? "progress-secondary" :
+                        "progress-error"} progress border-2 border-opacity-10`}
+                value={userAccountData.score} max="100">
+              </progress>
             </div>
-            <ConnectWallet />
           </div>
         </div>
 
@@ -257,24 +269,26 @@ const Discussion = () => {
           <div className="col-span-11 mr-5">
             <div className="scrollbar overflow-auto h-[75vh] border-2 border-opacity-20 ">
               <div className="font-trash navbar sticky top-0 z-40 text-neutral-content flex justify-between gap-2 bg-base-300 bg-opacity-50 backdrop-blur border-b-2 border-opacity-20">
-                <div className=''>
-                  <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
-
-                      {discussion[0]?.type == "3" ? (
-                        <div className='flex'>WALLET DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                <div className='flex justify-between'>
+                  <div className='flex'>
+                    <button onClick={() => router.back()}><ArrowCircleLeftIcon className='w-8 h-8 text-white mr-2' /></button>
+                    {discussion[0]?.type == "3" ? (
+                      <div className='flex'>WALLET DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                    ) : (
+                      (discussion[0]?.type == "4" ? (
+                        <div className='flex'>NFT DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
                       ) : (
-                        (discussion[0]?.type == "4" ? (
-                          <div className='flex'>NFT DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
-                        ) : (
-                          <div className='flex'>DM DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
-                        )
-                        )
-                      )}
+                        <div className='flex'>DM DISCUSSION <div className='text-gray-500 ml-2'>#{key}</div></div>
+                      )
+                      )
+                    )}
+                  </div>
+                    <button onClick={() => GetCourseOfDiscussion(fudility + `getcourseofdiscussion/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+                      <img src="/static/images/buttons/refresh.png" alt="tmp" />
+                    </button>
                 </div>
               </div>
-
               <div className='block justify-items-end'>
-
                 {discussion.length > 0 &&
                   <div id="Comments" className="p-2 border-b-2 border-opacity-20 font-trash uppercase bg-gray-900 bg-opacity-10">
                     <div className="flex justify-between">
@@ -361,7 +375,7 @@ const Discussion = () => {
           </div>
         </div>
 
-        <CommercialAlert isDismissed={false} />
+        {/*<CommercialAlert isDismissed={false} />*/}
         <Footer />
       </div>
     </div>

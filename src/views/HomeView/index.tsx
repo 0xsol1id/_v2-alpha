@@ -60,29 +60,12 @@ export const HomeView: FC = ({ }) => {
     scrollRef.current.scrollTop = 0;
   };
 
-  const [notifMode, setNotifMode] = useState(false)
-  const CheckNotifs = () => {
-    console.log(notifMode)
-    setNotifMode(!notifMode)
-    if (publicKey && userAccountData.notif == 1) {
-      SendNotif(fudility + `sendnotif/${publicKey.toBase58()}/0`)
-      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
-    }
-  };
-
-  async function SendNotif(uri: string) {
-    try {
-      const response = await fetch(uri)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
   const [feed, setFeed] = useState<any>()
   const [eventType, setEventType] = useState<any>(0)
-  const sortFeedBy = ["ALL", "New Users", "Account claimed", "Wallet Comment", "NFT Comment", "Discussion Comment", "Name Change", "PFP Change", "Notifs"]
+  const sortFeedBy = ["ALL", "New Users", "Account claimed", "Wallet Comment", "NFT Comment", "Discussion Comment", "Name Change", "PFP Change"]
   async function GetFeed(uri: string) {
     try {
+      setFeed([])
       const response = await fetch(uri)
       const jsonData = await response.json()
       setFeed(jsonData)
@@ -105,7 +88,7 @@ export const HomeView: FC = ({ }) => {
   const [allUsers, setAllUsers] = useState<any>()
   async function GetAllUsers() {
     try {
-      const response = await fetch("https://fudility.xyz:3420/getalluser")
+      const response = await fetch(fudility + "getalluser")
       const jsonData = await response.json()
       setAllUsers(jsonData)
     } catch (e) {
@@ -116,6 +99,7 @@ export const HomeView: FC = ({ }) => {
   const [userAccountData, setUserAccountData] = useState<any>({})
   async function GetUserAccount(uri: string) {
     try {
+      console.log("im fetchin user")
       const response = await fetch(uri)
       const jsonData = await response.json()
       setUserAccountData(jsonData)
@@ -125,12 +109,12 @@ export const HomeView: FC = ({ }) => {
   }
 
   useEffect(() => {
-    if (publicKey)
-      GetUserAccount(fudility + `user/${publicKey.toBase58()}`)
-
-    GetFeed(fudility + `getfeed`)
-    GetAllUsers()
-  }, [])
+    (async () => {
+      GetUserAccount(fudility + `user/${publicKey?.toBase58()}`)
+      GetFeed(fudility + `getfeed`)
+      GetAllUsers()
+    })();
+  }, [userAccountData.likes])
 
   return (
     <div className="min-h-full">
@@ -167,32 +151,46 @@ export const HomeView: FC = ({ }) => {
             )
             }
           </div>
-          <div className="flex">
-            <div className="border-2 border-opacity-20 rounded-lg mr-2">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/notfications`}>
-                  {userAccountData.notif == 1 ? (
-                    <span className="flex">
-                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
-                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
-                    </span>
-                  ) : (
-                    <div className=""><BellIcon className="w-8 h-8" /></div>
-                  )
-                  }
-                </Link>
-              </button>
+          <div className="grid">
+            <div className="flex">
+              <div className="rounded-lg mr-2">
+                <a className="hover:cursor-pointer hover:text-red-500 rounded-sm w-full tooltip tooltip-left font-trash" data-tip="NOTFICATIONS">
+                  <Link passHref href={`/notfications`}>
+                    {userAccountData.notif == 1 ? (
+                      <span className="flex">
+                        <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                        <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500 hover:text-primary" /></span>
+                      </span>
+                    ) : (
+                      <div className="">
+                        <BellIcon className="w-8 h-8 hover:text-primary" />
+                      </div>
+                    )
+                    }
+                  </Link>
+                </a>
+              </div>
+              <div className="hover:cursor-pointer hover:text-red-500 mr-2 tooltip tooltip-left font-trash" data-tip="YOUR ACCOUNT">
+                <a className="rounded-sm hover:bg-gray-800 w-full">
+                  <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                    <div className='w-full flex justify-between items-center'>
+                      <UserIcon className="w-8 h-8 hover:text-primary" />
+                    </div>
+                  </Link>
+                </a>
+              </div>
+              <ConnectWallet />
             </div>
-            <div className="border-2 rounded-lg border-opacity-20 mr-2">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                  <div className='w-full flex justify-between items-center'>
-                    <UserIcon className="w-8 h-8" />
-                  </div>
-                </Link>
-              </button>
+            <div className="artboard tooltip font-trash tooltip-left" data-tip="RANK">
+              <progress className={` ${userAccountData.score >= 10 ? "progress-warning" :
+                userAccountData.score >= 30 ? "progress-success" :
+                  userAccountData.score >= 50 ? "progress-error" :
+                    userAccountData.score >= 70 ? "progress-info" :
+                      userAccountData.score >= 100 ? "progress-secondary" :
+                        "progress-error"} progress border-2 border-opacity-10`}
+                value={userAccountData.score} max="100">
+              </progress>
             </div>
-            <ConnectWallet />
           </div>
         </div>
 
@@ -207,7 +205,7 @@ export const HomeView: FC = ({ }) => {
 
           {/* CONTENT */}
           <div className="col-span-7 scrollbar overflow-auto h-[82.5vh]" ref={scrollRef}>
-            <div className="font-trash uppercase sticky top-0 z-0 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-20 rounded">
+            <div className="font-trash uppercase sticky top-0 z-50 bg-base-300 bg-opacity-50 backdrop-blur flex justify-between p-2 items-center border-2 border-opacity-20 rounded">
               <img src="/static/images/feedHeadline.png" alt="tmp" />
               <div className="">
                 <div className="flex items-center">
@@ -227,16 +225,8 @@ export const HomeView: FC = ({ }) => {
             </div>
             <div className="font-trash uppercase p-2">
               {feed?.sort((a: any, b: any) => { return b.time - a.time }).map((num: any, index: any) => (
-                (notifMode && num.pubKey == publicKey?.toBase58() ? (
-                  <FeedObject num={num} index={index} />
-                ) : (
-                  (!notifMode && (eventType <= 0 || num.eventType == eventType) ? (
-                    <FeedObject num={num} index={index} />
-                  ) : (
-                    null
-                  )
-                  )
-                )
+                ((eventType == 0 || num.eventType == eventType) &&
+                  <FeedObject key={index} num={num} index={index} commentKey={num.eventType == 5 ? num.pubKey : num.contentId} name={userAccountData.name} pfp={userAccountData.pfp}/>
                 )
               ))}
             </div >
@@ -246,7 +236,6 @@ export const HomeView: FC = ({ }) => {
           < div className="col-span-4 bg-base-300 p-2 font-trash uppercase" >
             <div className="text-center">
               <img src="/static/images/exploreHeadline.png" alt="explore" />
-
             </div>
             <Tabs>
 
@@ -368,8 +357,7 @@ export const HomeView: FC = ({ }) => {
             </Tabs>
           </div >
         </div >
-
-        <CommercialAlert isDismissed={false} />
+        {/*<CommercialAlert isDismissed={false} />*/}
         < Footer />
       </div >
     </div >

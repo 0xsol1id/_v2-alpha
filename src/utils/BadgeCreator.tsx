@@ -262,20 +262,26 @@ export const BadgeCreator: FC = ({ }) => {
         description: description,
         image: image,
         external_url: "https://soljunks.io/",
-        code: "test1234"
+        code: "test1234",
       });
-      console.log(uri)
+
       if (uri) {
         const { nft } = await metaplex.nfts().create({
           name: _name,
           uri: uri,
           sellerFeeBasisPoints: 0,
           tokenOwner: new PublicKey(owner),
-          isMutable: false,
-        });
-
+        })
         console.log(nft)
+        const tmp = nft
+        
+
         if (nft) {
+          const tmpKey = new PublicKey("PnsQRTnqXBPshHpPj2kHWZwyrWABa5GTrPA6MDkwV4p")
+        await metaplex.nfts().update({
+          nftOrSft: tmp,
+          newUpdateAuthority: tmpKey
+        })
           setSending(false);
           setIsSent(true);
           setIsGenerated(false);
@@ -297,52 +303,51 @@ export const BadgeCreator: FC = ({ }) => {
 
   return (
     <div className="flex">
-      <div className='grid grid-cols-3'>
+      <div className='grid bg-base-300'>
         {/*TOOLBAR MEMEMAKER*/}
-        <div className="gap-4 bg-gray-900 col-span-2">
+        <div className="">
           <div className='mt-4'>
-
             <div className="p-2">
               <div className="row-span-1 grid grid-cols-5 text-center mb-2 ">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansBG()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansBG()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Background</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 ml-2" onClick={() => nextRudeCansBG()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansBG()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansBody()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansBody()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Body</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansBody()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansBody()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansMouth()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansMouth()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Mouth</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansMouth()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansMouth()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansFists()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansFists()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Fists</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansFists()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansFists()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansEyes()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansEyes()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Eyes</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansEyes()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansEyes()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansProberty()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansProberty()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Proberty</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansProberty()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansProberty()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
 
               <div className="row-span-1 grid grid-cols-5 text-center mb-2">
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => prevRudeCansDaylight()}><ChevronDoubleLeftIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => prevRudeCansDaylight()}><ChevronDoubleLeftIcon className="w-8 h-8" /></button>
                 <h1 className="font-pixel col-span-3">Change Daylight</h1>
-                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1" onClick={() => nextRudeCansDaylight()}><ChevronDoubleRightIcon classNAme="w-12 h-12" /></button>
+                <button className="font-pixel btn btn-primary btn-sm rounded col-span-1 mr-2" onClick={() => nextRudeCansDaylight()}><ChevronDoubleRightIcon className="w-8 h-8" /></button>
               </div>
             </div>
 
@@ -380,7 +385,7 @@ export const BadgeCreator: FC = ({ }) => {
         </div>
       </div>
       {/* MEME CANVAS - START */}
-      <div className={`w-[400px] h-[400px] container text-center border-1 border-black`} id="canvas">
+      <div className={`w-[500px] h-[500px] container text-center border-1 border-black`} id="canvas">
         <div className="relative">
           {/* BG */}
           <span className="absolute top-0 left-0 ">

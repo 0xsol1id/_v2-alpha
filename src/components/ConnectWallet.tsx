@@ -35,12 +35,12 @@ export const ConnectWallet: FC = () => {
     <div>
       {!wallet &&
         <div className="grid items-center">
-          <input type="checkbox" className="toggle tooltip tooltip-left font-trash uppercase" data-tip="Connect Wallet" onClick={handleWalletClick} />
+          <input type="checkbox" className="toggle tooltip tooltip-left font-trash uppercase mt-2" data-tip="Connect Wallet" onClick={handleWalletClick} />
         </div>
       }
       {publicKey &&
         <div className="grid items-center">
-          <input type="checkbox" className="toggle toggle-secondary tooltip tooltip-left font-trash uppercase" data-tip="Disconnect Wallet" onClick={disconnect} checked />
+          <input type="checkbox" className="toggle toggle-secondary tooltip tooltip-left font-trash uppercase mt-2" data-tip="Disconnect Wallet" onClick={disconnect} checked />
         </div>
       }
     </div>

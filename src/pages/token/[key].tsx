@@ -715,32 +715,44 @@ const Token = () => {
             )
             }
           </div>
-          <div className="flex">
-            <div className="border-2 border-opacity-20 rounded-lg mr-2">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/notfications`}>
-                  {userAccountData.notif == 1 ? (
-                    <span className="flex">
-                      <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
-                      <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500" /></span>
-                    </span>
-                  ) : (
-                    <div className=""><BellIcon className="w-8 h-8" /></div>
-                  )
-                  }
-                </Link>
-              </button>
+          <div className="grid">
+            <div className="flex">
+              <div className="rounded-lg mr-2">
+                <a className="hover:cursor-pointer hover:text-red-500 rounded-sm w-full tooltip tooltip-left font-trash" data-tip="NOTFICATIONS">
+                  <Link passHref href={`/notfications`}>
+                    {userAccountData.notif == 1 ? (
+                      <span className="flex">
+                        <span className="animate-ping absolute inline-flex h-8 w-8 opacity-75"><BellIcon className="w-8 h-8 text-red-500" /></span>
+                        <span className="relative inline-flex h-8 w-8 "><BellIcon className="w-8 h-8 text-red-500 hover:text-primary" /></span>
+                      </span>
+                    ) : (
+                      <div className=""><BellIcon className="w-8 h-8 hover:text-primary" /></div>
+                    )
+                    }
+                  </Link>
+                </a>
+              </div>
+              <div className="hover:cursor-pointer hover:text-red-500 mr-2 tooltip tooltip-left font-trash" data-tip="YOUR ACCOUNT">
+                <a className="rounded-sm hover:bg-gray-800 w-full">
+                  <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
+                    <div className='w-full flex justify-between items-center'>
+                      <UserIcon className="w-8 h-8 hover:text-primary" />
+                    </div>
+                  </Link>
+                </a>
+              </div>
+              <ConnectWallet />
             </div>
-            <div className="border-2 rounded-lg border-opacity-20">
-              <button className="btn btn-ghost rounded-sm hover:bg-gray-800 w-full">
-                <Link passHref href={`/wallet/${publicKey?.toBase58()}`}>
-                  <div className='w-full flex justify-between items-center'>
-                    <UserIcon className="w-8 h-8" />
-                  </div>
-                </Link>
-              </button>
+            <div className="artboard tooltip font-trash tooltip-left" data-tip="RANK">
+              <progress className={` ${userAccountData.score >= 10 ? "progress-warning" :
+                userAccountData.score >= 30 ? "progress-success" :
+                  userAccountData.score >= 50 ? "progress-error" :
+                    userAccountData.score >= 70 ? "progress-info" :
+                      userAccountData.score >= 100 ? "progress-secondary" :
+                        "progress-error"} progress border-2 border-opacity-10`}
+                value={userAccountData.score} max="100">
+              </progress>
             </div>
-            <ConnectWallet />
           </div>
         </div>
 
@@ -797,56 +809,61 @@ const Token = () => {
               </TabList>
 
               <TabPanel>
-                <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vh]">
-                  {comments.length > 0 ? (
-                    (comments?.slice(0).reverse().map((num: any, index: any) => (
-                      (num.type != "8" &&
-                        <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
-                          <div className="flex justify-between">
-                            <div className="flex">
-                              <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
-                                <Link passHref href={`/wallet/${num.writtenBy}`}>
-                                  <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
-                                </Link>
+                <div>
+                  <button onClick={() => GetComments(fudility + `getcomments/${key}`)} className="btn btn-ghost tooltip tooltip-left text-2xl" data-tip="Refresh Feed">
+                    <img src="/static/images/buttons/refresh.png" alt="tmp" />
+                  </button>
+                  <div className="font-trash uppercase p-2 overflow-auto scrollbar h-[70vh]">
+                    {comments.length > 0 ? (
+                      (comments?.slice(0).reverse().map((num: any, index: any) => (
+                        (num.type != "8" &&
+                          <div key={index} id="Comments" className="bg-base-300 w-full rounded-lg p-2 mb-2 border-2 border-opacity-20">
+                            <div className="flex justify-between">
+                              <div className="flex">
+                                <div className="font-trash uppercase w-full hover:text-red-500 hover:cursor-pointer">
+                                  <Link passHref href={`/wallet/${num.writtenBy}`}>
+                                    <div>{num.writtenBy.slice(0, 4)}...{num.writtenBy.slice(-4)}</div>
+                                  </Link>
+                                </div>
+                                <h1 className='ml-2'>said:</h1>
                               </div>
-                              <h1 className='ml-2'>said:</h1>
+                              <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
                             </div>
-                            <ReactTimeAgo date={num.time} locale="en-US" timeStyle="round" className="uppercase text-gray-500" />
+                            <div className='flex justify-between'>
+                              <h1 className="">{num.content}</h1>
+                              <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
+                                <Link passHref href={`/discussion/${num._id}`}>
+                                  <ReplyIcon className="w-6 h-6" />
+                                </Link>
+                              </button>
+                            </div>
                           </div>
-                          <div className='flex justify-between'>
-                            <h1 className="">{num.content}</h1>
-                            <button className="rounded hover:bg-gray-800 w-8 p-1 text-center">
-                              <Link passHref href={`/discussion/${num._id}`}>
-                                <ReplyIcon className="w-6 h-6" />
-                              </Link>
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    )))) : (
-                    <h1 className="text-center">Be the first who writes a comments on this</h1>
+                        )
+                      )))) : (
+                      <h1 className="text-center">Be the first who writes a comments on this</h1>
+                    )
+                    }
+                  </div>
+                  {publicKey ? (
+                    <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-20 p-1 rounded-lg">
+                      <InputEmoji
+                        type="text"
+                        value={commentValue}
+                        onChange={setCommentValue}
+                        placeholder="Write a Comment"
+                        maxLength={150}
+                        onEnter={() => addComment(commentValue)}
+                        borderColor="#EAEAEA"
+                        borderRadius={5}
+                      />
+                      <h1 className='grid items-center mr-3 text-xs'>{commentValue.length}/150</h1>
+                      <button onClick={() => addComment(commentValue)} className="btn btn-secondary mr-2">Send</button>
+                    </div>
+                  ) : (
+                    <h1 className="bg-base-300 w-full font-trash uppercase p-2 flex justify-between mt-5 border-2 border-opacity-20 text-center rounded-lg">connect your wallet to write comments</h1>
                   )
                   }
                 </div>
-                {publicKey ? (
-                  <div className="bg-base-300 w-full font-trash flex justify-between mt-5 border-2 border-opacity-20 p-1 rounded-lg">
-                    <InputEmoji
-                      type="text"
-                      value={commentValue}
-                      onChange={setCommentValue}
-                      placeholder="Write a Comment"
-                      maxLength={150}
-                      onEnter={() => addComment(commentValue)}
-                      borderColor="#EAEAEA"
-                      borderRadius={5}
-                    />
-                    <h1 className='grid items-center mr-3 text-xs'>{commentValue.length}/150</h1>
-                    <button onClick={() => addComment(commentValue)} className="btn btn-secondary mr-2">Send</button>
-                  </div>
-                ) : (
-                  <h1 className="bg-base-300 w-full font-trash uppercase p-2 flex justify-between mt-5 border-2 border-opacity-20 text-center rounded-lg">connect your wallet to write comments</h1>
-                )
-                }
               </TabPanel>
 
               <TabPanel>
@@ -1109,7 +1126,7 @@ const Token = () => {
           </div>
         </div>
 
-        <CommercialAlert isDismissed={false} />
+        {/*<CommercialAlert isDismissed={false} />*/}
         <Footer />
       </div>
     </div>
